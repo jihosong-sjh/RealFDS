@@ -107,22 +107,22 @@
 
 **목표**: Python 프로젝트 설정, 거래 생성 로직, Kafka Producer 구현 및 Dockerfile 작성
 
-- [ ] T009 transaction-generator 디렉토리 및 기본 구조 생성
+- [X] T009 transaction-generator 디렉토리 및 기본 구조 생성
   - transaction-generator/src/, tests/, requirements.txt, Dockerfile, README.md
   - 한국어로 서비스 목적 설명하는 README.md 작성
 
-- [ ] T010 [P] requirements.txt 작성 및 의존성 정의
+- [X] T010 [P] requirements.txt 작성 및 의존성 정의
   - transaction-generator/requirements.txt
   - confluent-kafka, python-dotenv, faker (가상 데이터 생성용)
   - pytest, pytest-kafka (테스트용)
 
-- [ ] T011 [P] Transaction 데이터 모델 정의
+- [X] T011 [P] Transaction 데이터 모델 정의
   - transaction-generator/src/models.py
   - Transaction 클래스 (transactionId, userId, amount, currency, countryCode, timestamp, schemaVersion)
   - 한국어 주석으로 필드 설명
   - to_dict() 메서드로 JSON 직렬화
 
-- [ ] T012 거래 생성 로직 구현
+- [X] T012 거래 생성 로직 구현
   - transaction-generator/src/generator.py
   - generate_transaction() 함수: 무작위 Transaction 객체 생성
   - 금액: 정규 분포 (평균 300,000원, 표준편차 200,000원, 1,000~1,500,000 범위)
@@ -130,7 +130,7 @@
   - 사용자: user-1 ~ user-10 균등 분포
   - 한국어 주석으로 로직 설명
 
-- [ ] T013 Kafka Producer 구현
+- [X] T013 Kafka Producer 구현
   - transaction-generator/src/kafka_producer.py
   - TransactionProducer 클래스
   - __init__: Kafka 설정 및 Producer 초기화
@@ -138,14 +138,14 @@
   - 에러 핸들링 (Kafka 연결 실패, 메시지 발행 실패)
   - 한국어 주석으로 구현 설명
 
-- [ ] T014 메인 진입점 구현
+- [X] T014 메인 진입점 구현
   - transaction-generator/src/main.py
   - 환경 변수 로드 (KAFKA_BOOTSTRAP_SERVERS, TRANSACTION_GENERATION_INTERVAL_MS)
   - 무한 루프에서 주기적으로 거래 생성 및 Kafka로 발행
   - INFO 레벨 로깅 (거래 생성 시 transactionId, userId, amount 출력)
   - 한국어 로그 메시지
 
-- [ ] T015 [P] 단위 테스트 작성 - generator.py
+- [X] T015 [P] 단위 테스트 작성 - generator.py
   - transaction-generator/tests/test_generator.py
   - test_generate_transaction_fields(): 모든 필수 필드 존재 확인
   - test_amount_in_range(): 금액이 1,000~1,500,000 범위인지 확인
@@ -153,14 +153,14 @@
   - test_user_id_valid(): userId가 user-1 ~ user-10 범위인지 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T016 [P] 단위 테스트 작성 - kafka_producer.py
+- [X] T016 [P] 단위 테스트 작성 - kafka_producer.py
   - transaction-generator/tests/test_kafka_producer.py
   - test_send_transaction_success(): Mock Producer로 정상 발행 확인
   - test_send_transaction_serialization(): JSON 직렬화 검증
   - test_send_transaction_kafka_error(): Kafka 연결 실패 시 에러 핸들링 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T017 Dockerfile 작성
+- [X] T017 Dockerfile 작성
   - transaction-generator/Dockerfile
   - 베이스 이미지: python:3.11-slim
   - requirements.txt 복사 및 의존성 설치
@@ -168,7 +168,7 @@
   - CMD: python src/main.py
   - 한국어 주석으로 단계 설명
 
-- [ ] T018 docker-compose.yml에 transaction-generator 서비스 추가
+- [X] T018 docker-compose.yml에 transaction-generator 서비스 추가
   - build: ./transaction-generator
   - depends_on: kafka
   - environment: KAFKA_BOOTSTRAP_SERVERS, TRANSACTION_GENERATION_INTERVAL_MS
