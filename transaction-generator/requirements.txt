@@ -1,0 +1,16 @@
+# Kafka 클라이언트 라이브러리
+confluent-kafka==2.3.0
+
+# 환경 변수 로드
+python-dotenv==1.0.0
+
+# 가상 데이터 생성 (사용자 이름, 국가 코드 등)
+faker==22.0.0
+
+# 구조화된 로깅
+loguru==0.7.2
+
+# 테스트 의존성
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0

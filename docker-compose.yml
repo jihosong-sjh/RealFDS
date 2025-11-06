@@ -65,6 +65,23 @@ services:
     networks:
       - realfds-network
 
+  # Transaction Generator: 가상 거래 데이터 생성 및 Kafka 발행 (Python)
+  transaction-generator:
+    build:
+      context: ./transaction-generator
+      dockerfile: Dockerfile
+    container_name: realfds-transaction-generator
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092  # Kafka 브로커 주소
+      TRANSACTION_GENERATION_INTERVAL_MS: 1000  # 거래 생성 주기 (1초)
+      TRANSACTION_TOPIC: virtual-transactions  # 발행 토픽명
+    mem_limit: 256m
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
 # 네트워크 정의: 모든 서비스가 동일한 네트워크에서 통신
 networks:
   realfds-network:
