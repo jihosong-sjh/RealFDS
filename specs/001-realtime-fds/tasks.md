@@ -182,58 +182,58 @@
 
 **목표**: Flink (Scala) 프로젝트 설정, `transactions` 토픽 구독, 간단한 필터링(예: 고액 거래만) 로직 구현, `alerts` 토픽으로 발행, Dockerfile 작성
 
-- [ ] T019 fraud-detector 디렉토리 및 Gradle 프로젝트 생성
+- [X] T019 fraud-detector 디렉토리 및 Gradle 프로젝트 생성
   - fraud-detector/build.gradle, settings.gradle, src/main/scala/, src/test/scala/, README.md
   - Scala 2.12, Flink 1.18.1 의존성 추가
   - 한국어로 서비스 목적 설명하는 README.md 작성
 
-- [ ] T020 [P] build.gradle 작성 및 의존성 정의
+- [X] T020 [P] build.gradle 작성 및 의존성 정의
   - fraud-detector/build.gradle
   - Flink Scala API, Flink Kafka Connector, Jackson (JSON 처리)
   - ScalaTest (테스트용)
   - 한국어 주석으로 의존성 설명
 
-- [ ] T021 [P] Transaction 케이스 클래스 정의
+- [X] T021 [P] Transaction 케이스 클래스 정의
   - fraud-detector/src/main/scala/com/realfds/detector/models/Transaction.scala
   - 필드: schemaVersion, transactionId, userId, amount, currency, countryCode, timestamp
   - 한국어 주석으로 필드 설명
 
-- [ ] T022 [P] Alert 케이스 클래스 정의
+- [X] T022 [P] Alert 케이스 클래스 정의
   - fraud-detector/src/main/scala/com/realfds/detector/models/Alert.scala
   - 필드: schemaVersion, alertId, originalTransaction, ruleType, ruleName, reason, severity, alertTimestamp
   - 한국어 주석으로 필드 설명
 
-- [ ] T023 Kafka 직렬화/역직렬화 스키마 구현
+- [X] T023 Kafka 직렬화/역직렬화 스키마 구현
   - fraud-detector/src/main/scala/com/realfds/detector/serde/TransactionDeserializationSchema.scala
   - Jackson ObjectMapper로 JSON → Transaction 변환
   - 한국어 주석으로 구현 설명
 
-- [ ] T024 [P] Kafka 직렬화 스키마 구현
+- [X] T024 [P] Kafka 직렬화 스키마 구현
   - fraud-detector/src/main/scala/com/realfds/detector/serde/AlertSerializationSchema.scala
   - Jackson ObjectMapper로 Alert → JSON 변환
   - 한국어 주석으로 구현 설명
 
-- [ ] T025 HighValueRule 구현 (고액 거래 탐지)
+- [X] T025 HighValueRule 구현 (고액 거래 탐지)
   - fraud-detector/src/main/scala/com/realfds/detector/rules/HighValueRule.scala
   - FilterFunction[Transaction] 상속
   - filter() 메서드: amount > 1,000,000 조건 확인
   - 한국어 주석으로 비즈니스 로직 설명
 
-- [ ] T026 HighValueRule Alert 생성 로직 구현
+- [X] T026 HighValueRule Alert 생성 로직 구현
   - fraud-detector/src/main/scala/com/realfds/detector/rules/HighValueRule.scala
   - toAlert() 메서드: Transaction → Alert 변환
   - ruleName: "HIGH_VALUE", ruleType: "SIMPLE_RULE", severity: "HIGH"
   - reason: "고액 거래 (100만원 초과): {amount}원"
   - 한국어 주석으로 설명
 
-- [ ] T027 [P] 단위 테스트 작성 - HighValueRule
+- [X] T027 [P] 단위 테스트 작성 - HighValueRule
   - fraud-detector/src/test/scala/com/realfds/detector/rules/HighValueRuleTest.scala
   - test_filter_high_value_transaction(): 100만원 초과 거래 필터링 확인
   - test_filter_normal_transaction(): 100만원 이하 거래 미필터링 확인
   - test_to_alert_fields(): Alert 필드 정확성 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T028 Flink Job 진입점 구현 (1단계: 고액 거래만)
+- [X] T028 Flink Job 진입점 구현 (1단계: 고액 거래만)
   - fraud-detector/src/main/scala/com/realfds/detector/FraudDetectionJob.scala
   - StreamExecutionEnvironment 초기화
   - Kafka Source: `virtual-transactions` 토픽 구독
@@ -243,26 +243,26 @@
   - 체크포인트 설정 (60초마다)
   - 한국어 주석으로 Flink Job 구조 설명
 
-- [ ] T029 application.conf 설정 파일 작성
+- [X] T029 application.conf 설정 파일 작성
   - fraud-detector/src/main/resources/application.conf
   - Kafka 브로커 주소, 토픽명, 컨슈머 그룹 ID
   - 환경 변수로 오버라이드 가능하도록 설정
   - 한국어 주석으로 설정 설명
 
-- [ ] T030 [P] logback.xml 설정 파일 작성
+- [X] T030 [P] logback.xml 설정 파일 작성
   - fraud-detector/src/main/resources/logback.xml
   - JSON 레이아웃 사용 (구조화된 로깅)
   - INFO 레벨 이상 로그 출력
   - 한국어 주석으로 로그 설정 설명
 
-- [ ] T031 Dockerfile 작성
+- [X] T031 Dockerfile 작성
   - fraud-detector/Dockerfile
   - Multi-stage build: Gradle 빌드 → 실행 이미지 분리
   - 베이스 이미지: flink:1.18-scala_2.12-java11
   - JAR 파일 복사 및 Flink Job 실행
   - 한국어 주석으로 단계 설명
 
-- [ ] T032 docker-compose.yml에 fraud-detector 서비스 추가
+- [X] T032 docker-compose.yml에 fraud-detector 서비스 추가
   - build: ./fraud-detector
   - depends_on: kafka, jobmanager
   - environment: KAFKA_BOOTSTRAP_SERVERS, HIGH_VALUE_THRESHOLD
