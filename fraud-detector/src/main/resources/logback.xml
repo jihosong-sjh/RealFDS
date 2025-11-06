@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fraud Detector Logback Configuration
+  실시간 금융 거래 탐지 시스템 로깅 설정
+
+  로그 레벨: TRACE < DEBUG < INFO < WARN < ERROR
+
+  환경 변수:
+  - LOG_LEVEL: 로그 레벨 설정 (기본값: INFO)
+-->
+<configuration>
+
+    <!-- 환경 변수에서 로그 레벨 읽기 (기본값: INFO) -->
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}" />
+
+    <!-- 로그 패턴 정의 -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <!-- JSON 로그 패턴 (구조화된 로깅) -->
+    <property name="JSON_LOG_PATTERN"
+              value='{"timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}","thread":"%thread","level":"%level","logger":"%logger{36}","message":"%msg"}%n' />
+
+    <!-- 콘솔 출력 Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- JSON 콘솔 출력 Appender (프로덕션 환경용) -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>transactionId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>alertId</includeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <!-- 파일 출력 Appender (선택적) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/fraud-detector.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 일별 로그 파일 생성 -->
+            <fileNamePattern>logs/fraud-detector.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 30일 보관 -->
+            <maxHistory>30</maxHistory>
+            <!-- 최대 1GB 보관 -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Flink 프레임워크 로그 레벨 설정 -->
+    <logger name="org.apache.flink" level="WARN" />
+    <logger name="org.apache.kafka" level="WARN" />
+    <logger name="org.apache.zookeeper" level="WARN" />
+
+    <!-- Jackson 로그 레벨 -->
+    <logger name="com.fasterxml.jackson" level="WARN" />
+
+    <!-- 애플리케이션 로그 레벨 (상세 로깅) -->
+    <logger name="com.realfds.detector" level="${LOG_LEVEL}" />
+
+    <!-- 탐지 규칙 상세 로깅 (디버깅용) -->
+    <logger name="com.realfds.detector.rules" level="INFO" />
+
+    <!-- 직렬화 로깅 -->
+    <logger name="com.realfds.detector.serialization" level="WARN" />
+
+    <!-- Root Logger 설정 -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="CONSOLE" />
+        <!-- 프로덕션 환경에서는 JSON 로깅 활성화 -->
+        <!-- <appender-ref ref="JSON_CONSOLE" /> -->
+        <!-- 파일 로깅이 필요한 경우 활성화 -->
+        <!-- <appender-ref ref="FILE" /> -->
+    </root>
+
+</configuration>
