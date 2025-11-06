@@ -82,6 +82,27 @@ services:
     networks:
       - realfds-network
 
+  # Fraud Detector: 실시간 거래 탐지 엔진 (Flink + Scala)
+  fraud-detector:
+    build:
+      context: ./fraud-detector
+      dockerfile: Dockerfile
+    container_name: realfds-fraud-detector
+    depends_on:
+      - kafka
+      - jobmanager
+      - taskmanager
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092  # Kafka 브로커 주소
+      HIGH_VALUE_THRESHOLD: 1000000  # 고액 거래 임계값 (100만원)
+      FLINK_CHECKPOINT_INTERVAL: 60000  # 체크포인트 간격 (60초)
+      LOG_LEVEL: INFO  # 로그 레벨
+      JOB_MANAGER_RPC_ADDRESS: jobmanager  # Flink JobManager 주소
+    mem_limit: 2g
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
 # 네트워크 정의: 모든 서비스가 동일한 네트워크에서 통신
 networks:
   realfds-network:

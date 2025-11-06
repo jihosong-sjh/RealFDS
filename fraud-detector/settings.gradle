@@ -1,0 +1,2 @@
+// fraud-detector Gradle 프로젝트 설정
+rootProject.name = 'fraud-detector'

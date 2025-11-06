@@ -1,0 +1,138 @@
+// fraud-detector Gradle 빌드 스크립트
+// Apache Flink 1.18.1 + Scala 2.12 기반 실시간 거래 탐지 엔진
+
+plugins {
+    id 'scala'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'  // Fat JAR 생성용
+}
+
+group = 'com.realfds'
+version = '1.0.0'
+
+// Java/Scala 버전 설정
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repository.apache.org/content/repositories/snapshots/"
+    }
+}
+
+// 버전 상수 정의
+ext {
+    flinkVersion = '1.18.1'
+    scalaVersion = '2.12'
+    scalaBinaryVersion = '2.12.18'
+    kafkaVersion = '3.6.1'
+    jacksonVersion = '2.15.2'
+    scalaTestVersion = '3.2.17'
+    logbackVersion = '1.4.11'
+    slf4jVersion = '2.0.9'
+}
+
+dependencies {
+    // Scala 표준 라이브러리
+    implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
+
+    // Apache Flink 코어 (Scala API)
+    implementation "org.apache.flink:flink-scala_${scalaVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-streaming-scala_${scalaVersion}:${flinkVersion}"
+
+    // Apache Flink Kafka Connector
+    implementation "org.apache.flink:flink-connector-kafka:3.0.2-1.18"
+
+    // Apache Kafka 클라이언트
+    implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+
+    // JSON 직렬화/역직렬화 (Jackson)
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-scala_${scalaVersion}:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"  // Java 8 시간 API 지원
+
+    // 로깅 (SLF4J + Logback)
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+    implementation "ch.qos.logback:logback-core:${logbackVersion}"
+    implementation "net.logstash.logback:logstash-logback-encoder:7.4"  // JSON 로깅
+
+    // Typesafe Config (application.conf 설정 파일 처리)
+    implementation 'com.typesafe:config:1.4.3'
+
+    // 테스트 의존성
+    testImplementation "org.scalatest:scalatest_${scalaVersion}:${scalaTestVersion}"
+    testImplementation "org.scalatestplus:junit-4-13_${scalaVersion}:${scalaTestVersion}.0"
+    testRuntimeOnly "org.junit.platform:junit-platform-engine:1.10.1"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.1"
+    testRuntimeOnly "co.helmethair:scalatest-junit-runner:0.2.0"
+    testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
+    testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
+    testImplementation "org.apache.flink:flink-streaming-java:${flinkVersion}:tests"
+    testImplementation "junit:junit:4.13.2"
+}
+
+// 애플리케이션 메인 클래스 지정
+application {
+    mainClass = 'com.realfds.detector.FraudDetectionJob'
+}
+
+// Scala 컴파일 옵션
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.additionalParameters = [
+        '-deprecation',           // deprecated 기능 사용 시 경고
+        '-feature',               // feature 경고 활성화
+        '-unchecked',             // 타입 소거 관련 경고
+        // '-Xfatal-warnings',    // Flink 1.18+ Scala API deprecated로 인해 비활성화
+        '-encoding', 'UTF-8'      // UTF-8 인코딩
+    ]
+}
+
+// 테스트 설정
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+}
+
+// Shadow JAR 설정 (Fat JAR 생성)
+shadowJar {
+    archiveBaseName.set('fraud-detector')
+    archiveClassifier.set('')
+    archiveVersion.set(project.version)
+
+    // Flink 런타임에 이미 포함된 의존성 제외 (provided scope)
+    dependencies {
+        exclude(dependency('org.apache.flink:flink-scala_.*'))
+        exclude(dependency('org.apache.flink:flink-streaming-scala_.*'))
+        exclude(dependency('org.apache.flink:flink-clients.*'))
+        exclude(dependency('org.scala-lang:scala-library'))
+    }
+
+    // META-INF 충돌 방지
+    mergeServiceFiles()
+
+    // Manifest 설정
+    manifest {
+        attributes(
+            'Main-Class': 'com.realfds.detector.FraudDetectionJob',
+            'Implementation-Title': 'fraud-detector',
+            'Implementation-Version': project.version
+        )
+    }
+}
+
+// build 태스크가 shadowJar를 포함하도록 설정
+build.dependsOn shadowJar
+
+// Wrapper 설정 (Gradle 버전 고정)
+wrapper {
+    gradleVersion = '8.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
