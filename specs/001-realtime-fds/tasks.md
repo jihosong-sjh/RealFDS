@@ -320,39 +320,39 @@
   - test_consume_alert_invalid_json(): 잘못된 JSON 수신 시 에러 핸들링 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T040 HealthController 구현
+- [x] T040 HealthController 구현
   - alert-service/src/main/java/com/realfds/alert/controller/HealthController.java
   - GET /actuator/health 엔드포인트
   - {"status": "UP"} 응답
   - 한국어 주석으로 설명
 
-- [ ] T041 application.yml 설정 파일 작성
+- [x] T041 application.yml 설정 파일 작성
   - alert-service/src/main/resources/application.yml
   - server.port: 8081
   - spring.kafka.bootstrap-servers, consumer.group-id, consumer.topics
   - 환경 변수로 오버라이드 가능하도록 설정
   - 한국어 주석으로 설정 설명
 
-- [ ] T042 [P] logback-spring.xml 설정 파일 작성
+- [x] T042 [P] logback-spring.xml 설정 파일 작성
   - alert-service/src/main/resources/logback-spring.xml
   - JSON 레이아웃 사용 (구조화된 로깅)
   - INFO 레벨 이상 로그 출력
   - 한국어 주석으로 로그 설정 설명
 
-- [ ] T043 AlertServiceApplication 메인 클래스 작성
+- [x] T043 AlertServiceApplication 메인 클래스 작성
   - alert-service/src/main/java/com/realfds/alert/AlertServiceApplication.java
   - @SpringBootApplication 어노테이션
   - main() 메서드
   - 한국어 주석으로 설명
 
-- [ ] T044 Dockerfile 작성
+- [x] T044 Dockerfile 작성
   - alert-service/Dockerfile
   - Multi-stage build: Gradle 빌드 → 실행 이미지 분리
   - 베이스 이미지: eclipse-temurin:17-jre-alpine
   - JAR 파일 복사 및 Spring Boot 실행
   - 한국어 주석으로 단계 설명
 
-- [ ] T045 docker-compose.yml에 alert-service 서비스 추가
+- [x] T045 docker-compose.yml에 alert-service 서비스 추가
   - build: ./alert-service
   - depends_on: kafka
   - environment: SPRING_KAFKA_BOOTSTRAP_SERVERS

@@ -32,6 +32,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    // Logstash Logback Encoder (JSON 형식 로그)
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     // Lombok (보일러플레이트 코드 감소) - 선택적
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
