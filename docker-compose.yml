@@ -1,0 +1,72 @@
+# 실시간 금융 거래 탐지 시스템 (RealFDS)
+# Docker Compose 오케스트레이션 파일
+
+version: '3.8'
+
+services:
+  # Zookeeper: Kafka 클러스터 메타데이터 관리
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: realfds-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181  # 클라이언트 연결 포트
+      ZOOKEEPER_TICK_TIME: 2000    # 기본 시간 단위 (밀리초)
+    mem_limit: 256m
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
+  # Kafka: 메시지 브로커 (거래 및 알림 이벤트 스트리밍)
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: realfds-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Zookeeper 연결 주소
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  # 내부 통신 주소
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # 단일 브로커 설정
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'  # 토픽 자동 생성 활성화
+    mem_limit: 1g
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
+  # Flink JobManager: Flink 클러스터 마스터 노드 (작업 스케줄링 및 조정)
+  jobmanager:
+    image: flink:1.18-scala_2.12-java11
+    container_name: realfds-jobmanager
+    command: jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    volumes:
+      - ./flink-checkpoints:/tmp/flink-checkpoints  # 체크포인트 저장소
+      - ./flink-savepoints:/tmp/flink-savepoints    # 세이브포인트 저장소
+    mem_limit: 1g
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
+  # Flink TaskManager: Flink 워커 노드 (실제 작업 실행)
+  taskmanager:
+    image: flink:1.18-scala_2.12-java11
+    container_name: realfds-taskmanager
+    command: taskmanager
+    depends_on:
+      - jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+    volumes:
+      - ./flink-checkpoints:/tmp/flink-checkpoints
+      - ./flink-savepoints:/tmp/flink-savepoints
+    mem_limit: 1g
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
+# 네트워크 정의: 모든 서비스가 동일한 네트워크에서 통신
+networks:
+  realfds-network:
+    driver: bridge
+    name: realfds-network

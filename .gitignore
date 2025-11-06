@@ -1,0 +1,111 @@
+# 실시간 금융 거래 탐지 시스템 (RealFDS) - Git Ignore 설정
+
+# ============================================
+# Python (transaction-generator)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# ============================================
+# Java/Scala (fraud-detector, alert-service, websocket-gateway)
+# ============================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradletasknamecache
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# ============================================
+# Node.js/TypeScript (frontend-dashboard)
+# ============================================
+node_modules/
+dist/
+.cache/
+.parcel-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.npm/
+.yarn/
+.pnp.*
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+docker-compose.override.yml
+
+# ============================================
+# Flink
+# ============================================
+flink-checkpoints/
+flink-savepoints/
+*.log
+
+# ============================================
+# 환경 변수 및 비밀 정보
+# ============================================
+.env
+.env.local
+.env.*.local
+*.secret
+credentials.json
+*.key
+*.pem
+
+# ============================================
+# IDE 설정 파일
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.tmp
+
+# ============================================
+# 테스트 및 커버리지
+# ============================================
+coverage/
+*.cover
+.hypothesis/
+.tox/
+.nox/
+test-results/
+test-reports/
+
+# ============================================
+# 기타
+# ============================================
+*.bak
+*.orig
+*.rej
