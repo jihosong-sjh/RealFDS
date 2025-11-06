@@ -5,6 +5,7 @@ plugins {
     id 'scala'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '8.1.1'  // Fat JAR 생성용
+    id 'jacoco'  // 커버리지 측정
 }
 
 group = 'com.realfds'
@@ -130,6 +131,41 @@ shadowJar {
 
 // build 태스크가 shadowJar를 포함하도록 설정
 build.dependsOn shadowJar
+
+// JaCoCo 커버리지 설정
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    // Scala 클래스 포함
+    classDirectories.setFrom(
+        files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/FraudDetectionJob*',  // 메인 클래스 제외
+            ])
+        })
+    )
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.70
+            }
+        }
+    }
+}
+
+test.finalizedBy jacocoTestReport
 
 // Wrapper 설정 (Gradle 버전 고정)
 wrapper {

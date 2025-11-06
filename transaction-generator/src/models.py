@@ -2,7 +2,7 @@
 Transaction 데이터 모델
 거래 엔터티의 구조와 직렬화 로직을 정의합니다.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict
 import uuid
 
@@ -45,7 +45,7 @@ class Transaction:
         self.amount = amount
         self.currency = "KRW"
         self.country_code = country_code
-        self.timestamp = timestamp or datetime.utcnow().isoformat() + "Z"
+        self.timestamp = timestamp or datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     
     def to_dict(self) -> Dict:
         """
