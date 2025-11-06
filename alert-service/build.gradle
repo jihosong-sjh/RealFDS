@@ -1,0 +1,71 @@
+// alert-service Gradle 빌드 설정
+// Spring Boot 3.2.0, Spring WebFlux, Spring Kafka를 사용하는 알림 관리 서비스
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.realfds'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot WebFlux (Reactive Web 프레임워크)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Spring Kafka (Kafka 메시지 소비)
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // Spring Boot Actuator (헬스 체크, 모니터링)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Jackson (JSON 직렬화/역직렬화)
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // Lombok (보일러플레이트 코드 감소) - 선택적
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 테스트 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+
+    // 테스트 실행 시 한국어 인코딩 설정
+    systemProperty 'file.encoding', 'UTF-8'
+
+    // 테스트 로그 출력
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+// JAR 파일 생성 설정
+tasks.named('jar') {
+    enabled = false
+}
+
+// Spring Boot 애플리케이션 실행 설정
+bootRun {
+    systemProperty 'file.encoding', 'UTF-8'
+}

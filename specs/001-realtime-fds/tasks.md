@@ -276,37 +276,37 @@
 
 **목표**: Spring WebFlux 프로젝트 설정, `alerts` 토픽 구독(Consumer) 구현, 수신된 알림을 로그에 출력하는 것까지 확인, Dockerfile 작성
 
-- [ ] T033 alert-service 디렉토리 및 Spring Boot 프로젝트 생성
+- [x] T033 alert-service 디렉토리 및 Spring Boot 프로젝트 생성
   - alert-service/build.gradle, src/main/java/, src/test/java/, src/main/resources/, README.md
   - Spring Boot 3.2.0, Spring WebFlux, Spring Kafka 의존성 추가
   - 한국어로 서비스 목적 설명하는 README.md 작성
 
-- [ ] T034 [P] build.gradle 작성 및 의존성 정의
+- [x] T034 [P] build.gradle 작성 및 의존성 정의
   - alert-service/build.gradle
   - spring-boot-starter-webflux, spring-kafka, spring-boot-starter-actuator
   - JUnit 5, Mockito, TestContainers (테스트용)
   - 한국어 주석으로 의존성 설명
 
-- [ ] T035 [P] Alert 모델 클래스 정의
+- [x] T035 [P] Alert 모델 클래스 정의
   - alert-service/src/main/java/com/realfds/alert/model/Alert.java
   - 필드: schemaVersion, alertId, originalTransaction, ruleType, ruleName, reason, severity, alertTimestamp
   - Jackson 어노테이션 (@JsonProperty)
   - 한국어 주석으로 필드 설명
 
-- [ ] T036 [P] Transaction 모델 클래스 정의
+- [x] T036 [P] Transaction 모델 클래스 정의
   - alert-service/src/main/java/com/realfds/alert/model/Transaction.java
   - 필드: schemaVersion, transactionId, userId, amount, currency, countryCode, timestamp
   - Jackson 어노테이션
   - 한국어 주석으로 필드 설명
 
-- [ ] T037 KafkaConfig 클래스 작성
+- [x] T037 KafkaConfig 클래스 작성
   - alert-service/src/main/java/com/realfds/alert/config/KafkaConfig.java
   - @Configuration 어노테이션
   - ConsumerFactory<String, Alert> 빈 정의
   - JSON 역직렬화 설정 (JsonDeserializer)
   - 한국어 주석으로 설정 설명
 
-- [ ] T038 AlertConsumer 구현
+- [x] T038 AlertConsumer 구현
   - alert-service/src/main/java/com/realfds/alert/consumer/AlertConsumer.java
   - @KafkaListener 어노테이션으로 `transaction-alerts` 토픽 구독
   - consumeAlert() 메서드: 알림 수신 시 로그 출력 (INFO 레벨)
@@ -314,7 +314,7 @@
   - 한국어 로그 메시지
   - 에러 핸들링 (JSON 역직렬화 실패 시 WARN 로그)
 
-- [ ] T039 [P] 단위 테스트 작성 - AlertConsumer
+- [x] T039 [P] 단위 테스트 작성 - AlertConsumer
   - alert-service/src/test/java/com/realfds/alert/consumer/AlertConsumerTest.java
   - test_consume_alert_success(): Mock Kafka 메시지로 정상 수신 확인
   - test_consume_alert_invalid_json(): 잘못된 JSON 수신 시 에러 핸들링 확인
