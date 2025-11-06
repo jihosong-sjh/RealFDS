@@ -57,45 +57,45 @@
 
 **목표**: Kafka, Zookeeper, Flink 클러스터 기본 설정 추가
 
-- [ ] T001 프로젝트 루트 디렉토리 구조 생성
+- [X] T001 프로젝트 루트 디렉토리 구조 생성
   - RealFDS/transaction-generator/, fraud-detector/, alert-service/, websocket-gateway/, frontend-dashboard/
   - RealFDS/scripts/, docs/
   - 한국어 주석으로 디렉토리 목적 설명하는 README.md 생성
 
-- [ ] T002 docker-compose.yml 파일 생성 및 Zookeeper 서비스 정의
+- [X] T002 docker-compose.yml 파일 생성 및 Zookeeper 서비스 정의
   - RealFDS/docker-compose.yml
   - Zookeeper 3.8.3 이미지 사용
   - ZOOKEEPER_CLIENT_PORT: 2181
   - mem_limit: 256m
 
-- [ ] T003 [P] docker-compose.yml에 Kafka 서비스 정의
+- [X] T003 [P] docker-compose.yml에 Kafka 서비스 정의
   - Kafka 3.6.1 이미지 (confluentinc/cp-kafka:7.5.0)
   - KAFKA_ZOOKEEPER_CONNECT, KAFKA_ADVERTISED_LISTENERS 설정
   - mem_limit: 1g
   - depends_on: zookeeper
 
-- [ ] T004 [P] docker-compose.yml에 Flink JobManager 서비스 정의
+- [X] T004 [P] docker-compose.yml에 Flink JobManager 서비스 정의
   - Flink 1.18.1 이미지 (flink:1.18-scala_2.12-java11)
   - command: jobmanager
   - RocksDB State Backend 볼륨 마운트 설정
   - mem_limit: 1g
 
-- [ ] T005 [P] docker-compose.yml에 Flink TaskManager 서비스 정의
+- [X] T005 [P] docker-compose.yml에 Flink TaskManager 서비스 정의
   - Flink 1.18.1 이미지
   - command: taskmanager
   - depends_on: jobmanager
   - mem_limit: 1g
 
-- [ ] T006 [P] .env.example 파일 생성 및 환경 변수 템플릿 작성
+- [X] T006 [P] .env.example 파일 생성 및 환경 변수 템플릿 작성
   - RealFDS/.env.example
   - KAFKA_BOOTSTRAP_SERVERS, TRANSACTION_GENERATION_INTERVAL_MS, HIGH_VALUE_THRESHOLD 등
   - 한국어 주석으로 각 환경 변수 설명
 
-- [ ] T007 [P] .gitignore 파일 생성
+- [X] T007 [P] .gitignore 파일 생성
   - RealFDS/.gitignore
   - Python (__pycache__, *.pyc, venv/), Java (target/, *.class), Node (node_modules/, dist/), IDE 설정 제외
 
-- [ ] T008 docker-compose.yml에 네트워크 설정 추가
+- [X] T008 docker-compose.yml에 네트워크 설정 추가
   - networks: realfds-network 정의
   - 모든 서비스가 동일 네트워크 사용
 
