@@ -97,6 +97,7 @@ Thumbs.db
 # ============================================
 coverage/
 *.cover
+coverage.xml
 .hypothesis/
 .tox/
 .nox/
