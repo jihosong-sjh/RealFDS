@@ -5,14 +5,14 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.realfds.alert.model.Alert;
 import com.realfds.alert.model.Transaction;
+import com.realfds.alert.service.AlertService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * AlertConsumer 단위 테스트
@@ -28,13 +28,17 @@ import static org.mockito.Mockito.when;
 class AlertConsumerTest {
 
     private AlertConsumer alertConsumer;
+    private AlertService mockAlertService;
     private Logger logger;
     private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeEach
     void setUp() {
+        // Given: Mock AlertService 생성
+        mockAlertService = mock(AlertService.class);
+
         // Given: AlertConsumer 인스턴스 생성
-        alertConsumer = new AlertConsumer();
+        alertConsumer = new AlertConsumer(mockAlertService);
 
         // 로그 캡처를 위한 ListAppender 설정
         logger = (Logger) LoggerFactory.getLogger(AlertConsumer.class);
@@ -55,6 +59,7 @@ class AlertConsumerTest {
      * Given: 유효한 Alert 객체가 준비됨
      * When: consumeAlert() 메서드를 호출함
      * Then: INFO 레벨 로그가 출력되고, alertId, ruleName, reason이 포함됨
+     * Then: AlertService.processAlert()가 호출됨
      */
     @Test
     void test_consume_alert_success() {
@@ -90,6 +95,9 @@ class AlertConsumerTest {
                 .anyMatch(event -> event.getFormattedMessage().contains("alert-123"))
                 .anyMatch(event -> event.getFormattedMessage().contains("HIGH_VALUE"))
                 .anyMatch(event -> event.getFormattedMessage().contains("고액 거래 탐지"));
+
+        // Then: AlertService.processAlert()가 호출되었는지 확인
+        verify(mockAlertService, times(1)).processAlert(alert);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.realfds.alert.consumer;
 
 import com.realfds.alert.model.Alert;
+import com.realfds.alert.service.AlertService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,10 +14,11 @@ import org.springframework.stereotype.Component;
  * AlertConsumer 클래스
  *
  * Kafka transaction-alerts 토픽에서 Alert 메시지를 소비합니다.
- * 수신한 알림을 로깅하여 모니터링 및 디버깅에 활용합니다.
+ * 수신한 알림을 AlertService를 통해 처리하고 로깅합니다.
  *
  * 주요 기능:
  * - @KafkaListener를 사용하여 transaction-alerts 토픽 구독
+ * - 알림 수신 시 AlertService를 통해 저장
  * - 알림 수신 시 alertId, ruleName, reason 로깅 (INFO 레벨)
  * - JSON 역직렬화 실패 시 WARN 레벨로 에러 로깅
  *
@@ -28,6 +30,17 @@ import org.springframework.stereotype.Component;
 public class AlertConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertConsumer.class);
+
+    private final AlertService alertService;
+
+    /**
+     * 생성자 기반 의존성 주입
+     *
+     * @param alertService 알림 처리 서비스
+     */
+    public AlertConsumer(AlertService alertService) {
+        this.alertService = alertService;
+    }
 
     /**
      * Kafka 알림 메시지 소비 메서드
@@ -49,6 +62,9 @@ public class AlertConsumer {
                     alert.getAlertId(),
                     alert.getRuleName(),
                     alert.getReason());
+
+            // AlertService를 통해 알림 처리 (저장)
+            alertService.processAlert(alert);
 
         } catch (Exception e) {
             // 예외 발생 시 WARN 레벨로 로깅
