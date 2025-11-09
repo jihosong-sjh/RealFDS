@@ -47,11 +47,24 @@ EXPOSE 6123
 EXPOSE 6121
 EXPOSE 6122
 
-# 헬스체크 (Flink REST API)
+# 헬스체크 (JobManager에 Job이 제출되었는지 확인)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8081/overview || exit 1
+    CMD curl -f http://${JOB_MANAGER_RPC_ADDRESS:-jobmanager}:8081/jobs || exit 1
 
 # Flink Job 실행
-# docker-compose에서 명령어를 오버라이드할 수 있도록 ENTRYPOINT 대신 CMD 사용
-CMD ["standalone-job", \
-     "--job-classname", "com.realfds.detector.FraudDetectionJob"]
+# 외부 JobManager에 Job 제출하는 스크립트
+# JobManager가 준비될 때까지 대기 후 Job 제출
+CMD bash -c ' \
+    echo "Waiting for JobManager to be ready..."; \
+    while ! curl -sf http://${JOB_MANAGER_RPC_ADDRESS:-jobmanager}:8081/overview > /dev/null; do \
+        echo "JobManager not ready, retrying in 5 seconds..."; \
+        sleep 5; \
+    done; \
+    echo "JobManager is ready. Submitting job..."; \
+    /opt/flink/bin/flink run \
+        --jobmanager ${JOB_MANAGER_RPC_ADDRESS:-jobmanager}:8081 \
+        --detached \
+        /opt/flink/usrlib/fraud-detector.jar; \
+    echo "Job submitted. Keeping container alive..."; \
+    tail -f /dev/null \
+'

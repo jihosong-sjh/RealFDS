@@ -3,8 +3,10 @@ Kafka Producer 모듈
 Transaction 객체를 Kafka 토픽으로 발행하는 Producer 클래스를 제공합니다.
 """
 import json
+import time
 from typing import Optional
 from confluent_kafka import Producer, KafkaException
+from confluent_kafka.admin import AdminClient, NewTopic
 from loguru import logger
 from src.models import Transaction
 
@@ -12,16 +14,16 @@ from src.models import Transaction
 class TransactionProducer:
     """
     Transaction 객체를 Kafka로 발행하는 Producer 클래스
-    
+
     Attributes:
         producer: confluent_kafka Producer 인스턴스
         topic: 거래 데이터를 발행할 Kafka 토픽명
     """
-    
+
     def __init__(self, bootstrap_servers: str, topic: str = "virtual-transactions"):
         """
         TransactionProducer 초기화
-        
+
         Args:
             bootstrap_servers: Kafka 브로커 주소 (예: "localhost:9092")
             topic: 발행할 토픽명 (기본값: "virtual-transactions")
@@ -37,14 +39,32 @@ class TransactionProducer:
             'linger.ms': 10,  # 메시지 배치를 위한 대기 시간 (밀리초)
             'batch.size': 16384,  # 배치 크기 (바이트)
         }
-        
-        try:
-            self.producer = Producer(config)
-            self.topic = topic
-            logger.info(f"Kafka Producer 초기화 완료: {bootstrap_servers}, 토픽: {topic}")
-        except KafkaException as e:
-            logger.error(f"Kafka Producer 초기화 실패: {e}")
-            raise
+
+        # Kafka 연결 재시도 (최대 30회, 약 1분)
+        max_retries = 30
+        retry_delay = 2  # 초
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                logger.info(f"Kafka 연결 시도 {attempt}/{max_retries}: {bootstrap_servers}")
+
+                # AdminClient로 Kafka 연결 확인
+                admin_client = AdminClient({'bootstrap.servers': bootstrap_servers})
+                metadata = admin_client.list_topics(timeout=5)
+
+                # Producer 초기화
+                self.producer = Producer(config)
+                self.topic = topic
+                logger.info(f"Kafka Producer 초기화 완료: {bootstrap_servers}, 토픽: {topic}")
+                return
+
+            except Exception as e:
+                if attempt < max_retries:
+                    logger.warning(f"Kafka 연결 실패 ({attempt}/{max_retries}): {e}. {retry_delay}초 후 재시도...")
+                    time.sleep(retry_delay)
+                else:
+                    logger.error(f"Kafka Producer 초기화 실패 (최대 재시도 횟수 초과): {e}")
+                    raise KafkaException(f"Kafka 연결 실패: {e}")
     
     def _delivery_report(self, err: Optional[Exception], msg):
         """

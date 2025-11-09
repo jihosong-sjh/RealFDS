@@ -21,6 +21,8 @@ COPY src/ ./src/
 ENV KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 ENV TRANSACTION_GENERATION_INTERVAL_MS=1000
 ENV TRANSACTION_TOPIC=virtual-transactions
+# Python 모듈 검색 경로 설정
+ENV PYTHONPATH=/app
 
 # 헬스 체크 (선택적)
 # HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

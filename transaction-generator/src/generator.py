@@ -9,14 +9,15 @@ from src.models import Transaction
 def generate_transaction() -> Transaction:
     """
     무작위 Transaction 객체를 생성
-    
+
     생성 규칙:
-    - 금액: 정규 분포 (평균 300,000원, 표준편차 200,000원)
-    - 범위: 1,000원 ~ 1,500,000원
+    - 금액: 정규 분포 (평균 600,000원, 표준편차 400,000원)
+    - 범위: 1,000원 ~ 2,000,000원
+    - HIGH_VALUE (100만원 초과) 거래가 약 16% 발생
     - 국가: 80% KR, 10% US, 5% JP, 5% CN
     - 사용자: user-1 ~ user-10 균등 분포
     - 통화: KRW (고정)
-    
+
     Returns:
         Transaction: 생성된 거래 객체
     """
@@ -24,13 +25,14 @@ def generate_transaction() -> Transaction:
     user_id = f"user-{random.randint(1, 10)}"
     
     # 거래 금액 생성 (정규 분포)
-    # 평균: 300,000원, 표준편차: 200,000원
-    mean_amount = 300_000
-    std_dev = 200_000
+    # 평균: 600,000원, 표준편차: 400,000원
+    # HIGH_VALUE_THRESHOLD(1,000,000원) 이상 거래가 약 16% 발생하도록 조정
+    mean_amount = 600_000
+    std_dev = 400_000
     amount = int(random.gauss(mean_amount, std_dev))
-    
-    # 금액 범위 제한 (1,000 ~ 1,500,000)
-    amount = max(1000, min(1_500_000, amount))
+
+    # 금액 범위 제한 (1,000 ~ 2,000,000)
+    amount = max(1000, min(2_000_000, amount))
     
     # 국가 코드 생성 (가중 무작위 선택)
     # 80% KR, 10% US, 5% JP, 5% CN
