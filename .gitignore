@@ -37,6 +37,7 @@ build/
 *.iws
 .idea/
 out/
+bin/
 
 # ============================================
 # Node.js/TypeScript (frontend-dashboard)

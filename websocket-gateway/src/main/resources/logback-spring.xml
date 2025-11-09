@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WebSocket Gateway - Logback 설정 파일
+
+  구조화된 로깅(Structured Logging)을 위한 JSON 레이아웃 사용
+
+  주요 설정:
+  - JSON 형식으로 로그 출력 (컨테이너 환경에서 로그 수집 및 분석 용이)
+  - INFO 레벨 이상 로그 출력
+  - 타임스탬프, 로그 레벨, 스레드, 로거 이름, 메시지 포함
+  - 예외 스택 트레이스 포함
+  - 컨테이너 환경을 고려한 CONSOLE appender 사용
+-->
+<configuration>
+
+    <!-- 로그 패턴 상수 정의 -->
+    <!-- JSON 형식이 아닌 경우를 위한 fallback 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <!-- 환경 변수: LOG_FORMAT (기본값: json) -->
+    <!-- json: JSON 형식 로그, text: 일반 텍스트 로그 -->
+    <springProperty scope="context" name="LOG_FORMAT" source="logging.format" defaultValue="json"/>
+
+    <!-- JSON 형식 로그 출력을 위한 CONSOLE Appender -->
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- JSON 레이아웃 -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- 타임스탬프 포맷 (ISO-8601) -->
+            <timestampPattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</timestampPattern>
+
+            <!-- 커스텀 필드 추가 -->
+            <customFields>{"service":"websocket-gateway","version":"1.0.0"}</customFields>
+
+            <!-- 짧은 로거 이름 사용 (전체 패키지명 대신 마지막 클래스명만) -->
+            <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+
+            <!-- 예외 스택 트레이스 포함 -->
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <!-- 스택 트레이스 최대 깊이 -->
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <!-- 각 예외별 최대 스택 트레이스 수 -->
+                <maxLength>1000</maxLength>
+                <!-- 짧은 클래스명 사용 -->
+                <shortenedClassNameLength>36</shortenedClassNameLength>
+                <!-- 공통 프레임 제외 -->
+                <exclude>sun\.reflect\..*</exclude>
+                <exclude>java\.lang\.reflect\.Method</exclude>
+                <exclude>org\.apache\.catalina\..*</exclude>
+                <exclude>org\.apache\.coyote\..*</exclude>
+                <exclude>org\.apache\.tomcat\..*</exclude>
+            </throwableConverter>
+        </encoder>
+    </appender>
+
+    <!-- 일반 텍스트 형식 로그 출력을 위한 CONSOLE Appender (개발 환경용) -->
+    <appender name="CONSOLE_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Spring Profile별 로그 설정 -->
+
+    <!-- 기본 프로파일: JSON 형식 로그 -->
+    <springProfile name="!dev">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_JSON" />
+        </root>
+    </springProfile>
+
+    <!-- 개발 프로파일: 텍스트 형식 로그 (가독성 우선) -->
+    <springProfile name="dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE_TEXT" />
+        </root>
+    </springProfile>
+
+    <!-- 애플리케이션별 로거 설정 -->
+
+    <!-- com.realfds.gateway 패키지: INFO 레벨 -->
+    <logger name="com.realfds.gateway" level="INFO" additivity="false">
+        <if condition='property("LOG_FORMAT").equals("json")'>
+            <then>
+                <appender-ref ref="CONSOLE_JSON" />
+            </then>
+            <else>
+                <appender-ref ref="CONSOLE_TEXT" />
+            </else>
+        </if>
+    </logger>
+
+    <!-- Spring Framework 로거: INFO 레벨 -->
+    <logger name="org.springframework" level="INFO" />
+
+    <!-- Spring WebSocket 로거: INFO 레벨 (WebSocket 디버깅 필요 시 DEBUG로 변경) -->
+    <logger name="org.springframework.web.socket" level="INFO" />
+
+    <!-- Netty 로거: INFO 레벨 (WebFlux에서 사용) -->
+    <logger name="io.netty" level="INFO" />
+
+    <!-- Reactor 로거: INFO 레벨 (reactive 스트림 디버깅 필요 시 DEBUG로 변경) -->
+    <logger name="reactor" level="INFO" />
+
+</configuration>
