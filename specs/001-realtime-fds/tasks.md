@@ -367,7 +367,7 @@
 
 **목표**: 1단계 전체 파이프라인 검증
 
-- [ ] T046 E2E 테스트 스크립트 작성 (1단계)
+- [X] T046 E2E 테스트 스크립트 작성 (1단계)
   - scripts/test-e2e-phase1.sh
   - 1. docker-compose up -d (zookeeper, kafka, transaction-generator, fraud-detector, alert-service)
   - 2. 3분 대기 (시스템 준비)
@@ -377,7 +377,7 @@
   - 6. docker-compose down
   - 한국어 주석으로 테스트 단계 설명
 
-- [ ] T047 E2E 테스트 실행 및 검증
+- [X] T047 E2E 테스트 실행 및 검증
   - scripts/test-e2e-phase1.sh 실행
   - 테스트 통과 확인
   - 실패 시 로그 확인 및 수정
