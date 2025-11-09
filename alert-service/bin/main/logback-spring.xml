@@ -79,18 +79,6 @@
 
     <!-- 애플리케이션별 로거 설정 -->
 
-    <!-- com.realfds.alert 패키지: INFO 레벨 -->
-    <logger name="com.realfds.alert" level="INFO" additivity="false">
-        <if condition='property("LOG_FORMAT").equals("json")'>
-            <then>
-                <appender-ref ref="CONSOLE_JSON" />
-            </then>
-            <else>
-                <appender-ref ref="CONSOLE_TEXT" />
-            </else>
-        </if>
-    </logger>
-
     <!-- Spring Framework 로거: INFO 레벨 -->
     <logger name="org.springframework" level="INFO" />
 

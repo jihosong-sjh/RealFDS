@@ -401,39 +401,39 @@
 
 **목표**: Spring WebFlux 프로젝트 설정, WebSocket 핸들러 구현, `/actuator/health` 엔드포인트 추가, Dockerfile 작성
 
-- [ ] T048 websocket-gateway 디렉토리 및 Spring Boot 프로젝트 생성
+- [X] T048 websocket-gateway 디렉토리 및 Spring Boot 프로젝트 생성
   - websocket-gateway/build.gradle, src/main/java/, src/test/java/, src/main/resources/, README.md
   - Spring Boot 3.2.0, Spring WebFlux, Spring WebSocket 의존성 추가
   - 한국어로 서비스 목적 설명하는 README.md 작성
 
-- [ ] T049 [P] build.gradle 작성 및 의존성 정의
+- [X] T049 [P] build.gradle 작성 및 의존성 정의
   - websocket-gateway/build.gradle
   - spring-boot-starter-webflux, spring-boot-starter-websocket, spring-boot-starter-actuator
   - WebClient (alert-service 호출용)
   - JUnit 5, Mockito (테스트용)
   - 한국어 주석으로 의존성 설명
 
-- [ ] T050 [P] Alert 모델 클래스 정의 (alert-service와 동일)
+- [X] T050 [P] Alert 모델 클래스 정의 (alert-service와 동일)
   - websocket-gateway/src/main/java/com/realfds/gateway/model/Alert.java
   - 필드: schemaVersion, alertId, originalTransaction, ruleType, ruleName, reason, severity, alertTimestamp
   - Jackson 어노테이션
   - 한국어 주석으로 필드 설명
 
-- [ ] T051 WebSocketConfig 클래스 작성
+- [X] T051 WebSocketConfig 클래스 작성
   - websocket-gateway/src/main/java/com/realfds/gateway/config/WebSocketConfig.java
   - @Configuration, @EnableWebSocket 어노테이션
   - WebSocket 핸들러 매핑 (/ws/alerts)
   - CORS 설정 (모든 Origin 허용 - 로컬 개발용)
   - 한국어 주석으로 설정 설명
 
-- [ ] T052 RestClientConfig 클래스 작성
+- [X] T052 RestClientConfig 클래스 작성
   - websocket-gateway/src/main/java/com/realfds/gateway/config/RestClientConfig.java
   - @Configuration 어노테이션
   - WebClient 빈 정의 (alert-service 호출용)
   - Base URL: http://alert-service:8081
   - 한국어 주석으로 설정 설명
 
-- [ ] T053 AlertWebSocketHandler 구현
+- [X] T053 AlertWebSocketHandler 구현
   - websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java
   - WebSocketHandler 인터페이스 구현
   - afterConnectionEstablished(): 클라이언트 연결 시 세션 저장
@@ -442,7 +442,7 @@
   - Thread-safe 세션 관리 (ConcurrentHashMap)
   - 한국어 주석으로 구현 설명
 
-- [ ] T054 BroadcastService 구현
+- [X] T054 BroadcastService 구현
   - websocket-gateway/src/main/java/com/realfds/gateway/service/BroadcastService.java
   - @Service 어노테이션
   - broadcast(Alert alert) 메서드: 모든 WebSocket 세션에 알림 브로드캐스트
@@ -450,7 +450,7 @@
   - 에러 핸들링 (세션 전송 실패 시 해당 세션 제거)
   - 한국어 주석으로 구현 설명
 
-- [ ] T055 AlertStreamService 구현 (alert-service 폴링)
+- [X] T055 AlertStreamService 구현 (alert-service 폴링)
   - websocket-gateway/src/main/java/com/realfds/gateway/service/AlertStreamService.java
   - @Service 어노테이션
   - @Scheduled(fixedDelay = 1000): 1초마다 alert-service API 호출
@@ -459,51 +459,51 @@
   - 새 알림 발견 시 BroadcastService.broadcast() 호출
   - 한국어 주석으로 구현 설명
 
-- [ ] T056 [P] 단위 테스트 작성 - AlertWebSocketHandler
+- [X] T056 [P] 단위 테스트 작성 - AlertWebSocketHandler
   - websocket-gateway/src/test/java/com/realfds/gateway/handler/AlertWebSocketHandlerTest.java
   - test_after_connection_established(): 세션 저장 확인
   - test_after_connection_closed(): 세션 제거 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T057 [P] 단위 테스트 작성 - BroadcastService
+- [X] T057 [P] 단위 테스트 작성 - BroadcastService
   - websocket-gateway/src/test/java/com/realfds/gateway/service/BroadcastServiceTest.java
   - test_broadcast_to_all_sessions(): 모든 세션에 브로드캐스트 확인
   - test_broadcast_remove_closed_session(): 전송 실패 시 세션 제거 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T058 HealthController 구현
+- [X] T058 HealthController 구현
   - websocket-gateway/src/main/java/com/realfds/gateway/controller/HealthController.java
   - GET /actuator/health 엔드포인트
   - {"status": "UP"} 응답
   - 한국어 주석으로 설명
 
-- [ ] T059 application.yml 설정 파일 작성
+- [X] T059 application.yml 설정 파일 작성
   - websocket-gateway/src/main/resources/application.yml
   - server.port: 8082
   - alert-service.url: http://alert-service:8081
   - 환경 변수로 오버라이드 가능하도록 설정
   - 한국어 주석으로 설정 설명
 
-- [ ] T060 [P] logback-spring.xml 설정 파일 작성
+- [X] T060 [P] logback-spring.xml 설정 파일 작성
   - websocket-gateway/src/main/resources/logback-spring.xml
   - JSON 레이아웃 사용 (구조화된 로깅)
   - INFO 레벨 이상 로그 출력
   - 한국어 주석으로 로그 설정 설명
 
-- [ ] T061 WebSocketGatewayApplication 메인 클래스 작성
+- [X] T061 WebSocketGatewayApplication 메인 클래스 작성
   - websocket-gateway/src/main/java/com/realfds/gateway/WebSocketGatewayApplication.java
   - @SpringBootApplication, @EnableScheduling 어노테이션
   - main() 메서드
   - 한국어 주석으로 설명
 
-- [ ] T062 Dockerfile 작성
+- [X] T062 Dockerfile 작성
   - websocket-gateway/Dockerfile
   - Multi-stage build: Gradle 빌드 → 실행 이미지 분리
   - 베이스 이미지: eclipse-temurin:17-jre-alpine
   - JAR 파일 복사 및 Spring Boot 실행
   - 한국어 주석으로 단계 설명
 
-- [ ] T063 docker-compose.yml에 websocket-gateway 서비스 추가
+- [X] T063 docker-compose.yml에 websocket-gateway 서비스 추가
   - build: ./websocket-gateway
   - depends_on: alert-service
   - environment: ALERT_SERVICE_URL
@@ -518,7 +518,7 @@
 
 **목표**: 인메모리 저장소(최근 100개) 로직 및 REST API 구현
 
-- [ ] T064 AlertRepository 구현 (인메모리 저장소)
+- [X] T064 AlertRepository 구현 (인메모리 저장소)
   - alert-service/src/main/java/com/realfds/alert/repository/AlertRepository.java
   - @Repository 어노테이션
   - ConcurrentLinkedDeque<Alert> 사용 (Thread-safe)
@@ -527,7 +527,7 @@
   - getRecentAlerts(int limit) 메서드: 최근 N개 알림 반환
   - 한국어 주석으로 구현 설명
 
-- [ ] T065 AlertService 구현
+- [X] T065 AlertService 구현
   - alert-service/src/main/java/com/realfds/alert/service/AlertService.java
   - @Service 어노테이션
   - AlertRepository 의존성 주입
@@ -535,33 +535,33 @@
   - getRecentAlerts(int limit) 메서드: 최근 알림 조회
   - 한국어 주석으로 구현 설명
 
-- [ ] T066 AlertConsumer 수정 (AlertService 연동)
+- [X] T066 AlertConsumer 수정 (AlertService 연동)
   - alert-service/src/main/java/com/realfds/alert/consumer/AlertConsumer.java
   - AlertService 의존성 주입
   - consumeAlert() 메서드 수정: AlertService.processAlert() 호출
   - 로그 출력 (INFO 레벨, 한국어)
 
-- [ ] T067 AlertController 구현 (REST API)
+- [X] T067 AlertController 구현 (REST API)
   - alert-service/src/main/java/com/realfds/alert/controller/AlertController.java
   - @RestController 어노테이션
   - GET /api/alerts 엔드포인트: AlertService.getRecentAlerts(100) 반환
   - Reactive 타입 사용 (Mono<List<Alert>>)
   - 한국어 주석으로 설명
 
-- [ ] T068 [P] 단위 테스트 작성 - AlertRepository
+- [X] T068 [P] 단위 테스트 작성 - AlertRepository
   - alert-service/src/test/java/com/realfds/alert/repository/AlertRepositoryTest.java
   - test_add_alert(): 알림 추가 확인
   - test_max_capacity_100(): 101개 추가 시 가장 오래된 알림 제거 확인
   - test_get_recent_alerts(): 최근 알림 조회 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T069 [P] 단위 테스트 작성 - AlertService
+- [X] T069 [P] 단위 테스트 작성 - AlertService
   - alert-service/src/test/java/com/realfds/alert/service/AlertServiceTest.java
   - test_process_alert(): 알림 저장 확인
   - test_get_recent_alerts(): 최근 알림 조회 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T070 통합 테스트 작성 - AlertController
+- [X] T070 통합 테스트 작성 - AlertController
   - alert-service/src/test/java/com/realfds/alert/controller/AlertControllerTest.java
   - test_get_alerts_endpoint(): GET /api/alerts 응답 확인
   - WebTestClient 사용
