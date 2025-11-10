@@ -575,41 +575,41 @@
 
 **목표**: React (Vite+TS) 프로젝트 초기 설정, WebSocket 연결 훅(`useWebSocket.ts`) 구현, 수신된 메시지를 console.log로 출력 확인, Dockerfile 작성
 
-- [ ] T071 frontend-dashboard 디렉토리 및 Vite 프로젝트 생성
+- [X] T071 frontend-dashboard 디렉토리 및 Vite 프로젝트 생성
   - frontend-dashboard/package.json, vite.config.ts, tsconfig.json, src/, public/, README.md
   - React 18, TypeScript 5, Vite 5 사용
   - 한국어로 서비스 목적 설명하는 README.md 작성
 
-- [ ] T072 [P] package.json 작성 및 의존성 정의
+- [X] T072 [P] package.json 작성 및 의존성 정의
   - frontend-dashboard/package.json
   - react, react-dom, typescript, vite
   - vitest, @testing-library/react (테스트용)
   - 한국어 주석으로 의존성 설명
 
-- [ ] T073 [P] tsconfig.json 작성
+- [X] T073 [P] tsconfig.json 작성
   - frontend-dashboard/tsconfig.json
   - strict 모드 활성화
   - 한국어 주석으로 설정 설명
 
-- [ ] T074 [P] vite.config.ts 작성
+- [X] T074 [P] vite.config.ts 작성
   - frontend-dashboard/vite.config.ts
   - React 플러그인 설정
   - server.port: 8083
   - 한국어 주석으로 설정 설명
 
-- [ ] T075 [P] Alert 타입 정의
+- [X] T075 [P] Alert 타입 정의
   - frontend-dashboard/src/types/alert.ts
   - interface Alert: schemaVersion, alertId, originalTransaction, ruleType, ruleName, reason, severity, alertTimestamp
   - interface Transaction: transactionId, userId, amount, currency, countryCode, timestamp
   - 한국어 주석으로 필드 설명
 
-- [ ] T076 [P] ConnectionStatus 타입 정의
+- [X] T076 [P] ConnectionStatus 타입 정의
   - frontend-dashboard/src/types/connectionStatus.ts
   - type ConnectionStatus: 'connected' | 'disconnected' | 'connecting'
   - interface ConnectionState: status, lastConnectedAt?, reconnectAttempts
   - 한국어 주석으로 필드 설명
 
-- [ ] T077 useWebSocket hook 구현
+- [X] T077 useWebSocket hook 구현
   - frontend-dashboard/src/hooks/useWebSocket.ts
   - useState로 alerts, connectionStatus 관리
   - useEffect로 WebSocket 연결 수립
@@ -619,7 +619,7 @@
   - onerror: 에러 로깅
   - 한국어 주석으로 구현 설명
 
-- [ ] T078 ConnectionStatus 컴포넌트 구현
+- [X] T078 ConnectionStatus 컴포넌트 구현
   - frontend-dashboard/src/components/ConnectionStatus.tsx
   - props: status (ConnectionStatus)
   - 연결 상태에 따라 다른 스타일 표시
@@ -627,7 +627,7 @@
   - 한국어 텍스트
   - 한국어 주석으로 컴포넌트 설명
 
-- [ ] T079 AlertItem 컴포넌트 구현
+- [X] T079 AlertItem 컴포넌트 구현
   - frontend-dashboard/src/components/AlertItem.tsx
   - props: alert (Alert)
   - 알림 정보 표시: 발생 시각, 거래 ID, 사용자 ID, 거래 금액, 탐지 규칙, 상세 사유
@@ -635,25 +635,25 @@
   - 한국어 텍스트
   - 한국어 주석으로 컴포넌트 설명
 
-- [ ] T080 AlertList 컴포넌트 구현
+- [X] T080 AlertList 컴포넌트 구현
   - frontend-dashboard/src/components/AlertList.tsx
   - props: alerts (Alert[])
   - 알림 목록을 AlertItem 컴포넌트로 렌더링
   - 알림이 없을 때 "알림이 없습니다" 메시지 표시 (한국어)
   - 한국어 주석으로 컴포넌트 설명
 
-- [ ] T081 Header 컴포넌트 구현
+- [X] T081 Header 컴포넌트 구현
   - frontend-dashboard/src/components/Header.tsx
   - "실시간 FDS 알림" 제목 표시 (한국어)
   - 한국어 주석으로 컴포넌트 설명
 
-- [ ] T082 App.tsx 루트 컴포넌트 구현
+- [X] T082 App.tsx 루트 컴포넌트 구현
   - frontend-dashboard/src/App.tsx
   - useWebSocket hook 사용 (ws://localhost:8082/ws/alerts)
   - Header, ConnectionStatus, AlertList 컴포넌트 배치
   - 한국어 주석으로 컴포넌트 설명
 
-- [ ] T083 main.tsx 진입점 구현
+- [X] T083 main.tsx 진입점 구현
   - frontend-dashboard/src/main.tsx
   - React.StrictMode로 App 컴포넌트 렌더링
   - 한국어 주석으로 설명
@@ -677,27 +677,27 @@
   - test_render_empty_message(): 알림 없을 때 메시지 표시 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T087 기본 CSS 스타일 작성
+- [X] T087 기본 CSS 스타일 작성
   - frontend-dashboard/src/styles/App.css
   - 간단한 레이아웃 스타일 (Flexbox 사용)
   - 알림 카드 스타일 (그림자, 패딩)
   - 심각도별 색상 정의
   - 한국어 주석으로 스타일 설명
 
-- [ ] T088 Dockerfile 작성 (Multi-stage build)
+- [X] T088 Dockerfile 작성 (Multi-stage build)
   - frontend-dashboard/Dockerfile
   - Stage 1: node:20-alpine으로 빌드 (npm run build)
   - Stage 2: nginx:alpine으로 정적 파일 서빙
   - 빌드된 파일을 /usr/share/nginx/html로 복사
   - 한국어 주석으로 단계 설명
 
-- [ ] T089 nginx.conf 설정 파일 작성
+- [X] T089 nginx.conf 설정 파일 작성
   - frontend-dashboard/nginx.conf
   - server.port: 8083
   - SPA 라우팅 지원 (try_files)
   - 한국어 주석으로 설정 설명
 
-- [ ] T090 docker-compose.yml에 frontend-dashboard 서비스 추가
+- [X] T090 docker-compose.yml에 frontend-dashboard 서비스 추가
   - build: ./frontend-dashboard
   - depends_on: websocket-gateway
   - ports: "8083:8083"

@@ -159,6 +159,23 @@ services:
       start_period: 60s
       retries: 3
 
+  # Frontend Dashboard: 실시간 알림 대시보드 (React + TypeScript + Vite)
+  frontend-dashboard:
+    build:
+      context: ./frontend-dashboard
+      dockerfile: Dockerfile
+    container_name: realfds-frontend-dashboard
+    depends_on:
+      - websocket-gateway
+    environment:
+      VITE_WEBSOCKET_URL: ws://localhost:8082/ws/alerts  # WebSocket 서버 URL
+    ports:
+      - "8083:8083"  # 외부 포트:컨테이너 포트 (브라우저 접속용)
+    mem_limit: 256m
+    restart: unless-stopped
+    networks:
+      - realfds-network
+
 # 네트워크 정의: 모든 서비스가 동일한 네트워크에서 통신
 networks:
   realfds-network:
