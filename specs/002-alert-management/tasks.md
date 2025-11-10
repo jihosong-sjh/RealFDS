@@ -114,30 +114,30 @@
 
 #### Backend: alert-service
 
-- [ ] T016 [US1] alert-service: AlertRepository에 상태 업데이트 메서드 추가 (alert-service/src/main/java/com/realfds/alert/repository/AlertRepository.java)
+- [X] T016 [US1] alert-service: AlertRepository에 상태 업데이트 메서드 추가 (alert-service/src/main/java/com/realfds/alert/repository/AlertRepository.java)
   - updateStatus(String alertId, AlertStatus status): 상태 업데이트
   - updateProcessedAt(String alertId, LocalDateTime processedAt): 처리 시각 기록
   - 최대 함수 길이 50줄 준수
   - 한국어 주석으로 메서드 설명
-- [ ] T017 [US1] alert-service: AlertService에 상태 관리 비즈니스 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T017 [US1] alert-service: AlertService에 상태 관리 비즈니스 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - changeStatus(String alertId, AlertStatus newStatus): 상태 전이 로직
   - COMPLETED 상태 시 processedAt 자동 설정
   - 상태 전이 검증 (UNREAD → IN_PROGRESS → COMPLETED, 역방향 가능)
   - 한국어 주석으로 비즈니스 규칙 설명
-- [ ] T018 [US1] alert-service: AlertService에 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T018 [US1] alert-service: AlertService에 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - filterByStatus(AlertStatus status): 상태별 필터링
   - 응답 시간 <100ms 목표 (100개 알림 기준)
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T019 [US1] alert-service: AlertController에 PATCH /api/alerts/{alertId}/status 엔드포인트 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T019 [US1] alert-service: AlertController에 PATCH /api/alerts/{alertId}/status 엔드포인트 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Request: { "status": "IN_PROGRESS" | "COMPLETED" }
   - Response: { "alertId", "status", "processedAt" }
   - 에러 처리: 404 Not Found, 400 Bad Request
   - 한국어 주석으로 API 설명
-- [ ] T020 [US1] alert-service: GET /api/alerts에 status 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T020 [US1] alert-service: GET /api/alerts에 status 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?status=UNREAD | IN_PROGRESS | COMPLETED
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
-- [ ] T021 [US1] alert-service: 상태 변경 시 Kafka로 이벤트 발행 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T021 [US1] alert-service: 상태 변경 시 Kafka로 이벤트 발행 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - Topic: alert-status-changed
   - Event: { alertId, status, processedAt }
   - 한국어 주석으로 이벤트 스키마 설명

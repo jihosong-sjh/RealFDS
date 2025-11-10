@@ -111,4 +111,75 @@ public class AlertRepository {
         alerts.clear();
         logger.debug("저장소 초기화 완료");
     }
+
+    /**
+     * 알림 ID로 조회
+     *
+     * @param alertId 조회할 알림 ID
+     * @return 알림 객체 (없으면 null)
+     */
+    public Alert findByAlertId(String alertId) {
+        if (alertId == null || alertId.isEmpty()) {
+            logger.warn("잘못된 alertId: {}", alertId);
+            return null;
+        }
+
+        for (Alert alert : alerts) {
+            if (alertId.equals(alert.getAlertId())) {
+                logger.debug("알림 조회 성공 - alertId={}", alertId);
+                return alert;
+            }
+        }
+
+        logger.debug("알림을 찾을 수 없음 - alertId={}", alertId);
+        return null;
+    }
+
+    /**
+     * 알림 상태 업데이트
+     *
+     * @param alertId 업데이트할 알림 ID
+     * @param status 새로운 상태 (UNREAD, IN_PROGRESS, COMPLETED)
+     * @return 업데이트 성공 여부
+     */
+    public boolean updateStatus(String alertId, com.realfds.alert.model.AlertStatus status) {
+        if (alertId == null || status == null) {
+            logger.warn("상태 업데이트 실패: alertId={}, status={}", alertId, status);
+            return false;
+        }
+
+        Alert alert = findByAlertId(alertId);
+        if (alert == null) {
+            logger.warn("상태 업데이트 실패: 알림을 찾을 수 없음 - alertId={}", alertId);
+            return false;
+        }
+
+        alert.setStatus(status);
+        logger.debug("상태 업데이트 완료 - alertId={}, status={}", alertId, status);
+        return true;
+    }
+
+    /**
+     * 처리 완료 시각 업데이트
+     *
+     * @param alertId 업데이트할 알림 ID
+     * @param processedAt 처리 완료 시각
+     * @return 업데이트 성공 여부
+     */
+    public boolean updateProcessedAt(String alertId, java.time.Instant processedAt) {
+        if (alertId == null || processedAt == null) {
+            logger.warn("처리 완료 시각 업데이트 실패: alertId={}, processedAt={}", alertId, processedAt);
+            return false;
+        }
+
+        Alert alert = findByAlertId(alertId);
+        if (alert == null) {
+            logger.warn("처리 완료 시각 업데이트 실패: 알림을 찾을 수 없음 - alertId={}", alertId);
+            return false;
+        }
+
+        alert.setProcessedAt(processedAt);
+        logger.debug("처리 완료 시각 업데이트 완료 - alertId={}, processedAt={}", alertId, processedAt);
+        return true;
+    }
 }
