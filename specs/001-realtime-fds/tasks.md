@@ -747,20 +747,20 @@
 
 **목표**: 해외 거래, 빈번한 거래(상태 저장 윈도우) 규칙 구현 및 단위 테스트 작성
 
-- [ ] T093 [P] ForeignCountryRule 구현 (해외 거래 탐지)
+- [X] T093 [P] ForeignCountryRule 구현 (해외 거래 탐지)
   - fraud-detector/src/main/scala/com/realfds/detector/rules/ForeignCountryRule.scala
   - FilterFunction[Transaction] 상속
   - filter() 메서드: countryCode != "KR" 조건 확인
   - 한국어 주석으로 비즈니스 로직 설명
 
-- [ ] T094 [P] ForeignCountryRule Alert 생성 로직 구현
+- [X] T094 [P] ForeignCountryRule Alert 생성 로직 구현
   - fraud-detector/src/main/scala/com/realfds/detector/rules/ForeignCountryRule.scala
   - toAlert() 메서드: Transaction → Alert 변환
   - ruleName: "FOREIGN_COUNTRY", ruleType: "SIMPLE_RULE", severity: "MEDIUM"
   - reason: "해외 거래 탐지 (국가: {countryCode})"
   - 한국어 주석으로 설명
 
-- [ ] T095 HighFrequencyRule 구현 (빈번한 거래 탐지)
+- [X] T095 HighFrequencyRule 구현 (빈번한 거래 탐지)
   - fraud-detector/src/main/scala/com/realfds/detector/rules/HighFrequencyRule.scala
   - KeyedProcessFunction[String, Transaction, Alert] 상속
   - processElement() 메서드: 1분 윈도우 내 거래 수 추적
@@ -769,29 +769,29 @@
   - 1분 이상 지난 데이터는 상태에서 제거
   - 한국어 주석으로 구현 설명
 
-- [ ] T096 HighFrequencyRule Alert 생성 로직 구현
+- [X] T096 HighFrequencyRule Alert 생성 로직 구현
   - fraud-detector/src/main/scala/com/realfds/detector/rules/HighFrequencyRule.scala
   - createAlert() 메서드: Transaction → Alert 변환
   - ruleName: "HIGH_FREQUENCY", ruleType: "STATEFUL_RULE", severity: "HIGH"
   - reason: "빈번한 거래 (1분 내 5회 초과): {userId}, {count}회"
   - 한국어 주석으로 설명
 
-- [ ] T097 [P] 단위 테스트 작성 - ForeignCountryRule
-  - fraud-detector/src/test/scala/com/realfds/detector/rules/ForeignCountryRuleTest.scala
+- [X] T097 [P] 단위 테스트 작성 - ForeignCountryRule
+  - fraud-detector/src/test/scala/com/realfds/detector/rules/ForeignCountryRuleSpec.scala
   - test_filter_foreign_transaction(): KR 외 국가 거래 필터링 확인
   - test_filter_kr_transaction(): KR 거래 미필터링 확인
   - test_to_alert_fields(): Alert 필드 정확성 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T098 [P] 단위 테스트 작성 - HighFrequencyRule
-  - fraud-detector/src/test/scala/com/realfds/detector/rules/HighFrequencyRuleTest.scala
+- [X] T098 [P] 단위 테스트 작성 - HighFrequencyRule
+  - fraud-detector/src/test/scala/com/realfds/detector/rules/HighFrequencyRuleSpec.scala
   - test_high_frequency_detection(): 1분 내 6회 거래 시 알림 생성 확인
   - test_normal_frequency_no_alert(): 5회 이하 거래 시 알림 미생성 확인
   - test_window_reset(): 1분 경과 후 카운터 리셋 확인
   - Flink Testing Harness 사용
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T099 FraudDetectionJob 수정 (3가지 규칙 통합)
+- [X] T099 FraudDetectionJob 수정 (3가지 규칙 통합)
   - fraud-detector/src/main/scala/com/realfds/detector/FraudDetectionJob.scala
   - HighValueRule, ForeignCountryRule 스트림 추가
   - HighFrequencyRule 스트림 추가 (keyBy userId, 1분 윈도우)

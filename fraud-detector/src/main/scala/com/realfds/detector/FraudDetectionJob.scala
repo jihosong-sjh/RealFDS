@@ -1,7 +1,7 @@
 package com.realfds.detector
 
 import com.realfds.detector.models.{Alert, Transaction}
-import com.realfds.detector.rules.HighValueRule
+import com.realfds.detector.rules.{ForeignCountryRule, HighFrequencyRule, HighValueRule}
 import com.realfds.detector.serialization.{AlertSerializationSchema, TransactionDeserializationSchema}
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
@@ -18,14 +18,22 @@ import java.time.{Duration, Instant}
  *
  * **목적**:
  * - Kafka virtual-transactions 토픽에서 거래 데이터를 소비
- * - HighValueRule을 적용하여 고액 거래 탐지
+ * - 3가지 탐지 규칙을 적용하여 의심스러운 거래 패턴 탐지
  * - 탐지된 알림을 Kafka transaction-alerts 토픽으로 발행
+ *
+ * **탐지 규칙**:
+ * 1. HighValueRule (고액 거래): 100만원 초과 거래 탐지
+ * 2. ForeignCountryRule (해외 거래): 한국(KR) 외 국가 거래 탐지
+ * 3. HighFrequencyRule (빈번한 거래): 1분 내 5회 초과 거래 탐지 (상태 기반)
  *
  * **처리 흐름**:
  * 1. Kafka Source: virtual-transactions 토픽 구독
  * 2. Watermark 설정: 5초 지연 허용 (out-of-order 이벤트 처리)
- * 3. HighValueRule 필터 적용
- * 4. Transaction → Alert 변환
+ * 3. 세 가지 규칙을 병렬로 적용:
+ *    - HighValueRule: 단순 필터 (상태 없음)
+ *    - ForeignCountryRule: 단순 필터 (상태 없음)
+ *    - HighFrequencyRule: KeyedProcessFunction (상태 기반)
+ * 4. 모든 Alert 스트림을 Union으로 병합
  * 5. Kafka Sink: transaction-alerts 토픽으로 발행
  *
  * **실행 방법**:
@@ -112,11 +120,15 @@ object FraudDetectionJob {
 
     logger.info("Transaction 스트림 생성 완료")
 
-    // 7. HighValueRule 초기화
+    // 7. 탐지 규칙 초기화
     val highValueRule = new HighValueRule()
+    val foreignCountryRule = new ForeignCountryRule()
+    val highFrequencyRule = new HighFrequencyRule()
 
-    // 8. 고액 거래 필터링 및 Alert 생성
-    val alertStream: DataStream[Alert] = transactionStream
+    logger.info("3가지 탐지 규칙 초기화 완료")
+
+    // 8. HighValueRule: 고액 거래 탐지 (상태 없음, 단순 필터)
+    val highValueAlerts: DataStream[Alert] = transactionStream
       .filter(highValueRule)
       .name("High Value Filter")
       .uid("high-value-filter")
@@ -124,12 +136,44 @@ object FraudDetectionJob {
         logger.debug(s"고액 거래 탐지: transactionId=${transaction.transactionId}")
         highValueRule.toAlert(transaction)
       })
-      .name("Alert Mapper")
-      .uid("alert-mapper")
+      .name("High Value Alert Mapper")
+      .uid("high-value-alert-mapper")
 
     logger.info("고액 거래 탐지 파이프라인 구성 완료")
 
-    // 9. Kafka Sink 생성 (transaction-alerts 토픽)
+    // 9. ForeignCountryRule: 해외 거래 탐지 (상태 없음, 단순 필터)
+    val foreignCountryAlerts: DataStream[Alert] = transactionStream
+      .filter(foreignCountryRule)
+      .name("Foreign Country Filter")
+      .uid("foreign-country-filter")
+      .map(transaction => {
+        logger.debug(s"해외 거래 탐지: transactionId=${transaction.transactionId}, countryCode=${transaction.countryCode}")
+        foreignCountryRule.toAlert(transaction)
+      })
+      .name("Foreign Country Alert Mapper")
+      .uid("foreign-country-alert-mapper")
+
+    logger.info("해외 거래 탐지 파이프라인 구성 완료")
+
+    // 10. HighFrequencyRule: 빈번한 거래 탐지 (상태 기반, KeyedProcessFunction)
+    val highFrequencyAlerts: DataStream[Alert] = transactionStream
+      .keyBy(_.userId) // userId별로 키 지정 (사용자별 상태 관리)
+      .process(highFrequencyRule)
+      .name("High Frequency Processor")
+      .uid("high-frequency-processor")
+
+    logger.info("빈번한 거래 탐지 파이프라인 구성 완료")
+
+    // 11. 모든 Alert 스트림을 Union으로 병합
+    val alertStream: DataStream[Alert] = highValueAlerts
+      .union(foreignCountryAlerts)
+      .union(highFrequencyAlerts)
+      .name("Unified Alert Stream")
+      .uid("unified-alert-stream")
+
+    logger.info("3가지 탐지 규칙 통합 완료")
+
+    // 12. Kafka Sink 생성 (transaction-alerts 토픽)
     val kafkaSink = KafkaSink.builder[Alert]()
       .setBootstrapServers(kafkaBootstrapServers)
       .setRecordSerializer(new AlertSerializationSchema())
@@ -137,7 +181,7 @@ object FraudDetectionJob {
 
     logger.info("Kafka Sink 생성 완료: transaction-alerts 토픽")
 
-    // 10. Alert를 Kafka로 전송
+    // 13. Alert를 Kafka로 전송
     alertStream
       .sinkTo(kafkaSink)
       .name("Alert Sink")
@@ -145,8 +189,8 @@ object FraudDetectionJob {
 
     logger.info("Alert Sink 연결 완료")
 
-    // 11. Job 실행
-    logger.info("=== Fraud Detection Job 실행 중 ===")
-    env.execute("Fraud Detection Job - High Value Rule")
+    // 14. Job 실행
+    logger.info("=== Fraud Detection Job 실행 중 (3가지 탐지 규칙) ===")
+    env.execute("Fraud Detection Job - All Rules (High Value, Foreign Country, High Frequency)")
   }
 }
