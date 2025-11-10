@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Alert } from '../types/alert';
-import type { ConnectionState, ConnectionStatus } from '../types/connectionStatus';
+import type { ConnectionState as ConnectionStatusType } from '../types/connectionStatus';
 
 /**
  * useWebSocket Hook: WebSocket 연결 관리 및 실시간 알림 수신
@@ -13,7 +13,7 @@ export function useWebSocket(url: string) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
   // 상태 관리: 연결 상태 정보
-  const [connectionState, setConnectionState] = useState<ConnectionState>({
+  const [connectionState, setConnectionState] = useState<ConnectionStatusType>({
     status: 'disconnected',
     reconnectAttempts: 0,
   });

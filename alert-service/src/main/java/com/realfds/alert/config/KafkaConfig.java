@@ -64,17 +64,10 @@ public class KafkaConfig {
         // Value Deserializer: JSON (Alert 객체)
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
-        // JSON 역직렬화 설정
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.realfds.alert.model");
-        config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.realfds.alert.model.Alert");
-
         // 오프셋 리셋 정책: earliest (처음부터 읽기)
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        // JSON 역직렬화 시 타입 정보 헤더 사용 안 함
-        config.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
-
-        // JsonDeserializer 설정
+        // JsonDeserializer 설정 (프로그래밍 방식으로만 설정)
         JsonDeserializer<Alert> deserializer = new JsonDeserializer<>(Alert.class);
         deserializer.addTrustedPackages("com.realfds.alert.model");
         deserializer.setUseTypeHeaders(false);
@@ -92,6 +85,10 @@ public class KafkaConfig {
      * @KafkaListener 어노테이션에서 사용되는 Factory입니다.
      * ConsumerFactory를 사용하여 Listener Container를 생성합니다.
      *
+     * autoStartup을 false로 설정하여 애플리케이션 시작 시 Kafka 연결 실패로 인한
+     * 전체 애플리케이션 실패를 방지합니다. Listener는 애플리케이션이 완전히 시작된 후
+     * ApplicationReadyEvent에서 수동으로 시작됩니다.
+     *
      * @return ConcurrentKafkaListenerContainerFactory<String, Alert>
      */
     @Bean
@@ -99,6 +96,8 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, Alert> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        // Kafka 연결 실패 시에도 애플리케이션이 시작될 수 있도록 auto-startup 비활성화
+        factory.setAutoStartup(false);
         return factory;
     }
 }

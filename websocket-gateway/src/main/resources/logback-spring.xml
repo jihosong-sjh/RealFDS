@@ -80,16 +80,8 @@
     <!-- 애플리케이션별 로거 설정 -->
 
     <!-- com.realfds.gateway 패키지: INFO 레벨 -->
-    <logger name="com.realfds.gateway" level="INFO" additivity="false">
-        <if condition='property("LOG_FORMAT").equals("json")'>
-            <then>
-                <appender-ref ref="CONSOLE_JSON" />
-            </then>
-            <else>
-                <appender-ref ref="CONSOLE_TEXT" />
-            </else>
-        </if>
-    </logger>
+    <!-- com.realfds.gateway 패키지: INFO 레벨 -->
+    <logger name="com.realfds.gateway" level="INFO" />
 
     <!-- Spring Framework 로거: INFO 레벨 -->
     <logger name="org.springframework" level="INFO" />

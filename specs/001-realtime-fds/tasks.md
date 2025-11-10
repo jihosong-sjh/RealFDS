@@ -806,32 +806,32 @@
 
 **목표**: ConnectionStatus, AlertList, AlertItem 컴포넌트 개선 및 사용자 경험 향상
 
-- [ ] T100 [P] 시간 포맷팅 유틸리티 구현
+- [X] T100 [P] 시간 포맷팅 유틸리티 구현
   - frontend-dashboard/src/utils/formatter.ts
   - formatTimestamp(timestamp: string): "2025-11-06 10:30:45" 형식 반환
   - formatAmount(amount: number): "1,250,000원" 형식 반환
   - 한국어 주석으로 함수 설명
 
-- [ ] T101 AlertItem 컴포넌트 개선
+- [X] T101 AlertItem 컴포넌트 개선
   - frontend-dashboard/src/components/AlertItem.tsx
   - formatTimestamp, formatAmount 유틸리티 사용
   - 심각도 아이콘 추가 (HIGH: ⚠️, MEDIUM: ⚡, LOW: ℹ️)
   - 애니메이션 효과 추가 (새 알림 등장 시 fade-in)
   - 한국어 주석으로 개선 내용 설명
 
-- [ ] T102 ConnectionStatus 컴포넌트 개선
+- [X] T102 ConnectionStatus 컴포넌트 개선
   - frontend-dashboard/src/components/ConnectionStatus.tsx
   - 재연결 시도 횟수 표시 (reconnectAttempts)
   - 마지막 연결 시각 표시 (lastConnectedAt)
   - 한국어 텍스트
 
-- [ ] T103 AlertList 컴포넌트 개선
+- [X] T103 AlertList 컴포넌트 개선
   - frontend-dashboard/src/components/AlertList.tsx
   - 스크롤 영역 추가 (최대 높이 600px, overflow-y: auto)
   - 로딩 인디케이터 추가 (알림 없을 때)
   - 한국어 텍스트
 
-- [ ] T104 [P] CSS 스타일 개선
+- [X] T104 [P] CSS 스타일 개선
   - frontend-dashboard/src/styles/App.css
   - 반응형 디자인 추가 (미디어 쿼리)
   - 그라데이션 배경 추가
@@ -846,7 +846,7 @@
 
 **목표**: `scripts/test-e2e.sh` 스크립트 작성 및 전체 파이프라인 테스트
 
-- [ ] T105 E2E 테스트 스크립트 작성 (최종)
+- [X] T105 E2E 테스트 스크립트 작성 (최종)
   - scripts/test-e2e.sh
   - 1. docker-compose up -d (모든 서비스)
   - 2. 5분 대기 (시스템 준비)
@@ -861,7 +861,7 @@
   - 8. docker-compose down
   - 한국어 주석으로 테스트 단계 설명
 
-- [ ] T106 지연 시간 측정 스크립트 작성
+- [X] T106 지연 시간 측정 스크립트 작성
   - scripts/measure-latency.sh
   - 1. Kafka 토픽에서 Transaction 타임스탬프 추출
   - 2. alert-service 로그에서 Alert 수신 타임스탬프 추출
@@ -870,13 +870,13 @@
   - 목표: 평균 <3초, p95 <5초
   - 한국어 주석으로 스크립트 설명
 
-- [ ] T107 E2E 테스트 실행 및 검증
+- [X] T107 E2E 테스트 실행 및 검증
   - scripts/test-e2e.sh 실행
   - 3가지 탐지 규칙 모두 작동 확인
   - 종단 간 지연 시간 측정 (scripts/measure-latency.sh)
   - 테스트 통과 확인
 
-- [ ] T108 30분 안정성 테스트
+- [X] T108 30분 안정성 테스트
   - docker-compose up -d로 시스템 실행
   - 30분간 모니터링 (docker-compose logs -f)
   - 크래시, 메모리 부족, 연결 끊김 없는지 확인
