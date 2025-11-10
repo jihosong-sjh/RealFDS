@@ -144,11 +144,11 @@
 
 #### Backend: websocket-gateway
 
-- [ ] T022 [US1] websocket-gateway: alert-status-changed Kafka 이벤트 구독 (websocket-gateway/src/main/java/com/realfds/gateway/service/KafkaConsumerService.java)
+- [X] T022 [US1] websocket-gateway: alert-status-changed Kafka 이벤트 구독 (websocket-gateway/src/main/java/com/realfds/gateway/service/KafkaConsumerService.java)
   - Topic: alert-status-changed 구독
   - 이벤트 수신 시 WebSocket 브로드캐스트 트리거
   - 한국어 주석으로 구독 로직 설명
-- [ ] T023 [US1] websocket-gateway: ALERT_STATUS_CHANGED WebSocket 이벤트 브로드캐스트 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T023 [US1] websocket-gateway: ALERT_STATUS_CHANGED WebSocket 이벤트 브로드캐스트 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
   - Event: { type: "ALERT_STATUS_CHANGED", alertId, status, processedAt }
   - 모든 연결된 클라이언트에 브로드캐스트
   - 1초 이내 브로드캐스트 목표
@@ -156,32 +156,32 @@
 
 #### Frontend: frontend-dashboard
 
-- [ ] T024 [P] [US1] frontend: Alert 타입에 status, processedAt 필드 추가 (frontend-dashboard/src/types/alert.ts)
+- [X] T024 [P] [US1] frontend: Alert 타입에 status, processedAt 필드 추가 (frontend-dashboard/src/types/alert.ts)
   - status: 'UNREAD' | 'IN_PROGRESS' | 'COMPLETED'
   - processedAt: string | null
   - TypeScript 타입 정의
   - 한국어 주석으로 타입 설명
-- [ ] T025 [P] [US1] frontend: AlertStatus enum 타입 정의 (frontend-dashboard/src/types/alertStatus.ts)
+- [X] T025 [P] [US1] frontend: AlertStatus enum 타입 정의 (frontend-dashboard/src/types/alertStatus.ts)
   - UNREAD, IN_PROGRESS, COMPLETED
   - 한국어 주석으로 상태 설명
-- [ ] T026 [US1] frontend: useAlertManagement 커스텀 hook 생성 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T026 [US1] frontend: useAlertManagement 커스텀 hook 생성 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - changeAlertStatus(alertId, newStatus): 상태 변경 API 호출
   - 에러 처리 및 로딩 상태 관리
   - 한국어 주석으로 hook 사용법 설명
-- [ ] T027 [US1] frontend: AlertItem 컴포넌트에 상태 뱃지 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T027 [US1] frontend: AlertItem 컴포넌트에 상태 뱃지 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - UNREAD: 회색, IN_PROGRESS: 파란색, COMPLETED: 초록색
   - 상태 텍스트 표시 (미확인/확인중/완료)
   - 한국어 주석으로 컴포넌트 설명
-- [ ] T028 [US1] frontend: AlertDetailModal 컴포넌트 생성 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T028 [US1] frontend: AlertDetailModal 컴포넌트 생성 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 알림 상세 정보 표시
   - 상태 변경 버튼 (확인중으로 변경, 완료 처리)
   - 모달 로딩 시간 <200ms 목표
   - 한국어 주석으로 UI 설명
-- [ ] T029 [US1] frontend: AlertFilterPanel 컴포넌트 생성 - 상태 필터 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T029 [US1] frontend: AlertFilterPanel 컴포넌트 생성 - 상태 필터 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 상태별 필터 드롭다운 (전체/미확인/확인중/완료)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T030 [US1] frontend: WebSocket 이벤트 리스너에 ALERT_STATUS_CHANGED 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
+- [X] T030 [US1] frontend: WebSocket 이벤트 리스너에 ALERT_STATUS_CHANGED 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
   - 이벤트 수신 시 알림 목록 자동 업데이트
   - 1초 이내 UI 반영 목표
   - 한국어 주석으로 동기화 로직 설명

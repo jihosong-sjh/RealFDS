@@ -25,4 +25,8 @@ export interface Alert {
   reason: string;                 // 한국어 설명 (예: "고액 거래 (100만원 초과)")
   severity: 'HIGH' | 'MEDIUM' | 'LOW'; // 심각도
   alertTimestamp: string;         // 알림 생성 시각 (ISO 8601)
+
+  // 002-alert-management: 상태 관리 필드 추가
+  status: 'UNREAD' | 'IN_PROGRESS' | 'COMPLETED'; // 처리 상태
+  processedAt: string | null;     // 처리 완료 시각 (ISO 8601, status=COMPLETED 시만)
 }
