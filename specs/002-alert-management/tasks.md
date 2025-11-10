@@ -188,11 +188,11 @@
 
 #### Logging & Observability
 
-- [ ] T031 [US1] alert-service: 상태 변경 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T031 [US1] alert-service: 상태 변경 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - INFO 레벨: 상태 변경 성공 (alertId, oldStatus, newStatus, processedAt 포함)
   - ERROR 레벨: 상태 변경 실패 (alertId, 오류 원인 포함)
   - 로그 메시지는 한국어로 작성
-- [ ] T032 [US1] websocket-gateway: 상태 변경 브로드캐스트 로깅 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T032 [US1] websocket-gateway: 상태 변경 브로드캐스트 로깅 추가 (websocket-gateway/src/main/java/com/realfds/gateway/service/BroadcastService.java)
   - INFO 레벨: 브로드캐스트 성공 (eventType, alertId, 클라이언트 수 포함)
   - ERROR 레벨: 브로드캐스트 실패 (오류 원인 포함)
   - 로그 메시지는 한국어로 작성

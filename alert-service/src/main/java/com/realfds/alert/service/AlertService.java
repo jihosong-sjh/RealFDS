@@ -105,47 +105,64 @@ public class AlertService {
      * - COMPLETED 상태로 변경 시 processedAt 자동 설정
      * - 상태 변경 성공 시 Kafka 이벤트 발행 (alert-status-changed 토픽)
      *
+     * 구조화된 로깅:
+     * - INFO: 상태 변경 성공 (alertId, oldStatus, newStatus, processedAt 포함)
+     * - ERROR: 상태 변경 실패 (alertId, 오류 원인 포함)
+     *
      * @param alertId 변경할 알림 ID
      * @param newStatus 새로운 상태 (UNREAD, IN_PROGRESS, COMPLETED)
      * @return 업데이트된 Alert 객체 (실패 시 null)
      */
     public Alert changeStatus(String alertId, AlertStatus newStatus) {
+        // 입력 검증: alertId
         if (alertId == null || alertId.isEmpty()) {
-            logger.warn("상태 변경 실패: alertId가 비어있음");
+            logger.error("상태 변경 실패: alertId={}, 오류 원인=alertId가 비어있음", alertId);
             return null;
         }
 
+        // 입력 검증: newStatus
         if (newStatus == null) {
-            logger.warn("상태 변경 실패: newStatus가 null - alertId={}", alertId);
+            logger.error("상태 변경 실패: alertId={}, 오류 원인=newStatus가 null", alertId);
             return null;
         }
 
         // 알림 조회
         Alert alert = alertRepository.findByAlertId(alertId);
         if (alert == null) {
-            logger.warn("상태 변경 실패: 알림을 찾을 수 없음 - alertId={}", alertId);
+            logger.error("상태 변경 실패: alertId={}, 오류 원인=알림을 찾을 수 없음", alertId);
             return null;
         }
 
         AlertStatus oldStatus = alert.getStatus();
 
-        // 상태 변경
-        alert.setStatus(newStatus);
+        try {
+            // 상태 변경
+            alert.setStatus(newStatus);
 
-        // COMPLETED 상태로 변경 시 processedAt 자동 설정
-        if (newStatus == AlertStatus.COMPLETED && alert.getProcessedAt() == null) {
-            alert.setProcessedAt(Instant.now());
-            logger.info("상태 변경 완료 - alertId={}, oldStatus={}, newStatus={}, processedAt={}",
-                alertId, oldStatus, newStatus, alert.getProcessedAt());
-        } else {
-            logger.info("상태 변경 완료 - alertId={}, oldStatus={}, newStatus={}",
-                alertId, oldStatus, newStatus);
+            // COMPLETED 상태로 변경 시 processedAt 자동 설정
+            if (newStatus == AlertStatus.COMPLETED && alert.getProcessedAt() == null) {
+                alert.setProcessedAt(Instant.now());
+
+                // 구조화된 로깅: INFO 레벨 (성공 - processedAt 포함)
+                logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
+                    alertId, oldStatus, newStatus, alert.getProcessedAt());
+            } else {
+                // 구조화된 로깅: INFO 레벨 (성공)
+                logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
+                    alertId, oldStatus, newStatus, alert.getProcessedAt());
+            }
+
+            // Kafka 이벤트 발행
+            publishStatusChangedEvent(alert);
+
+            return alert;
+
+        } catch (Exception e) {
+            // 구조화된 로깅: ERROR 레벨 (실패)
+            logger.error("상태 변경 실패: alertId={}, oldStatus={}, newStatus={}, 오류 원인={}",
+                alertId, oldStatus, newStatus, e.getMessage(), e);
+            return null;
         }
-
-        // Kafka 이벤트 발행
-        publishStatusChangedEvent(alert);
-
-        return alert;
     }
 
     /**
