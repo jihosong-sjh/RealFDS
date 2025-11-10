@@ -658,20 +658,20 @@
   - React.StrictMode로 App 컴포넌트 렌더링
   - 한국어 주석으로 설명
 
-- [ ] T084 [P] 단위 테스트 작성 - useWebSocket hook
+- [X] T084 [P] 단위 테스트 작성 - useWebSocket hook
   - frontend-dashboard/tests/hooks/useWebSocket.test.ts
   - test_initial_state(): 초기 상태 확인 (disconnected, 빈 alerts 배열)
   - test_connection_established(): WebSocket 연결 시 상태 변경 확인
   - Mock WebSocket 사용
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T085 [P] 단위 테스트 작성 - AlertItem 컴포넌트
+- [X] T085 [P] 단위 테스트 작성 - AlertItem 컴포넌트
   - frontend-dashboard/tests/components/AlertItem.test.tsx
   - test_render_alert_fields(): 모든 필드 렌더링 확인
   - test_severity_color(): 심각도에 따른 색상 표시 확인
   - Given-When-Then 구조 사용, 한국어 주석
 
-- [ ] T086 [P] 단위 테스트 작성 - AlertList 컴포넌트
+- [X] T086 [P] 단위 테스트 작성 - AlertList 컴포넌트
   - frontend-dashboard/tests/components/AlertList.test.tsx
   - test_render_alerts(): 알림 목록 렌더링 확인
   - test_render_empty_message(): 알림 없을 때 메시지 표시 확인
@@ -711,7 +711,7 @@
 
 **목표**: 2단계 전체 파이프라인 검증 (백엔드 → 프론트엔드)
 
-- [ ] T091 E2E 테스트 스크립트 작성 (2단계)
+- [X] T091 E2E 테스트 스크립트 작성 (2단계)
   - scripts/test-e2e-phase2.sh
   - 1. docker-compose up -d (모든 서비스)
   - 2. 5분 대기 (시스템 준비)
@@ -722,7 +722,7 @@
   - 7. docker-compose down
   - 한국어 주석으로 테스트 단계 설명
 
-- [ ] T092 E2E 테스트 실행 및 검증
+- [X] T092 E2E 테스트 실행 및 검증
   - scripts/test-e2e-phase2.sh 실행
   - 테스트 통과 확인
   - 실패 시 로그 확인 및 수정

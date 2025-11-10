@@ -13,4 +13,10 @@ export default defineConfig({
     port: 8083, // 프리뷰 서버 포트 (빌드 후 미리보기)
     host: true,
   },
+  test: {
+    // Vitest 설정: 단위 테스트 및 컴포넌트 테스트
+    globals: true, // describe, it, expect 등을 전역으로 사용
+    environment: 'jsdom', // React 컴포넌트 테스트를 위한 브라우저 환경 시뮬레이션
+    setupFiles: './tests/setup.ts', // 테스트 초기화 파일
+  },
 })

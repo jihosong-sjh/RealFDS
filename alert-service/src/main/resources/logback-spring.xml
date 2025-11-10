@@ -61,21 +61,10 @@
         </encoder>
     </appender>
 
-    <!-- Spring Profile별 로그 설정 -->
-
-    <!-- 기본 프로파일: JSON 형식 로그 -->
-    <springProfile name="!dev">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE_JSON" />
-        </root>
-    </springProfile>
-
-    <!-- 개발 프로파일: 텍스트 형식 로그 (가독성 우선) -->
-    <springProfile name="dev">
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE_TEXT" />
-        </root>
-    </springProfile>
+    <!-- Root 로거 설정: JSON 형식 로그, INFO 레벨 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_JSON" />
+    </root>
 
     <!-- 애플리케이션별 로거 설정 -->
 
