@@ -890,7 +890,7 @@
 
 **목표**: 각 서비스별 README 및 상위 레벨 문서(`quickstart.md`, `architecture.md`) 작성
 
-- [ ] T109 [P] 루트 README.md 작성
+- [X] T109 [P] 루트 README.md 작성
   - README.md
   - 프로젝트 개요 (한국어)
   - 빠른 시작 가이드 (docker-compose up)
@@ -899,7 +899,7 @@
   - 문제 해결 섹션
   - 한국어로 작성
 
-- [ ] T110 [P] architecture.md 작성
+- [X] T110 [P] architecture.md 작성
   - docs/architecture.md
   - 시스템 아키텍처 다이어그램
   - 데이터 흐름 설명 (거래 생성 → 탐지 → 알림 → 브라우저)
@@ -907,7 +907,7 @@
   - 기술 스택 설명
   - 한국어로 작성
 
-- [ ] T111 [P] development.md 작성
+- [X] T111 [P] development.md 작성
   - docs/development.md
   - 로컬 개발 환경 설정
   - 각 서비스별 빌드 및 실행 방법
@@ -915,14 +915,14 @@
   - 새로운 탐지 규칙 추가 가이드
   - 한국어로 작성
 
-- [ ] T112 [P] troubleshooting.md 작성
+- [X] T112 [P] troubleshooting.md 작성
   - docs/troubleshooting.md
   - 일반적인 문제 및 해결 방법
   - 포트 충돌, 메모리 부족, Kafka 연결 실패 등
   - 로그 확인 방법
   - 한국어로 작성
 
-- [ ] T113 [P] transaction-generator/README.md 작성
+- [X] T113 [P] transaction-generator/README.md 작성
   - transaction-generator/README.md
   - 서비스 목적 및 책임
   - 입력/출력 (Kafka 토픽)
@@ -930,7 +930,7 @@
   - 환경 변수 설명
   - 한국어로 작성
 
-- [ ] T114 [P] fraud-detector/README.md 작성
+- [X] T114 [P] fraud-detector/README.md 작성
   - fraud-detector/README.md
   - 서비스 목적 및 책임
   - 3가지 탐지 규칙 설명
@@ -938,21 +938,21 @@
   - 로컬 실행 방법
   - 한국어로 작성
 
-- [ ] T115 [P] alert-service/README.md 작성
+- [X] T115 [P] alert-service/README.md 작성
   - alert-service/README.md
   - 서비스 목적 및 책임
   - 입력/출력 (Kafka 토픽, REST API)
   - 로컬 실행 방법
   - 한국어로 작성
 
-- [ ] T116 [P] websocket-gateway/README.md 작성
+- [X] T116 [P] websocket-gateway/README.md 작성
   - websocket-gateway/README.md
   - 서비스 목적 및 책임
   - WebSocket API 설명
   - 로컬 실행 방법
   - 한국어로 작성
 
-- [ ] T117 [P] frontend-dashboard/README.md 작성
+- [X] T117 [P] frontend-dashboard/README.md 작성
   - frontend-dashboard/README.md
   - 서비스 목적 및 책임
   - UI 컴포넌트 설명
