@@ -1,15 +1,19 @@
-import type { ConnectionStatus as StatusType } from '../types/connectionStatus';
+import type { ConnectionState } from '../types/connectionStatus';
+import { formatTimestamp } from '../utils/formatter';
 
 /**
  * ConnectionStatus 컴포넌트: WebSocket 연결 상태 표시
+ * - 재연결 시도 횟수 표시 (reconnectAttempts)
+ * - 마지막 연결 시각 표시 (lastConnectedAt)
  *
- * @param props.status - 연결 상태 ("connected" | "disconnected" | "connecting")
+ * @param props.connectionState - 연결 상태 정보
  */
 interface ConnectionStatusProps {
-  status: StatusType;
+  connectionState: ConnectionState;
 }
 
-export function ConnectionStatus({ status }: ConnectionStatusProps) {
+export function ConnectionStatus({ connectionState }: ConnectionStatusProps) {
+  const { status, lastConnectedAt, reconnectAttempts } = connectionState;
   // 연결 상태에 따른 스타일 및 텍스트 설정
   const getStatusConfig = () => {
     switch (status) {
@@ -44,8 +48,26 @@ export function ConnectionStatus({ status }: ConnectionStatusProps) {
 
   return (
     <div className={`connection-status ${config.className}`} style={{ color: config.color }}>
-      <span className="status-indicator" style={{ backgroundColor: config.color }}></span>
-      <span className="status-text">{config.text}</span>
+      <div className="status-main">
+        <span className="status-indicator" style={{ backgroundColor: config.color }}></span>
+        <span className="status-text">{config.text}</span>
+      </div>
+
+      {/* 재연결 시도 횟수 표시 (연결 끊김 상태일 때만) */}
+      {status === 'disconnected' && reconnectAttempts > 0 && (
+        <div className="status-details">
+          <span className="status-detail-text">재연결 시도: {reconnectAttempts}회</span>
+        </div>
+      )}
+
+      {/* 마지막 연결 시각 표시 (연결됨 상태일 때만) */}
+      {status === 'connected' && lastConnectedAt && (
+        <div className="status-details">
+          <span className="status-detail-text">
+            마지막 연결: {formatTimestamp(lastConnectedAt)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

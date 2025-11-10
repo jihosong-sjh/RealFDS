@@ -1,7 +1,11 @@
 import type { Alert } from '../types/alert';
+import { formatTimestamp, formatAmount } from '../utils/formatter';
 
 /**
  * AlertItem 컴포넌트: 개별 알림 카드 표시
+ * - 포맷팅 유틸리티 사용 (formatTimestamp, formatAmount)
+ * - 심각도 아이콘 추가 (HIGH: ⚠️, MEDIUM: ⚡, LOW: ℹ️)
+ * - 애니메이션 효과 추가 (새 알림 등장 시 fade-in)
  *
  * @param props.alert - 알림 데이터
  */
@@ -46,30 +50,8 @@ export function AlertItem({ alert }: AlertItemProps) {
 
   const severityConfig = getSeverityConfig(alert.severity);
 
-  // 시간 포맷팅 (ISO 8601 → 한국 시간)
-  const formatTimestamp = (timestamp: string) => {
-    try {
-      const date = new Date(timestamp);
-      return date.toLocaleString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-    } catch {
-      return timestamp;
-    }
-  };
-
-  // 금액 포맷팅 (1,000,000 → 1,000,000원)
-  const formatAmount = (amount: number) => {
-    return amount.toLocaleString('ko-KR') + '원';
-  };
-
   return (
-    <div className={`alert-item ${severityConfig.className}`}>
+    <div className={`alert-item ${severityConfig.className} alert-item-fade-in`}>
       {/* 심각도 표시 */}
       <div className="alert-header">
         <span className="severity-badge" style={{ backgroundColor: severityConfig.color }}>

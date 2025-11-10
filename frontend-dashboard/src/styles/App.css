@@ -7,7 +7,9 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 그라데이션 배경 개선: 보라색에서 파란색으로 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5b7fe6 100%);
+  background-attachment: fixed; /* 스크롤 시 배경 고정 */
   min-height: 100vh;
   color: #1f2937;
 }
@@ -41,6 +43,7 @@ body {
 /* 연결 상태 스타일 */
 .connection-status {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
@@ -50,6 +53,12 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
   font-weight: 600;
+}
+
+.status-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .status-indicator {
@@ -70,6 +79,18 @@ body {
 
 .status-text {
   font-size: 1rem;
+}
+
+/* 연결 상태 상세 정보 */
+.status-details {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.status-detail-text {
+  font-size: 0.875rem;
 }
 
 /* 알림 목록 스타일 */
@@ -137,6 +158,9 @@ body {
   text-align: center;
   padding: 4rem 2rem;
   color: #6b7280;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .empty-message {
@@ -150,13 +174,50 @@ body {
   opacity: 0.8;
 }
 
+/* 로딩 인디케이터 스타일 */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
 /* 개별 알림 카드 스타일 */
 .alert-item {
   background: #f9fafb;
   border-left: 4px solid #d1d5db;
   border-radius: 0.5rem;
   padding: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 새 알림 등장 시 fade-in 애니메이션 */
+.alert-item-fade-in {
   animation: fadeIn 0.5s ease-out;
 }
 
@@ -171,9 +232,11 @@ body {
   }
 }
 
+/* 카드 호버 효과 개선 */
 .alert-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 
 /* 심각도별 색상 */
@@ -260,6 +323,7 @@ body {
 }
 
 /* 반응형 디자인 */
+/* 태블릿 (768px 이하) */
 @media (max-width: 768px) {
   .app-container {
     padding: 1rem;
@@ -276,5 +340,43 @@ body {
   .detail-row {
     flex-direction: column;
     gap: 0.25rem;
+  }
+
+  .alert-list-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
+
+/* 모바일 (480px 이하) */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .alert-list-container {
+    max-height: 400px;
+  }
+
+  .alert-item {
+    padding: 0.75rem;
+  }
+
+  .alert-reason {
+    font-size: 1rem;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
   }
 }

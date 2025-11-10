@@ -14,7 +14,7 @@ function App() {
   const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8082/ws/alerts';
 
   // useWebSocket hook으로 WebSocket 연결 및 알림 수신
-  const { alerts, connectionStatus } = useWebSocket(websocketUrl);
+  const { alerts, connectionState } = useWebSocket(websocketUrl);
 
   return (
     <div className="app-container">
@@ -22,7 +22,7 @@ function App() {
       <Header />
 
       {/* 연결 상태 표시 */}
-      <ConnectionStatus status={connectionStatus} />
+      <ConnectionStatus connectionState={connectionState} />
 
       {/* 알림 목록 */}
       <AlertList alerts={alerts} />
