@@ -69,13 +69,13 @@
 
 **⚠️ 중요**: 이 Phase가 완료되어야 User Story 작업을 시작할 수 있습니다
 
-- [ ] T006 [P] fraud-detector: DetectionRule 모델에 severity 필드 추가 (fraud-detector/src/main/scala/com/realfds/detector/models/DetectionRule.scala)
-- [ ] T007 [P] fraud-detector: HighValueRule에 severity=HIGH 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/HighValueRule.scala)
-- [ ] T008 [P] fraud-detector: ForeignCountryRule에 severity=MEDIUM 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/ForeignCountryRule.scala)
-- [ ] T009 [P] fraud-detector: HighFrequencyRule에 severity=HIGH 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/HighFrequencyRule.scala)
-- [ ] T010 [P] alert-service: Alert 모델에 status, assignedTo, actionNote, processedAt 필드 추가 (alert-service/src/main/java/com/realfds/alert/model/Alert.java)
-- [ ] T011 [P] alert-service: AlertStatus enum 생성 (UNREAD, IN_PROGRESS, COMPLETED) (alert-service/src/main/java/com/realfds/alert/model/AlertStatus.java)
-- [ ] T012 [P] alert-service: Severity enum 생성 (LOW, MEDIUM, HIGH, CRITICAL) (alert-service/src/main/java/com/realfds/alert/model/Severity.java)
+- [X] T006 [P] fraud-detector: DetectionRule 모델에 severity 필드 추가 (fraud-detector/src/main/scala/com/realfds/detector/models/DetectionRule.scala)
+- [X] T007 [P] fraud-detector: HighValueRule에 severity=HIGH 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/HighValueRule.scala)
+- [X] T008 [P] fraud-detector: ForeignCountryRule에 severity=MEDIUM 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/ForeignCountryRule.scala)
+- [X] T009 [P] fraud-detector: HighFrequencyRule에 severity=HIGH 설정 추가 (fraud-detector/src/main/scala/com/realfds/detector/rules/HighFrequencyRule.scala)
+- [X] T010 [P] alert-service: Alert 모델에 status, assignedTo, actionNote, processedAt 필드 추가 (alert-service/src/main/java/com/realfds/alert/model/Alert.java)
+- [X] T011 [P] alert-service: AlertStatus enum 생성 (UNREAD, IN_PROGRESS, COMPLETED) (alert-service/src/main/java/com/realfds/alert/model/AlertStatus.java)
+- [X] T012 [P] alert-service: Severity enum 생성 (LOW, MEDIUM, HIGH, CRITICAL) (alert-service/src/main/java/com/realfds/alert/model/Severity.java)
 
 **Checkpoint**: 기반 인프라 준비 완료 - User Story 구현을 병렬로 시작 가능
 
