@@ -99,14 +99,14 @@
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 > **Constitution V 요구사항**: ≥70% 커버리지, Given-When-Then 구조 사용
 
-- [ ] T013 [P] [US1] alert-service: AlertService 상태 변경 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertServiceTest.java)
+- [X] T013 [P] [US1] alert-service: AlertService 상태 변경 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertServiceTest.java)
   - Given: UNREAD 상태의 알림, When: IN_PROGRESS로 변경, Then: 상태 변경 성공 및 processedAt null 유지
   - Given: IN_PROGRESS 상태의 알림, When: COMPLETED로 변경, Then: 상태 변경 성공 및 processedAt 자동 설정
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T014 [P] [US1] alert-service: 상태별 필터링 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterTest.java)
+- [X] T014 [P] [US1] alert-service: 상태별 필터링 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterTest.java)
   - Given: 다양한 상태의 알림 목록, When: status=UNREAD 필터 적용, Then: UNREAD 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T015 [P] [US1] alert-service: REST API 엔드포인트 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/controller/AlertControllerIntegrationTest.java)
+- [X] T015 [P] [US1] alert-service: REST API 엔드포인트 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/controller/AlertControllerIntegrationTest.java)
   - Given: 테스트 알림 생성, When: PATCH /api/alerts/{id}/status 호출, Then: 200 OK 및 상태 변경 확인
   - 한국어 주석으로 API 계약 설명
 

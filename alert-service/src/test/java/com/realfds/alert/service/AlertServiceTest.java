@@ -119,6 +119,98 @@ class AlertServiceTest {
         verify(alertRepository, times(1)).getRecentAlerts(10);
     }
 
+    // ========================================
+    // T013: 상태 변경 로직 단위 테스트 (User Story 1)
+    // ========================================
+
+    @Test
+    @DisplayName("[T013] Given: UNREAD 상태의 알림, When: IN_PROGRESS로 변경, Then: 상태 변경 성공 및 processedAt null 유지")
+    void testChangeStatusFromUnreadToInProgress() {
+        // Given: UNREAD 상태의 알림 생성
+        Alert alert = createTestAlert("alert-001", "HIGH_VALUE", "HIGH");
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.UNREAD);
+        assertThat(alert.getProcessedAt()).isNull();
+
+        // When: IN_PROGRESS로 상태 변경
+        alert.setStatus(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+
+        // Then: 상태가 IN_PROGRESS로 변경되고 processedAt은 null 유지
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+        assertThat(alert.getProcessedAt()).isNull();
+    }
+
+    @Test
+    @DisplayName("[T013] Given: IN_PROGRESS 상태의 알림, When: COMPLETED로 변경, Then: 상태 변경 성공 및 processedAt 자동 설정")
+    void testChangeStatusFromInProgressToCompleted() {
+        // Given: IN_PROGRESS 상태의 알림 생성
+        Alert alert = createTestAlert("alert-001", "HIGH_VALUE", "HIGH");
+        alert.setStatus(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+        assertThat(alert.getProcessedAt()).isNull();
+
+        Instant beforeChange = Instant.now();
+
+        // When: COMPLETED로 상태 변경
+        alert.setStatus(com.realfds.alert.model.AlertStatus.COMPLETED);
+
+        Instant afterChange = Instant.now();
+
+        // Then: 상태가 COMPLETED로 변경되고 processedAt이 자동 설정됨
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.COMPLETED);
+        assertThat(alert.getProcessedAt()).isNotNull();
+
+        // Then: processedAt이 현재 시각 범위 내에 있는지 확인
+        assertThat(alert.getProcessedAt()).isBetween(beforeChange, afterChange);
+    }
+
+    @Test
+    @DisplayName("[T013] Given: UNREAD 상태의 알림, When: COMPLETED로 직접 변경, Then: 상태 변경 성공 및 processedAt 자동 설정")
+    void testChangeStatusFromUnreadToCompletedDirectly() {
+        // Given: UNREAD 상태의 알림 생성
+        Alert alert = createTestAlert("alert-001", "HIGH_VALUE", "HIGH");
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.UNREAD);
+        assertThat(alert.getProcessedAt()).isNull();
+
+        // When: COMPLETED로 직접 변경 (조사 불필요한 경우)
+        alert.setStatus(com.realfds.alert.model.AlertStatus.COMPLETED);
+
+        // Then: 상태가 COMPLETED로 변경되고 processedAt이 자동 설정됨
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.COMPLETED);
+        assertThat(alert.getProcessedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[T013] Given: COMPLETED 상태의 알림, When: IN_PROGRESS로 역방향 변경, Then: 상태 변경 성공 및 processedAt 유지")
+    void testChangeStatusFromCompletedToInProgressReverse() {
+        // Given: COMPLETED 상태의 알림 생성
+        Alert alert = createTestAlert("alert-001", "HIGH_VALUE", "HIGH");
+        alert.setStatus(com.realfds.alert.model.AlertStatus.COMPLETED);
+        Instant originalProcessedAt = alert.getProcessedAt();
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.COMPLETED);
+        assertThat(originalProcessedAt).isNotNull();
+
+        // When: IN_PROGRESS로 역방향 변경 (재조사 필요)
+        alert.setStatus(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+
+        // Then: 상태가 IN_PROGRESS로 변경되고 processedAt은 기존 값 유지
+        assertThat(alert.getStatus()).isEqualTo(com.realfds.alert.model.AlertStatus.IN_PROGRESS);
+        assertThat(alert.getProcessedAt()).isEqualTo(originalProcessedAt);
+    }
+
+    @Test
+    @DisplayName("[T013] Given: 알림, When: null 상태로 변경 시도, Then: IllegalArgumentException 발생")
+    void testChangeStatusToNull() {
+        // Given: UNREAD 상태의 알림 생성
+        Alert alert = createTestAlert("alert-001", "HIGH_VALUE", "HIGH");
+
+        // When & Then: null 상태로 변경 시 예외 발생
+        org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> alert.setStatus(null),
+            "Status는 null일 수 없습니다"
+        );
+    }
+
     /**
      * 테스트용 Alert 객체 생성 헬퍼 메서드
      */
