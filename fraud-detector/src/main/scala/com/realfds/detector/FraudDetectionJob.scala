@@ -168,8 +168,6 @@ object FraudDetectionJob {
     val alertStream: DataStream[Alert] = highValueAlerts
       .union(foreignCountryAlerts)
       .union(highFrequencyAlerts)
-      .name("Unified Alert Stream")
-      .uid("unified-alert-stream")
 
     logger.info("3가지 탐지 규칙 통합 완료")
 
