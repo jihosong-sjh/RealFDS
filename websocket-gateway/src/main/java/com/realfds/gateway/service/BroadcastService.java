@@ -122,6 +122,87 @@ public class BroadcastService {
     }
 
     /**
+     * 모든 WebSocket 세션에 상태 변경 이벤트를 브로드캐스트합니다.
+     *
+     * alert-service에서 Kafka를 통해 수신한 상태 변경 이벤트를
+     * 연결된 모든 WebSocket 클라이언트에게 전달합니다.
+     *
+     * 이벤트 스키마:
+     * {
+     *   "type": "ALERT_STATUS_CHANGED",
+     *   "alertId": "uuid",
+     *   "status": "IN_PROGRESS",
+     *   "processedAt": "2025-11-11T10:30:00Z" (선택),
+     *   "assignedTo": "김보안" (선택),
+     *   "actionNote": "고객 확인 완료" (선택)
+     * }
+     *
+     * 구조화된 로깅:
+     * - INFO: 브로드캐스트 성공 (eventType, alertId, 클라이언트 수 포함)
+     * - ERROR: 브로드캐스트 실패 (오류 원인 포함)
+     *
+     * Micrometer 메트릭:
+     * - websocket_broadcast_total: 브로드캐스트 성공 시 카운터 증가
+     * - websocket_broadcast_latency: 브로드캐스트 소요 시간 기록
+     *
+     * @param statusChangeEvent 상태 변경 이벤트 (Map)
+     */
+    public void broadcastStatusChange(java.util.Map<String, Object> statusChangeEvent) {
+        // 브로드캐스트 지연 시간 측정
+        broadcastLatencyTimer.record(() -> {
+            long startTime = System.currentTimeMillis();
+            int successCount = 0;
+            int failureCount = 0;
+
+            try {
+                // 이벤트 타입 추가 (프론트엔드에서 구분하기 위해)
+                java.util.Map<String, Object> eventWithType = new java.util.HashMap<>(statusChangeEvent);
+                eventWithType.put("type", "ALERT_STATUS_CHANGED");
+
+                // Map을 JSON으로 직렬화
+                String json = objectMapper.writeValueAsString(eventWithType);
+                TextMessage message = new TextMessage(json);
+
+                int totalSessions = alertWebSocketHandler.getSessions().size();
+
+                // 모든 활성 세션에 메시지 전송
+                for (WebSocketSession session : alertWebSocketHandler.getSessions()) {
+                    if (session.isOpen()) {
+                        try {
+                            session.sendMessage(message);
+                            successCount++;
+                            logger.debug("상태 변경 이벤트 전송 성공: sessionId={}, alertId={}",
+                                        session.getId(), statusChangeEvent.get("alertId"));
+                        } catch (IOException e) {
+                            failureCount++;
+                            logger.error("상태 변경 이벤트 전송 실패: sessionId={}, alertId={}, 오류={}",
+                                        session.getId(), statusChangeEvent.get("alertId"), e.getMessage());
+                            // 전송 실패 시 세션 닫기
+                            closeSession(session);
+                        }
+                    }
+                }
+
+                long duration = System.currentTimeMillis() - startTime;
+
+                // Micrometer 메트릭: 브로드캐스트 성공 카운터 증가
+                broadcastCounter.increment();
+
+                // 구조화된 로깅: INFO 레벨 (브로드캐스트 성공)
+                logger.info("상태 변경 이벤트 브로드캐스트 성공: eventType=ALERT_STATUS_CHANGED, alertId={}, " +
+                           "status={}, 클라이언트 수={}, 성공={}, 실패={}, 소요 시간={}ms",
+                           statusChangeEvent.get("alertId"), statusChangeEvent.get("status"),
+                           totalSessions, successCount, failureCount, duration);
+
+            } catch (Exception e) {
+                // 구조화된 로깅: ERROR 레벨 (브로드캐스트 실패)
+                logger.error("상태 변경 이벤트 브로드캐스트 실패: eventType=ALERT_STATUS_CHANGED, alertId={}, 오류 원인={}",
+                           statusChangeEvent.get("alertId"), e.getMessage(), e);
+            }
+        });
+    }
+
+    /**
      * WebSocket 세션을 안전하게 닫습니다.
      *
      * @param session 닫을 세션

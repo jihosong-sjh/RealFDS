@@ -147,10 +147,14 @@ services:
       dockerfile: Dockerfile
     container_name: realfds-websocket-gateway
     depends_on:
-      - alert-service
+      kafka:
+        condition: service_healthy
+      alert-service:
+        condition: service_started
     environment:
       SERVER_PORT: 8082  # 서버 포트
       ALERT_SERVICE_URL: http://alert-service:8081  # alert-service URL
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092  # Kafka 브로커 주소
       LOG_LEVEL_ROOT: INFO  # 전체 로그 레벨
       LOG_LEVEL_APP: INFO  # 애플리케이션 로그 레벨
     ports:
@@ -176,6 +180,7 @@ services:
       - websocket-gateway
     environment:
       VITE_WEBSOCKET_URL: ws://localhost:8082/ws/alerts  # WebSocket 서버 URL
+      VITE_ALERT_SERVICE_URL: http://localhost:8081  # alert-service REST API URL
     ports:
       - "8083:8083"  # 외부 포트:컨테이너 포트 (브라우저 접속용)
     mem_limit: 256m

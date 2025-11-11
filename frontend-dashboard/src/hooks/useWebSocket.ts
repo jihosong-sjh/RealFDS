@@ -6,9 +6,10 @@ import type { ConnectionState as ConnectionStatusType } from '../types/connectio
  * useWebSocket Hook: WebSocket 연결 관리 및 실시간 알림 수신
  *
  * @param url - WebSocket 서버 URL (예: "ws://localhost:8082/ws/alerts")
+ * @param alertServiceUrl - alert-service REST API URL (예: "http://localhost:8081")
  * @returns alerts (최근 100개 알림 목록), connectionState (연결 상태 정보)
  */
-export function useWebSocket(url: string) {
+export function useWebSocket(url: string, alertServiceUrl: string) {
   // 상태 관리: 알림 목록 (최근 100개만 유지)
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
@@ -23,6 +24,38 @@ export function useWebSocket(url: string) {
 
   // 재연결 타이머 참조
   const reconnectTimerRef = useRef<number | null>(null);
+
+  // 초기 데이터 로드 여부 추적
+  const initialLoadRef = useRef<boolean>(false);
+
+  // 초기 알림 데이터 로드
+  useEffect(() => {
+    const loadInitialAlerts = async () => {
+      if (initialLoadRef.current) {
+        return; // 이미 로드됨
+      }
+
+      try {
+        console.log('[useWebSocket] 초기 알림 데이터 로드 시작:', alertServiceUrl);
+        const response = await fetch(`${alertServiceUrl}/api/alerts`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data: Alert[] = await response.json();
+        console.log(`[useWebSocket] 초기 알림 ${data.length}개 로드 완료`);
+
+        setAlerts(data.slice(0, 100)); // 최근 100개만 유지
+        initialLoadRef.current = true;
+      } catch (error) {
+        console.error('[useWebSocket] 초기 알림 로드 실패:', error);
+        // 로드 실패 시에도 WebSocket 연결은 계속 시도
+      }
+    };
+
+    loadInitialAlerts();
+  }, [alertServiceUrl]);
 
   useEffect(() => {
     // WebSocket 연결 수립
@@ -70,8 +103,15 @@ export function useWebSocket(url: string) {
               const alert: Alert = message as Alert;
               console.log('[WebSocket] 신규 알림 수신:', alert.alertId, alert.ruleName);
 
-              // 알림 추가 (최신 알림이 맨 앞, 최근 100개만 유지)
+              // 알림 추가 (중복 체크 후 최신 알림이 맨 앞, 최근 100개만 유지)
               setAlerts((prev) => {
+                // 중복 체크: 이미 존재하는 alertId인지 확인
+                const exists = prev.some((existing) => existing.alertId === alert.alertId);
+                if (exists) {
+                  console.log('[WebSocket] 중복 알림 무시:', alert.alertId);
+                  return prev; // 중복이면 추가하지 않음
+                }
+
                 const updated = [alert, ...prev];
                 return updated.slice(0, 100); // 최근 100개만 유지
               });
