@@ -425,45 +425,45 @@
 
 ### Observability & Monitoring (Constitution V - MANDATORY)
 
-- [ ] T069 [P] fraud-detector: 헬스 체크 엔드포인트 확인 및 severity 필드 반영 (fraud-detector/src/main/scala/com/realfds/detector/health/HealthCheck.scala)
+- [X] T069 [P] fraud-detector: 헬스 체크 엔드포인트 확인 및 severity 필드 반영 (fraud-detector/src/main/scala/com/realfds/detector/health/HealthCheck.scala)
   - /actuator/health가 severity 설정 반영 여부 포함
   - 한국어 주석으로 헬스 체크 설명
-- [ ] T070 [P] alert-service: 헬스 체크 엔드포인트에 상태 관리 통계 추가 (alert-service/src/main/java/com/realfds/alert/health/AlertHealthIndicator.java)
+- [X] T070 [P] alert-service: 헬스 체크 엔드포인트에 상태 관리 통계 추가 (alert-service/src/main/java/com/realfds/alert/controller/HealthController.java)
   - /actuator/health에 알림 개수(상태별, 심각도별) 포함
   - 한국어 주석으로 헬스 체크 설명
-- [ ] T071 [P] websocket-gateway: 헬스 체크 엔드포인트에 WebSocket 연결 수 추가 (websocket-gateway/src/main/java/com/realfds/gateway/health/WebSocketHealthIndicator.java)
+- [X] T071 [P] websocket-gateway: 헬스 체크 엔드포인트에 WebSocket 연결 수 추가 (websocket-gateway/src/main/java/com/realfds/gateway/controller/HealthController.java)
   - /actuator/health에 활성 WebSocket 연결 수 포함
   - 한국어 주석으로 헬스 체크 설명
-- [ ] T072 alert-service: Kafka 연결에 서킷 브레이커 검증 (alert-service/src/main/java/com/realfds/alert/config/KafkaConfig.java)
+- [X] T072 alert-service: Kafka 연결에 서킷 브레이커 검증 (alert-service/src/main/java/com/realfds/alert/config/KafkaConfig.java)
   - 지수적 백오프 (1s, 2s, 4s, 8s, 최대 30s) 동작 확인
   - 연결 실패 로깅 확인
   - 한국어 주석으로 서킷 브레이커 로직 설명
-- [ ] T073 [P] alert-service: Micrometer 메트릭 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T073 [P] alert-service: Micrometer 메트릭 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - alerts_status_changed_total (counter)
   - alerts_assigned_total (counter)
   - alert_status_change_latency (histogram)
   - 한국어 주석으로 메트릭 설명
-- [ ] T074 [P] websocket-gateway: Micrometer 메트릭 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T074 [P] websocket-gateway: Micrometer 메트릭 추가 (websocket-gateway/src/main/java/com/realfds/gateway/service/BroadcastService.java)
   - websocket_broadcast_total (counter)
   - websocket_broadcast_latency (histogram)
   - 한국어 주석으로 메트릭 설명
 
 ### Documentation (Constitution VI - MANDATORY)
 
-- [ ] T075 [P] 프로젝트 루트 README.md 업데이트 (README.md)
+- [X] T075 [P] 프로젝트 루트 README.md 업데이트 (README.md)
   - 알림 상태 관리 기능 설명 추가
   - 담당자 할당 및 조치 기록 기능 설명 추가
   - 심각도별 우선순위 기능 설명 추가
   - 한국어로 작성
-- [ ] T076 [P] alert-service: README.md 생성 또는 업데이트 (alert-service/README.md)
+- [X] T076 [P] alert-service: README.md 생성 또는 업데이트 (alert-service/README.md)
   - 서비스 목적 및 책임 설명
   - 새로운 API 엔드포인트 문서화
   - 상태 관리 로직 설명
   - 한국어로 작성
-- [ ] T077 [P] websocket-gateway: README.md 업데이트 (websocket-gateway/README.md)
+- [X] T077 [P] websocket-gateway: README.md 업데이트 (websocket-gateway/README.md)
   - ALERT_STATUS_CHANGED 이벤트 스키마 문서화
   - 한국어로 작성
-- [ ] T078 [P] frontend-dashboard: README.md 업데이트 (frontend-dashboard/README.md)
+- [X] T078 [P] frontend-dashboard: README.md 업데이트 (frontend-dashboard/README.md)
   - 새로운 컴포넌트 설명 (AlertDetailModal, AlertFilterPanel, SeverityBadge)
   - 상태 관리 hook 사용법 설명
   - 한국어로 작성

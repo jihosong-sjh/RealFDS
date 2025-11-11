@@ -14,6 +14,9 @@ RealFDS는 학습 및 포트폴리오 목적으로 개발된 실시간 스트리
   - 해외 거래 (KR 외 국가)
   - 빈번한 거래 (1분 내 5회 초과)
 - **실시간 알림**: WebSocket을 통한 즉각적인 브라우저 알림
+- **알림 상태 관리**: 알림 처리 상태 추적 (미확인/확인중/완료)
+- **담당자 할당 및 조치 기록**: 알림 담당자 할당 및 처리 내역 기록
+- **심각도별 우선순위**: 탐지 규칙별 심각도 자동 할당 및 색상 구분 (낮음/보통/높음/긴급)
 - **대시보드**: 실시간 알림 모니터링 웹 UI
 
 ### 시스템 구성 요소
@@ -240,7 +243,8 @@ bash scripts/measure-latency.sh
 - [아키텍처 설명](docs/architecture.md)
 - [개발 가이드](docs/development.md)
 - [문제 해결 가이드](docs/troubleshooting.md)
-- [빠른 시작 가이드](specs/001-realtime-fds/quickstart.md)
+- [빠른 시작 가이드 - 실시간 FDS](specs/001-realtime-fds/quickstart.md)
+- [빠른 시작 가이드 - 알림 관리](specs/002-alert-management/quickstart.md)
 
 ## 각 서비스 상세 문서
 
