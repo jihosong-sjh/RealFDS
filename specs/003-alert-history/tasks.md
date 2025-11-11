@@ -113,12 +113,12 @@
 
 ### DTO 및 검색 조건 (User Story 1)
 
-- [ ] T013 [P] [US1] Create AlertSearchCriteria DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
+- [X] T013 [P] [US1] Create AlertSearchCriteria DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
   - startDate, endDate, page, size 필드 포함 (규칙명, 사용자ID, 상태는 US3에서 추가)
   - 검증 로직 (init 블록에서 page ≥ 0, size 1~100, startDate ≤ endDate 등)
   - 기본값 설정 (page=0, size=50)
   - 한국어 주석으로 각 필드 및 검증 규칙 설명
-- [ ] T014 [P] [US1] Create PagedAlertResult DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/PagedAlertResult.kt
+- [X] T014 [P] [US1] Create PagedAlertResult DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/PagedAlertResult.kt
   - content, totalElements, totalPages, currentPage, pageSize, hasNext, hasPrevious 필드 포함
   - 한국어 주석으로 각 필드 설명
 
@@ -126,12 +126,12 @@
 
 > **CRITICAL: 테스트를 먼저 작성하고, FAIL 확인 후 구현을 시작하세요**
 
-- [ ] T015 [P] [US1] Unit test for Alert entity validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/domain/AlertTest.kt
+- [X] T015 [P] [US1] Unit test for Alert entity validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/domain/AlertTest.kt
   - Given-When-Then 구조 사용
   - 유효한 Alert 생성 테스트
   - 필드 검증 테스트 (amount > 0, reason 길이 등)
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T016 [P] [US1] Unit test for AlertSearchCriteria validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/dto/AlertSearchCriteriaTest.kt
+- [X] T016 [P] [US1] Unit test for AlertSearchCriteria validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/dto/AlertSearchCriteriaTest.kt
   - Given-When-Then 구조 사용
   - 날짜 범위 검증 테스트 (startDate ≤ endDate)
   - 페이지 번호/크기 검증 테스트
@@ -139,14 +139,14 @@
 
 ### Repository (User Story 1)
 
-- [ ] T017 [US1] Create AlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/AlertRepository.kt
+- [X] T017 [US1] Create AlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/AlertRepository.kt
   - R2dbcRepository<Alert, UUID> 확장
   - 기본 CRUD 메서드 상속
   - 한국어 주석으로 Repository 목적 설명
-- [ ] T018 [US1] Create CustomAlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepository.kt
+- [X] T018 [US1] Create CustomAlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepository.kt
   - 동적 쿼리 메서드 정의 (findByCriteria, countByCriteria)
   - 한국어 주석으로 메서드 설명
-- [ ] T019 [US1] Implement CustomAlertRepositoryImpl in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
+- [X] T019 [US1] Implement CustomAlertRepositoryImpl in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
   - R2dbcEntityTemplate 사용하여 동적 쿼리 생성
   - 날짜 범위 필터링 구현 (startDate, endDate)
   - 페이지네이션 구현 (LIMIT, OFFSET)
@@ -156,13 +156,13 @@
 
 ### 테스트 (User Story 1 - Repository Layer) ⚠️
 
-- [ ] T020 [US1] Integration test for AlertRepository basic operations in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/AlertRepositoryTest.kt
+- [X] T020 [US1] Integration test for AlertRepository basic operations in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/AlertRepositoryTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - Alert 저장 및 조회 테스트
   - 시스템 재시작 시뮬레이션 테스트 (영속성 확인)
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T021 [US1] Integration test for CustomAlertRepository date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CustomAlertRepositoryTest.kt
+- [X] T021 [US1] Integration test for CustomAlertRepository date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CustomAlertRepositoryTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 날짜 범위 검색 테스트 (1주일 전 ~ 오늘)
@@ -172,7 +172,7 @@
 
 ### Service (User Story 1)
 
-- [ ] T022 [US1] Create AlertHistoryService in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertHistoryService.kt
+- [X] T022 [US1] Create AlertHistoryService in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertHistoryService.kt
   - searchAlerts 메서드 구현 (AlertSearchCriteria 받아서 PagedAlertResult 반환)
   - 기본 날짜 범위 설정 (최근 7일)
   - 구조화된 로깅 추가 (검색 시작, 완료, 결과 개수)
@@ -183,7 +183,7 @@
 
 ### 테스트 (User Story 1 - Service Layer) ⚠️
 
-- [ ] T023 [US1] Unit test for AlertHistoryService search logic in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertHistoryServiceTest.kt
+- [X] T023 [US1] Unit test for AlertHistoryService search logic in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertHistoryServiceTest.kt
   - Mockito로 Repository 모킹
   - Reactor Test (StepVerifier) 사용
   - Given-When-Then 구조 사용
@@ -194,7 +194,7 @@
 
 ### Controller (User Story 1)
 
-- [ ] T024 [US1] Create AlertHistoryController in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/controller/AlertHistoryController.kt
+- [X] T024 [US1] Create AlertHistoryController in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/controller/AlertHistoryController.kt
   - GET /api/alerts/history 엔드포인트 구현
   - @Valid로 AlertSearchCriteria 검증
   - ResponseEntity로 응답 반환
@@ -206,7 +206,7 @@
 
 ### 테스트 (User Story 1 - Controller Layer) ⚠️
 
-- [ ] T025 [US1] Integration test for AlertHistoryController GET /api/alerts/history in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/controller/AlertHistoryControllerTest.kt
+- [X] T025 [US1] Integration test for AlertHistoryController GET /api/alerts/history in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/controller/AlertHistoryControllerTest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL)
   - WebTestClient 사용
   - Given-When-Then 구조 사용
@@ -218,7 +218,7 @@
 
 ### 알림 저장 통합 (User Story 1)
 
-- [ ] T026 [US1] Update AlertService to save alerts to PostgreSQL in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertService.kt
+- [X] T026 [US1] Update AlertService to save alerts to PostgreSQL in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertService.kt
   - Kafka에서 AlertEvent 수신 시 AlertRepository.save() 호출
   - 저장 성공/실패 로깅
   - 저장 실패 시 재시도 로직 (최대 3회)
@@ -228,7 +228,7 @@
 
 ### 테스트 (User Story 1 - Alert Persistence) ⚠️
 
-- [ ] T027 [US1] Integration test for alert persistence in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertServicePersistenceTest.kt
+- [X] T027 [US1] Integration test for alert persistence in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertServicePersistenceTest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL + Kafka)
   - Given-When-Then 구조 사용
   - Kafka로 AlertEvent 전송 → 데이터베이스 저장 확인

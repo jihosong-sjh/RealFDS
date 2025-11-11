@@ -30,7 +30,8 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:1.0.3.RELEASE")
 
     // Flyway (데이터베이스 마이그레이션)
-    implementation("org.flywaydb:flyway-core:10.4.1")
+    implementation("org.flywaydb:flyway-core:10.22.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.22.0")
 
     // PostgreSQL JDBC Driver (Flyway가 사용)
     runtimeOnly("org.postgresql:postgresql:42.7.1")
