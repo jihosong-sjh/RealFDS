@@ -37,35 +37,53 @@ public class BroadcastService {
     /**
      * 모든 WebSocket 세션에 알림을 브로드캐스트합니다.
      *
+     * 구조화된 로깅:
+     * - INFO: 브로드캐스트 성공 (eventType, alertId, 클라이언트 수 포함)
+     * - ERROR: 브로드캐스트 실패 (오류 원인 포함)
+     *
      * @param alert 브로드캐스트할 알림
      */
     public void broadcast(Alert alert) {
+        long startTime = System.currentTimeMillis();
+        int successCount = 0;
+        int failureCount = 0;
+
         try {
             // Alert를 JSON으로 직렬화
             String json = objectMapper.writeValueAsString(alert);
             TextMessage message = new TextMessage(json);
+
+            int totalSessions = alertWebSocketHandler.getSessions().size();
 
             // 모든 활성 세션에 메시지 전송
             for (WebSocketSession session : alertWebSocketHandler.getSessions()) {
                 if (session.isOpen()) {
                     try {
                         session.sendMessage(message);
+                        successCount++;
                         logger.debug("알림 전송 성공: sessionId={}, alertId={}",
                                     session.getId(), alert.getAlertId());
                     } catch (IOException e) {
-                        logger.error("알림 전송 실패: sessionId={}, 오류={}",
-                                    session.getId(), e.getMessage());
+                        failureCount++;
+                        logger.error("알림 전송 실패: sessionId={}, alertId={}, 오류={}",
+                                    session.getId(), alert.getAlertId(), e.getMessage());
                         // 전송 실패 시 세션 닫기
                         closeSession(session);
                     }
                 }
             }
 
-            logger.info("알림 브로드캐스트 완료: alertId={}, 전송 세션 수={}",
-                       alert.getAlertId(), alertWebSocketHandler.getSessions().size());
+            long duration = System.currentTimeMillis() - startTime;
+
+            // 구조화된 로깅: INFO 레벨 (브로드캐스트 성공)
+            logger.info("브로드캐스트 성공: eventType=ALERT_STATUS_CHANGED, alertId={}, " +
+                       "클라이언트 수={}, 성공={}, 실패={}, 소요 시간={}ms",
+                       alert.getAlertId(), totalSessions, successCount, failureCount, duration);
 
         } catch (Exception e) {
-            logger.error("알림 브로드캐스트 실패: {}", e.getMessage(), e);
+            // 구조화된 로깅: ERROR 레벨 (브로드캐스트 실패)
+            logger.error("브로드캐스트 실패: eventType=ALERT_STATUS_CHANGED, alertId={}, 오류 원인={}",
+                       alert.getAlertId(), e.getMessage(), e);
         }
     }
 

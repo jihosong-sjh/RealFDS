@@ -99,14 +99,14 @@
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 > **Constitution V 요구사항**: ≥70% 커버리지, Given-When-Then 구조 사용
 
-- [ ] T013 [P] [US1] alert-service: AlertService 상태 변경 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertServiceTest.java)
+- [X] T013 [P] [US1] alert-service: AlertService 상태 변경 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertServiceTest.java)
   - Given: UNREAD 상태의 알림, When: IN_PROGRESS로 변경, Then: 상태 변경 성공 및 processedAt null 유지
   - Given: IN_PROGRESS 상태의 알림, When: COMPLETED로 변경, Then: 상태 변경 성공 및 processedAt 자동 설정
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T014 [P] [US1] alert-service: 상태별 필터링 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterTest.java)
+- [X] T014 [P] [US1] alert-service: 상태별 필터링 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterTest.java)
   - Given: 다양한 상태의 알림 목록, When: status=UNREAD 필터 적용, Then: UNREAD 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T015 [P] [US1] alert-service: REST API 엔드포인트 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/controller/AlertControllerIntegrationTest.java)
+- [X] T015 [P] [US1] alert-service: REST API 엔드포인트 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/controller/AlertControllerIntegrationTest.java)
   - Given: 테스트 알림 생성, When: PATCH /api/alerts/{id}/status 호출, Then: 200 OK 및 상태 변경 확인
   - 한국어 주석으로 API 계약 설명
 
@@ -114,41 +114,41 @@
 
 #### Backend: alert-service
 
-- [ ] T016 [US1] alert-service: AlertRepository에 상태 업데이트 메서드 추가 (alert-service/src/main/java/com/realfds/alert/repository/AlertRepository.java)
+- [X] T016 [US1] alert-service: AlertRepository에 상태 업데이트 메서드 추가 (alert-service/src/main/java/com/realfds/alert/repository/AlertRepository.java)
   - updateStatus(String alertId, AlertStatus status): 상태 업데이트
   - updateProcessedAt(String alertId, LocalDateTime processedAt): 처리 시각 기록
   - 최대 함수 길이 50줄 준수
   - 한국어 주석으로 메서드 설명
-- [ ] T017 [US1] alert-service: AlertService에 상태 관리 비즈니스 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T017 [US1] alert-service: AlertService에 상태 관리 비즈니스 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - changeStatus(String alertId, AlertStatus newStatus): 상태 전이 로직
   - COMPLETED 상태 시 processedAt 자동 설정
   - 상태 전이 검증 (UNREAD → IN_PROGRESS → COMPLETED, 역방향 가능)
   - 한국어 주석으로 비즈니스 규칙 설명
-- [ ] T018 [US1] alert-service: AlertService에 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T018 [US1] alert-service: AlertService에 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - filterByStatus(AlertStatus status): 상태별 필터링
   - 응답 시간 <100ms 목표 (100개 알림 기준)
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T019 [US1] alert-service: AlertController에 PATCH /api/alerts/{alertId}/status 엔드포인트 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T019 [US1] alert-service: AlertController에 PATCH /api/alerts/{alertId}/status 엔드포인트 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Request: { "status": "IN_PROGRESS" | "COMPLETED" }
   - Response: { "alertId", "status", "processedAt" }
   - 에러 처리: 404 Not Found, 400 Bad Request
   - 한국어 주석으로 API 설명
-- [ ] T020 [US1] alert-service: GET /api/alerts에 status 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T020 [US1] alert-service: GET /api/alerts에 status 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?status=UNREAD | IN_PROGRESS | COMPLETED
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
-- [ ] T021 [US1] alert-service: 상태 변경 시 Kafka로 이벤트 발행 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T021 [US1] alert-service: 상태 변경 시 Kafka로 이벤트 발행 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - Topic: alert-status-changed
   - Event: { alertId, status, processedAt }
   - 한국어 주석으로 이벤트 스키마 설명
 
 #### Backend: websocket-gateway
 
-- [ ] T022 [US1] websocket-gateway: alert-status-changed Kafka 이벤트 구독 (websocket-gateway/src/main/java/com/realfds/gateway/service/KafkaConsumerService.java)
+- [X] T022 [US1] websocket-gateway: alert-status-changed Kafka 이벤트 구독 (websocket-gateway/src/main/java/com/realfds/gateway/service/KafkaConsumerService.java)
   - Topic: alert-status-changed 구독
   - 이벤트 수신 시 WebSocket 브로드캐스트 트리거
   - 한국어 주석으로 구독 로직 설명
-- [ ] T023 [US1] websocket-gateway: ALERT_STATUS_CHANGED WebSocket 이벤트 브로드캐스트 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T023 [US1] websocket-gateway: ALERT_STATUS_CHANGED WebSocket 이벤트 브로드캐스트 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
   - Event: { type: "ALERT_STATUS_CHANGED", alertId, status, processedAt }
   - 모든 연결된 클라이언트에 브로드캐스트
   - 1초 이내 브로드캐스트 목표
@@ -156,43 +156,43 @@
 
 #### Frontend: frontend-dashboard
 
-- [ ] T024 [P] [US1] frontend: Alert 타입에 status, processedAt 필드 추가 (frontend-dashboard/src/types/alert.ts)
+- [X] T024 [P] [US1] frontend: Alert 타입에 status, processedAt 필드 추가 (frontend-dashboard/src/types/alert.ts)
   - status: 'UNREAD' | 'IN_PROGRESS' | 'COMPLETED'
   - processedAt: string | null
   - TypeScript 타입 정의
   - 한국어 주석으로 타입 설명
-- [ ] T025 [P] [US1] frontend: AlertStatus enum 타입 정의 (frontend-dashboard/src/types/alertStatus.ts)
+- [X] T025 [P] [US1] frontend: AlertStatus enum 타입 정의 (frontend-dashboard/src/types/alertStatus.ts)
   - UNREAD, IN_PROGRESS, COMPLETED
   - 한국어 주석으로 상태 설명
-- [ ] T026 [US1] frontend: useAlertManagement 커스텀 hook 생성 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T026 [US1] frontend: useAlertManagement 커스텀 hook 생성 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - changeAlertStatus(alertId, newStatus): 상태 변경 API 호출
   - 에러 처리 및 로딩 상태 관리
   - 한국어 주석으로 hook 사용법 설명
-- [ ] T027 [US1] frontend: AlertItem 컴포넌트에 상태 뱃지 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T027 [US1] frontend: AlertItem 컴포넌트에 상태 뱃지 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - UNREAD: 회색, IN_PROGRESS: 파란색, COMPLETED: 초록색
   - 상태 텍스트 표시 (미확인/확인중/완료)
   - 한국어 주석으로 컴포넌트 설명
-- [ ] T028 [US1] frontend: AlertDetailModal 컴포넌트 생성 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T028 [US1] frontend: AlertDetailModal 컴포넌트 생성 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 알림 상세 정보 표시
   - 상태 변경 버튼 (확인중으로 변경, 완료 처리)
   - 모달 로딩 시간 <200ms 목표
   - 한국어 주석으로 UI 설명
-- [ ] T029 [US1] frontend: AlertFilterPanel 컴포넌트 생성 - 상태 필터 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T029 [US1] frontend: AlertFilterPanel 컴포넌트 생성 - 상태 필터 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 상태별 필터 드롭다운 (전체/미확인/확인중/완료)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T030 [US1] frontend: WebSocket 이벤트 리스너에 ALERT_STATUS_CHANGED 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
+- [X] T030 [US1] frontend: WebSocket 이벤트 리스너에 ALERT_STATUS_CHANGED 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
   - 이벤트 수신 시 알림 목록 자동 업데이트
   - 1초 이내 UI 반영 목표
   - 한국어 주석으로 동기화 로직 설명
 
 #### Logging & Observability
 
-- [ ] T031 [US1] alert-service: 상태 변경 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T031 [US1] alert-service: 상태 변경 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - INFO 레벨: 상태 변경 성공 (alertId, oldStatus, newStatus, processedAt 포함)
   - ERROR 레벨: 상태 변경 실패 (alertId, 오류 원인 포함)
   - 로그 메시지는 한국어로 작성
-- [ ] T032 [US1] websocket-gateway: 상태 변경 브로드캐스트 로깅 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T032 [US1] websocket-gateway: 상태 변경 브로드캐스트 로깅 추가 (websocket-gateway/src/main/java/com/realfds/gateway/service/BroadcastService.java)
   - INFO 레벨: 브로드캐스트 성공 (eventType, alertId, 클라이언트 수 포함)
   - ERROR 레벨: 브로드캐스트 실패 (오류 원인 포함)
   - 로그 메시지는 한국어로 작성
@@ -218,15 +218,15 @@
 
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 
-- [ ] T033 [P] [US2] alert-service: 담당자 할당 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertAssignmentTest.java)
+- [X] T033 [P] [US2] alert-service: 담당자 할당 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertAssignmentTest.java)
   - Given: 알림 생성, When: 담당자 할당, Then: assignedTo 필드 저장 및 최대 100자 검증
   - Given: 담당자 미할당, When: 알림 조회, Then: assignedTo null 반환
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T034 [P] [US2] alert-service: 조치 내용 기록 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertActionTest.java)
+- [X] T034 [P] [US2] alert-service: 조치 내용 기록 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertActionTest.java)
   - Given: 알림 생성, When: 조치 내용 입력 (최대 2000자), Then: actionNote 필드 저장
   - Given: 조치 내용 입력, When: 완료 처리, Then: status=COMPLETED 및 processedAt 자동 설정
   - 한국어 주석으로 비즈니스 규칙 설명
-- [ ] T035 [P] [US2] alert-service: 담당자별 필터링 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterByAssigneeTest.java)
+- [X] T035 [P] [US2] alert-service: 담당자별 필터링 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterByAssigneeTest.java)
   - Given: 다양한 담당자의 알림 목록, When: assignedTo 필터 적용, Then: 해당 담당자 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
 
@@ -276,50 +276,50 @@
 
 #### Backend: websocket-gateway
 
-- [ ] T045 [US2] websocket-gateway: ALERT_STATUS_CHANGED 이벤트에 assignedTo, actionNote 필드 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T045 [US2] websocket-gateway: ALERT_STATUS_CHANGED 이벤트에 assignedTo, actionNote 필드 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
   - Event: { type: "ALERT_STATUS_CHANGED", alertId, status, assignedTo, actionNote, processedAt }
   - 기존 브로드캐스트 로직 확장
   - 한국어 주석으로 확장된 스키마 설명
 
 #### Frontend: frontend-dashboard
 
-- [ ] T046 [P] [US2] frontend: Alert 타입에 assignedTo, actionNote 필드 추가 (frontend-dashboard/src/types/alert.ts)
+- [X] T046 [P] [US2] frontend: Alert 타입에 assignedTo, actionNote 필드 추가 (frontend-dashboard/src/types/alert.ts)
   - assignedTo: string | null
   - actionNote: string | null
   - TypeScript 타입 정의
   - 한국어 주석으로 타입 설명
-- [ ] T047 [US2] frontend: useAlertManagement hook에 담당자 할당 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T047 [US2] frontend: useAlertManagement hook에 담당자 할당 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - assignAlert(alertId, assignedTo): 담당자 할당 API 호출
   - 최대 100자 클라이언트 검증
   - 한국어 주석으로 함수 설명
-- [ ] T048 [US2] frontend: useAlertManagement hook에 조치 기록 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T048 [US2] frontend: useAlertManagement hook에 조치 기록 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - recordAction(alertId, actionNote, complete): 조치 기록 API 호출
   - 최대 2000자 클라이언트 검증
   - 한국어 주석으로 함수 설명
-- [ ] T049 [US2] frontend: AlertItem 컴포넌트에 담당자 표시 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T049 [US2] frontend: AlertItem 컴포넌트에 담당자 표시 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - assignedTo 표시 (미할당 시 "미할당" 표시)
   - 담당자 아이콘 및 이름 표시
   - 한국어 주석으로 UI 설명
-- [ ] T050 [US2] frontend: AlertDetailModal에 담당자 할당 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T050 [US2] frontend: AlertDetailModal에 담당자 할당 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 담당자 입력 필드 (텍스트 인풋, 최대 100자)
   - 할당 버튼
   - 한국어 주석으로 폼 로직 설명
-- [ ] T051 [US2] frontend: AlertDetailModal에 조치 내용 입력 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T051 [US2] frontend: AlertDetailModal에 조치 내용 입력 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 조치 내용 텍스트 영역 (최대 2000자)
   - 완료 처리 버튼
   - 입력 권장 메시지 표시
   - 한국어 주석으로 폼 로직 설명
-- [ ] T052 [US2] frontend: AlertFilterPanel에 담당자 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T052 [US2] frontend: AlertFilterPanel에 담당자 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 담당자별 필터 드롭다운 (전체/특정 담당자)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T053 [US2] frontend: WebSocket 이벤트 리스너에 assignedTo, actionNote 필드 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
+- [X] T053 [US2] frontend: WebSocket 이벤트 리스너에 assignedTo, actionNote 필드 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
   - 이벤트 수신 시 담당자 및 조치 내용 자동 업데이트
   - 한국어 주석으로 동기화 로직 설명
 
 #### Logging & Observability
 
-- [ ] T054 [US2] alert-service: 담당자 할당 및 조치 기록 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T054 [US2] alert-service: 담당자 할당 및 조치 기록 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - INFO 레벨: 담당자 할당 성공 (alertId, assignedTo 포함)
   - INFO 레벨: 조치 기록 성공 (alertId, actionNote 길이, status 포함)
   - ERROR 레벨: 할당/기록 실패 (alertId, 오류 원인 포함)

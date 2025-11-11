@@ -45,14 +45,37 @@ export function useWebSocket(url: string) {
         // 메시지 수신 이벤트
         ws.onmessage = (event) => {
           try {
-            const alert: Alert = JSON.parse(event.data);
-            console.log('[WebSocket] 알림 수신:', alert.alertId, alert.ruleName);
+            const message = JSON.parse(event.data);
 
-            // 알림 추가 (최신 알림이 맨 앞, 최근 100개만 유지)
-            setAlerts((prev) => {
-              const updated = [alert, ...prev];
-              return updated.slice(0, 100); // 최근 100개만 유지
-            });
+            // 002-alert-management: 이벤트 타입별 처리
+            if (message.type === 'ALERT_STATUS_CHANGED') {
+              // User Story 2: 알림 상태 변경 이벤트 처리 (assignedTo, actionNote 포함)
+              console.log('[WebSocket] 상태 변경 이벤트 수신:', message.alertId, message.status, message.assignedTo, message.actionNote);
+
+              setAlerts((prev) =>
+                prev.map((alert) =>
+                  alert.alertId === message.alertId
+                    ? {
+                        ...alert,
+                        status: message.status,
+                        processedAt: message.processedAt || alert.processedAt,
+                        assignedTo: message.assignedTo !== undefined ? message.assignedTo : alert.assignedTo,
+                        actionNote: message.actionNote !== undefined ? message.actionNote : alert.actionNote,
+                      }
+                    : alert
+                )
+              );
+            } else {
+              // 기존 NEW_ALERT 이벤트 처리 (message가 Alert 객체인 경우)
+              const alert: Alert = message as Alert;
+              console.log('[WebSocket] 신규 알림 수신:', alert.alertId, alert.ruleName);
+
+              // 알림 추가 (최신 알림이 맨 앞, 최근 100개만 유지)
+              setAlerts((prev) => {
+                const updated = [alert, ...prev];
+                return updated.slice(0, 100); // 최근 100개만 유지
+              });
+            }
           } catch (error) {
             console.error('[WebSocket] 메시지 파싱 실패:', error);
           }

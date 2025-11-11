@@ -101,13 +101,12 @@ public enum Severity {
     }
 
     /**
-     * 우선순위 기준 비교
-     * 정렬 시 사용됩니다.
+     * 우선순위 기준 Comparator 반환
+     * 정렬 시 사용됩니다 (높은 우선순위 → 낮은 우선순위).
      *
-     * @param other 비교할 다른 Severity
-     * @return 이 Severity가 더 높으면 양수, 같으면 0, 낮으면 음수
+     * @return 우선순위 역순 Comparator (CRITICAL → HIGH → MEDIUM → LOW)
      */
-    public int compareTo(Severity other) {
-        return Integer.compare(this.priority, other.priority);
+    public static java.util.Comparator<Severity> priorityComparator() {
+        return java.util.Comparator.comparingInt(Severity::getPriority).reversed();
     }
 }
