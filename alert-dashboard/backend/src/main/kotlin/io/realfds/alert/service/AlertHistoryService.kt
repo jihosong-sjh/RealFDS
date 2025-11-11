@@ -2,6 +2,7 @@ package io.realfds.alert.service
 
 import io.realfds.alert.dto.AlertSearchCriteria
 import io.realfds.alert.dto.PagedAlertResult
+import io.realfds.alert.metrics.AlertHistoryMetrics
 import io.realfds.alert.repository.CustomAlertRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -18,7 +19,8 @@ import java.time.temporal.ChronoUnit
  */
 @Service
 class AlertHistoryService(
-    private val customAlertRepository: CustomAlertRepository
+    private val customAlertRepository: CustomAlertRepository,
+    private val alertHistoryMetrics: AlertHistoryMetrics
 ) {
     private val logger = LoggerFactory.getLogger(AlertHistoryService::class.java)
 
@@ -33,6 +35,9 @@ class AlertHistoryService(
      */
     fun searchAlerts(criteria: AlertSearchCriteria): Mono<PagedAlertResult> {
         val startTime = Instant.now()
+
+        // 메트릭: 검색 요청 기록
+        alertHistoryMetrics.recordSearchRequest()
 
         // 기본 날짜 범위 설정: 날짜가 지정되지 않으면 최근 7일
         val effectiveCriteria = applyDefaultDateRange(criteria)
@@ -61,11 +66,22 @@ class AlertHistoryService(
                 )
             }
             .doOnSuccess { result ->
-                val duration = Duration.between(startTime, Instant.now()).toMillis()
-                logger.info("알림 이력 검색 완료: {}개의 알림을 {}ms에 조회했습니다", result.content.size, duration)
+                val duration = Duration.between(startTime, Instant.now())
+                logger.info("알림 이력 검색 완료: {}개의 알림을 {}ms에 조회했습니다", result.content.size, duration.toMillis())
+
+                // 메트릭: 검색 성공 기록
+                alertHistoryMetrics.recordSearchSuccess(duration, result.content.size)
+
+                // 메트릭: 빈 결과 기록
+                if (result.content.isEmpty()) {
+                    alertHistoryMetrics.recordEmptySearchResult()
+                }
             }
             .doOnError { error ->
                 logger.error("알림 이력 검색 실패: criteria={}", effectiveCriteria, error)
+
+                // 메트릭: 검색 실패 기록
+                alertHistoryMetrics.recordSearchFailure(error.javaClass.simpleName)
             }
             .onErrorResume { error ->
                 logger.error("알림 검색 중 오류 발생", error)

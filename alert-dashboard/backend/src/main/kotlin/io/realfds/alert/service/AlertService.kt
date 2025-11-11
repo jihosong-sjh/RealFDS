@@ -3,6 +3,7 @@ package io.realfds.alert.service
 import io.realfds.alert.domain.Alert
 import io.realfds.alert.domain.AlertStatus
 import io.realfds.alert.domain.Severity
+import io.realfds.alert.metrics.AlertHistoryMetrics
 import io.realfds.alert.repository.AlertRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -21,7 +22,8 @@ import java.util.UUID
  */
 @Service
 class AlertService(
-    private val alertRepository: AlertRepository
+    private val alertRepository: AlertRepository,
+    private val alertHistoryMetrics: AlertHistoryMetrics
 ) {
     private val logger = LoggerFactory.getLogger(AlertService::class.java)
 
@@ -46,18 +48,28 @@ class AlertService(
             .retryWhen(
                 Retry.backoff(3, Duration.ofSeconds(1))
                     .doBeforeRetry { retrySignal ->
+                        val attemptNumber = (retrySignal.totalRetries() + 1).toInt()
                         logger.warn(
                             "알림 저장 재시도 {}/3: alertId={}",
-                            retrySignal.totalRetries() + 1,
+                            attemptNumber,
                             alertEvent.alertId
                         )
+
+                        // 메트릭: 재시도 기록
+                        alertHistoryMetrics.recordPersistenceRetry(attemptNumber)
                     }
             )
             .doOnSuccess {
                 logger.info("알림 저장 성공: alertId={}", it.alertId)
+
+                // 메트릭: 저장 성공 기록
+                alertHistoryMetrics.recordPersistenceSuccess()
             }
             .doOnError { error ->
                 logger.error("알림 저장 실패: alertId={}", alertEvent.alertId, error)
+
+                // 메트릭: 저장 실패 기록
+                alertHistoryMetrics.recordPersistenceFailure(error.javaClass.simpleName)
             }
     }
 }

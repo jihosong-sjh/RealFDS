@@ -397,16 +397,16 @@
 
 ### Observability & Monitoring (Constitution V - MANDATORY)
 
-- [ ] T046 [P] Implement health check endpoint for alert-dashboard in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/health/AlertDashboardHealthIndicator.kt
+- [X] T046 [P] Implement health check endpoint for alert-dashboard in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/health/AlertDashboardHealthIndicator.kt
   - PostgreSQL 연결 상태 확인
   - R2DBC 커넥션 풀 상태 확인
   - 한국어 주석으로 헬스 체크 로직 설명
-- [ ] T047 [P] Add structured logging (SLF4J + JSON) to all services
-  - Logback JSON encoder 설정 (alert-dashboard/backend/src/main/resources/logback.xml)
+- [X] T047 [P] Add structured logging (SLF4J + JSON) to all services
+  - Logback JSON encoder 설정 (alert-dashboard/backend/src/main/resources/logback-spring.xml)
   - 서비스 생명주기 이벤트 로깅
   - 중요 비즈니스 이벤트 로깅 (알림 저장, 검색)
   - 로그 메시지는 한국어로 작성
-- [ ] T048 [P] Add metrics collection (Micrometer) in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/metrics/AlertHistoryMetrics.kt
+- [X] T048 [P] Add metrics collection (Micrometer) in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/metrics/AlertHistoryMetrics.kt
   - alert.history.search.count (검색 횟수)
   - alert.history.search.duration (검색 응답 시간)
   - alert.persistence.success.count (저장 성공 횟수)
