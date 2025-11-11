@@ -47,11 +47,11 @@
 
 **Purpose**: 프로젝트 초기화 및 기본 구조 설정
 
-- [ ] T001 Create database migration directory structure in alert-dashboard/backend/src/main/resources/db/migration/
-- [ ] T002 [P] Add PostgreSQL R2DBC dependencies to alert-dashboard/backend/build.gradle.kts (Spring Data R2DBC, PostgreSQL R2DBC Driver)
-- [ ] T003 [P] Add Flyway dependency to alert-dashboard/backend/build.gradle.kts
-- [ ] T004 [P] Configure R2DBC connection in alert-dashboard/backend/src/main/resources/application.yml
-- [ ] T005 [P] Configure Flyway settings in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T001 Create database migration directory structure in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T002 [P] Add PostgreSQL R2DBC dependencies to alert-dashboard/backend/build.gradle.kts (Spring Data R2DBC, PostgreSQL R2DBC Driver)
+- [X] T003 [P] Add Flyway dependency to alert-dashboard/backend/build.gradle.kts
+- [X] T004 [P] Configure R2DBC connection in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T005 [P] Configure Flyway settings in alert-dashboard/backend/src/main/resources/application.yml
 
 ---
 
