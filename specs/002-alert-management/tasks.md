@@ -366,19 +366,19 @@
 
 #### Backend: alert-service
 
-- [ ] T058 [US3] alert-service: AlertService에 심각도별 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T058 [US3] alert-service: AlertService에 심각도별 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - filterBySeverity(Severity severity): 심각도별 필터링
   - 응답 시간 <100ms 목표
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T059 [US3] alert-service: AlertService에 심각도별 정렬 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T059 [US3] alert-service: AlertService에 심각도별 정렬 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - sortBySeverity(): CRITICAL → HIGH → MEDIUM → LOW 순서 정렬
   - Comparator 구현
   - 한국어 주석으로 정렬 로직 설명
-- [ ] T060 [US3] alert-service: GET /api/alerts에 severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T060 [US3] alert-service: GET /api/alerts에 severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?severity=LOW | MEDIUM | HIGH | CRITICAL
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
-- [ ] T061 [US3] alert-service: GET /api/alerts에 sortBy=severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T061 [US3] alert-service: GET /api/alerts에 sortBy=severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?sortBy=severity
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
