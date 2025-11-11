@@ -1,6 +1,11 @@
 import type { Alert } from '../types/alert';
 
 /**
+ * AlertStatus: 알림 상태 타입
+ */
+export type AlertStatus = 'UNREAD' | 'IN_PROGRESS' | 'COMPLETED';
+
+/**
  * AlertSearchCriteria: 알림 이력 검색 조건
  */
 export interface AlertSearchCriteria {
@@ -8,6 +13,12 @@ export interface AlertSearchCriteria {
   startDate?: string | null;
   /** 종료 날짜 (YYYY-MM-DD 형식) */
   endDate?: string | null;
+  /** 탐지 규칙명 (HIGH_AMOUNT, FOREIGN_COUNTRY, RAPID_TRANSACTION) */
+  ruleName?: string | null;
+  /** 사용자 ID (예: user-1) */
+  userId?: string | null;
+  /** 알림 상태 (UNREAD, IN_PROGRESS, COMPLETED) */
+  status?: AlertStatus | null;
   /** 페이지 번호 (0부터 시작) */
   page?: number;
   /** 페이지 크기 (1~100) */
@@ -91,6 +102,19 @@ export class AlertHistoryService {
     if (criteria.endDate) {
       const endDateISO = this.convertToISO8601(criteria.endDate, false);
       params.append('endDate', endDateISO);
+    }
+
+    // 필터 파라미터 추가 (User Story 3: 다중 필터링)
+    if (criteria.ruleName && criteria.ruleName.trim() !== '') {
+      params.append('ruleName', criteria.ruleName);
+    }
+
+    if (criteria.userId && criteria.userId.trim() !== '') {
+      params.append('userId', criteria.userId);
+    }
+
+    if (criteria.status && criteria.status.trim() !== '') {
+      params.append('status', criteria.status);
     }
 
     // 페이지네이션 파라미터 추가

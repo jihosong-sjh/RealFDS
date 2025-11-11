@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DateRangePicker } from '../components/DateRangePicker';
+import { AlertHistoryFilters, type FilterValues } from '../components/AlertHistoryFilters';
 import { alertHistoryService, type PagedAlertResult } from '../services/alertHistoryService';
 import type { Alert } from '../types/alert';
 import '../styles/AlertHistoryPage.css';
@@ -9,15 +10,24 @@ import '../styles/AlertHistoryPage.css';
  *
  * 알림 이력 조회 페이지입니다.
  * - DateRangePicker를 통해 날짜 범위 선택
+ * - AlertHistoryFilters를 통해 다중 필터링 (규칙명, 사용자ID, 상태)
  * - 검색 버튼 클릭 시 API 호출
  * - 알림 목록을 테이블로 표시
  * - 페이지네이션 지원
  * - 로딩 상태 및 에러 상태 표시
  */
 export function AlertHistoryPage() {
-  // 상태 관리: 검색 조건
+  // 상태 관리: 검색 조건 (날짜 범위)
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
+
+  // 상태 관리: 검색 조건 (다중 필터)
+  const [filters, setFilters] = useState<FilterValues>({
+    ruleName: '',
+    userId: '',
+    status: '',
+  });
+
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize] = useState<number>(50);
 
@@ -39,18 +49,36 @@ export function AlertHistoryPage() {
   };
 
   /**
-   * 검색 실행 핸들러
+   * 필터 값 변경 핸들러
+   */
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+  };
+
+  /**
+   * 검색 실행 핸들러 (모든 검색 조건 포함)
    */
   const handleSearch = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log('[AlertHistoryPage] 검색 시작:', { startDate, endDate, page: currentPage, size: pageSize });
+      console.log('[AlertHistoryPage] 검색 시작:', {
+        startDate,
+        endDate,
+        ruleName: filters.ruleName || null,
+        userId: filters.userId || null,
+        status: filters.status || null,
+        page: currentPage,
+        size: pageSize,
+      });
 
       const result = await alertHistoryService.searchAlerts({
         startDate,
         endDate,
+        ruleName: filters.ruleName || null,
+        userId: filters.userId || null,
+        status: filters.status || null,
         page: currentPage,
         size: pageSize,
       });
@@ -99,21 +127,21 @@ export function AlertHistoryPage() {
         </p>
       </header>
 
-      {/* 검색 조건 */}
+      {/* 검색 조건: 날짜 범위 */}
       <section className="alert-history-page__search">
         <DateRangePicker
           onChange={handleDateRangeChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
         />
+      </section>
 
-        <button
-          className="alert-history-page__search-button"
-          onClick={handleSearch}
-          disabled={isLoading}
-        >
-          {isLoading ? '검색 중...' : '검색'}
-        </button>
+      {/* 검색 조건: 다중 필터 (User Story 3) */}
+      <section className="alert-history-page__filters">
+        <AlertHistoryFilters
+          onFilterChange={handleFilterChange}
+          onSearch={handleSearch}
+        />
       </section>
 
       {/* 로딩 상태 */}

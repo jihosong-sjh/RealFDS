@@ -71,8 +71,12 @@ class CustomAlertRepositoryImpl(
      * AlertSearchCriteria의 필드를 검사하여 값이 있으면
      * 해당 조건을 Criteria에 추가합니다.
      *
-     * User Story 1에서는 날짜 범위만 지원하며,
-     * User Story 3에서 규칙명, 사용자ID, 상태 필터가 추가될 예정입니다.
+     * User Story 1: 날짜 범위 필터링
+     * User Story 3: 규칙명, 사용자ID, 상태 필터 추가
+     *
+     * 동적 쿼리 생성:
+     * - 선택된 필터만 WHERE 절에 포함
+     * - 날짜 범위가 없으면 기본값으로 최근 7일 적용
      */
     private fun buildCriteria(criteria: AlertSearchCriteria): Criteria {
         var queryCriteria = Criteria.empty()
@@ -91,6 +95,21 @@ class CustomAlertRepositoryImpl(
         if (criteria.startDate == null && criteria.endDate == null) {
             val sevenDaysAgo = java.time.Instant.now().minus(7, ChronoUnit.DAYS)
             queryCriteria = queryCriteria.and("alertTimestamp").greaterThanOrEquals(sevenDaysAgo)
+        }
+
+        // 규칙명 필터: rule_name = :ruleName
+        criteria.ruleName?.let { ruleName ->
+            queryCriteria = queryCriteria.and("ruleName").`is`(ruleName)
+        }
+
+        // 사용자 ID 필터: user_id = :userId
+        criteria.userId?.let { userId ->
+            queryCriteria = queryCriteria.and("userId").`is`(userId)
+        }
+
+        // 상태 필터: status = :status
+        criteria.status?.let { status ->
+            queryCriteria = queryCriteria.and("status").`is`(status)
         }
 
         return queryCriteria

@@ -306,11 +306,11 @@
 
 ### Backend: Multi-Filter Support (User Story 3)
 
-- [ ] T034 [US3] Update AlertSearchCriteria to include ruleName, userId, status filters in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
+- [X] T034 [US3] Update AlertSearchCriteria to include ruleName, userId, status filters in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
   - ruleName, userId, status 필드 추가 (모두 nullable)
   - 검증 로직 추가 (ruleName은 Enum 값, userId는 패턴 검증)
   - 한국어 주석으로 필터 설명
-- [ ] T035 [US3] Update CustomAlertRepositoryImpl to support multi-filter search in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
+- [X] T035 [US3] Update CustomAlertRepositoryImpl to support multi-filter search in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
   - ruleName 필터링 추가 (WHERE rule_name = :ruleName)
   - userId 필터링 추가 (WHERE user_id = :userId)
   - status 필터링 추가 (WHERE status = :status)
@@ -319,25 +319,25 @@
 
 ### 테스트 (User Story 3 - Backend Multi-Filter) ⚠️
 
-- [ ] T036 [P] [US3] Integration test for ruleName filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/RuleNameFilterTest.kt
+- [X] T036 [P] [US3] Integration test for ruleName filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/RuleNameFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 규칙의 알림 생성 (HIGH_AMOUNT, FOREIGN_COUNTRY, RAPID_TRANSACTION)
   - ruleName="HIGH_AMOUNT" 검색 → 해당 규칙의 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T037 [P] [US3] Integration test for userId filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/UserIdFilterTest.kt
+- [X] T037 [P] [US3] Integration test for userId filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/UserIdFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 여러 사용자의 알림 생성 (user-1 ~ user-10)
   - userId="user-5" 검색 → 해당 사용자의 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T038 [P] [US3] Integration test for status filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/StatusFilterTest.kt
+- [X] T038 [P] [US3] Integration test for status filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/StatusFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 상태의 알림 생성 (UNREAD, IN_PROGRESS, COMPLETED)
   - status="UNREAD" 검색 → 미확인 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T039 [US3] Integration test for combined filters in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CombinedFiltersTest.kt
+- [X] T039 [US3] Integration test for combined filters in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CombinedFiltersTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 조합의 알림 생성
@@ -347,7 +347,7 @@
 
 ### Frontend: Filter Components (User Story 3)
 
-- [ ] T040 [P] [US3] Create AlertHistoryFilters component in alert-dashboard/frontend/src/components/AlertHistoryFilters.tsx
+- [X] T040 [P] [US3] Create AlertHistoryFilters component in frontend-dashboard/src/components/AlertHistoryFilters.tsx
   - 규칙명 드롭다운 (HIGH_AMOUNT, FOREIGN_COUNTRY, RAPID_TRANSACTION)
   - 사용자 ID 입력 필드
   - 상태 드롭다운 (UNREAD, IN_PROGRESS, COMPLETED)
@@ -355,13 +355,13 @@
   - 초기화 버튼
   - 한국어 라벨
   - TypeScript 타입 정의
-- [ ] T041 [US3] Update AlertHistoryPage to include AlertHistoryFilters in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
+- [X] T041 [US3] Update AlertHistoryPage to include AlertHistoryFilters in frontend-dashboard/src/pages/AlertHistoryPage.tsx
   - AlertHistoryFilters 컴포넌트 추가
   - 필터 state 관리
   - 검색 버튼 클릭 시 API 호출 (모든 필터 포함)
   - 한국어 UI 텍스트
   - TypeScript 타입 정의
-- [ ] T042 [US3] Update alertHistoryService to support all filter parameters in alert-dashboard/frontend/src/services/alertHistoryService.ts
+- [X] T042 [US3] Update alertHistoryService to support all filter parameters in frontend-dashboard/src/services/alertHistoryService.ts
   - ruleName, userId, status 쿼리 파라미터 추가
   - TypeScript 타입 정의
 
