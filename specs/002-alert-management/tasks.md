@@ -218,15 +218,15 @@
 
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 
-- [ ] T033 [P] [US2] alert-service: 담당자 할당 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertAssignmentTest.java)
+- [X] T033 [P] [US2] alert-service: 담당자 할당 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertAssignmentTest.java)
   - Given: 알림 생성, When: 담당자 할당, Then: assignedTo 필드 저장 및 최대 100자 검증
   - Given: 담당자 미할당, When: 알림 조회, Then: assignedTo null 반환
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T034 [P] [US2] alert-service: 조치 내용 기록 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertActionTest.java)
+- [X] T034 [P] [US2] alert-service: 조치 내용 기록 로직 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertActionTest.java)
   - Given: 알림 생성, When: 조치 내용 입력 (최대 2000자), Then: actionNote 필드 저장
   - Given: 조치 내용 입력, When: 완료 처리, Then: status=COMPLETED 및 processedAt 자동 설정
   - 한국어 주석으로 비즈니스 규칙 설명
-- [ ] T035 [P] [US2] alert-service: 담당자별 필터링 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterByAssigneeTest.java)
+- [X] T035 [P] [US2] alert-service: 담당자별 필터링 통합 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterByAssigneeTest.java)
   - Given: 다양한 담당자의 알림 목록, When: assignedTo 필터 적용, Then: 해당 담당자 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
 
