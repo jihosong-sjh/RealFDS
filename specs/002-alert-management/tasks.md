@@ -346,15 +346,15 @@
 
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 
-- [ ] T055 [P] [US3] fraud-detector: 규칙별 severity 설정 단위 테스트 작성 (fraud-detector/src/test/scala/com/realfds/detector/rules/SeverityAssignmentTest.scala)
+- [X] T055 [P] [US3] fraud-detector: 규칙별 severity 설정 단위 테스트 작성 (fraud-detector/src/test/scala/com/realfds/detector/rules/SeverityAssignmentTest.scala)
   - Given: HighValueRule 실행, When: 알림 생성, Then: severity=HIGH 확인
   - Given: ForeignCountryRule 실행, When: 알림 생성, Then: severity=MEDIUM 확인
   - Given: HighFrequencyRule 실행, When: 알림 생성, Then: severity=HIGH 확인
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T056 [P] [US3] alert-service: 심각도별 필터링 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterBySeverityTest.java)
+- [X] T056 [P] [US3] alert-service: 심각도별 필터링 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterBySeverityTest.java)
   - Given: 다양한 심각도의 알림 목록, When: severity=HIGH 필터 적용, Then: HIGH 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T057 [P] [US3] alert-service: 심각도별 정렬 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertSortBySeverityTest.java)
+- [X] T057 [P] [US3] alert-service: 심각도별 정렬 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertSortBySeverityTest.java)
   - Given: 다양한 심각도의 알림 목록, When: 심각도별 정렬, Then: CRITICAL → HIGH → MEDIUM → LOW 순서 확인
   - 한국어 주석으로 정렬 로직 설명
 
