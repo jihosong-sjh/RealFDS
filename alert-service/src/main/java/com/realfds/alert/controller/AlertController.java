@@ -4,6 +4,10 @@ import com.realfds.alert.model.Alert;
 import com.realfds.alert.model.AlertStatus;
 import com.realfds.alert.model.UpdateStatusRequest;
 import com.realfds.alert.model.UpdateStatusResponse;
+import com.realfds.alert.model.AssignRequest;
+import com.realfds.alert.model.AssignResponse;
+import com.realfds.alert.model.ActionRequest;
+import com.realfds.alert.model.ActionResponse;
 import com.realfds.alert.service.AlertService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +64,20 @@ public class AlertController {
      * GET /api/alerts?status=UNREAD
      * - 특정 상태의 알림만 필터링하여 반환
      *
+     * GET /api/alerts?assignedTo=김보안
+     * - 특정 담당자에게 할당된 알림만 필터링하여 반환
+     *
      * @param status 필터링할 상태 (선택 사항: UNREAD, IN_PROGRESS, COMPLETED)
+     * @param assignedTo 필터링할 담당자 이름 (선택 사항)
      * @return Mono<List<Alert>> 최근 알림 리스트 (최신순)
      */
     @GetMapping("/alerts")
     public Mono<List<Alert>> getAlerts(
-            @RequestParam(required = false) AlertStatus status) {
+            @RequestParam(required = false) AlertStatus status,
+            @RequestParam(required = false) String assignedTo) {
 
-        logger.debug("알림 조회 요청 수신 - limit={}, status={}",
-                DEFAULT_ALERT_LIMIT, status);
+        logger.debug("알림 조회 요청 수신 - limit={}, status={}, assignedTo={}",
+                DEFAULT_ALERT_LIMIT, status, assignedTo);
 
         List<Alert> alerts;
 
@@ -76,6 +85,10 @@ public class AlertController {
             // 상태별 필터링
             logger.debug("상태별 필터링 시작 - status={}", status);
             alerts = alertService.filterByStatus(status);
+        } else if (assignedTo != null && !assignedTo.isEmpty()) {
+            // 담당자별 필터링
+            logger.debug("담당자별 필터링 시작 - assignedTo={}", assignedTo);
+            alerts = alertService.filterByAssignee(assignedTo);
         } else {
             // 전체 알림 조회
             alerts = alertService.getRecentAlerts(DEFAULT_ALERT_LIMIT);
@@ -149,6 +162,167 @@ public class AlertController {
 
         logger.info("알림 상태 변경 완료 - alertId={}, status={}, processedAt={}",
                 response.getAlertId(), response.getStatus(), response.getProcessedAt());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 담당자 할당 API
+     *
+     * PATCH /api/alerts/{alertId}/assign
+     * - 알림에 담당자를 할당합니다
+     * - 담당자 이름은 최대 100자까지 허용
+     *
+     * 요청 예시:
+     * {
+     *   "assignedTo": "김보안"
+     * }
+     *
+     * 응답 예시:
+     * {
+     *   "alertId": "uuid",
+     *   "assignedTo": "김보안"
+     * }
+     *
+     * @param alertId 할당할 알림 ID
+     * @param request 담당자 할당 요청 (assignedTo 필드 포함)
+     * @return ResponseEntity<AssignResponse> 담당자 할당 결과
+     *         - 200 OK: 담당자 할당 성공
+     *         - 400 Bad Request: 잘못된 요청 (alertId 또는 assignedTo가 null, 또는 100자 초과)
+     *         - 404 Not Found: 알림을 찾을 수 없음
+     */
+    @PatchMapping("/alerts/{alertId}/assign")
+    public ResponseEntity<AssignResponse> assignAlert(
+            @PathVariable String alertId,
+            @RequestBody AssignRequest request) {
+
+        logger.info("담당자 할당 요청 수신 - alertId={}, assignedTo={}",
+                alertId, request.getAssignedTo());
+
+        // 요청 검증
+        if (alertId == null || alertId.isEmpty()) {
+            logger.warn("담당자 할당 실패: alertId가 비어있음");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (request.getAssignedTo() == null || request.getAssignedTo().isEmpty()) {
+            logger.warn("담당자 할당 실패: assignedTo가 비어있음 - alertId={}", alertId);
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 담당자 이름 길이 검증 (최대 100자)
+        if (request.getAssignedTo().length() > 100) {
+            logger.warn("담당자 할당 실패: assignedTo가 100자를 초과함 - alertId={}, 길이={}",
+                    alertId, request.getAssignedTo().length());
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 담당자 할당
+        Alert updatedAlert = alertService.assignAlert(alertId, request.getAssignedTo());
+
+        if (updatedAlert == null) {
+            logger.warn("담당자 할당 실패: 알림을 찾을 수 없음 - alertId={}", alertId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // 응답 생성
+        AssignResponse response = new AssignResponse(
+                updatedAlert.getAlertId(),
+                updatedAlert.getAssignedTo()
+        );
+
+        logger.info("담당자 할당 완료 - alertId={}, assignedTo={}",
+                response.getAlertId(), response.getAssignedTo());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 조치 내용 기록 API
+     *
+     * POST /api/alerts/{alertId}/action
+     * - 알림에 조치 내용을 기록하고, 선택적으로 완료 처리합니다
+     * - 조치 내용은 최대 2000자까지 허용
+     * - status="COMPLETED"를 전달하면 알림을 완료 처리
+     *
+     * 요청 예시 (완료 처리):
+     * {
+     *   "actionNote": "고객 확인 완료. 정상 거래로 판명됨.",
+     *   "status": "COMPLETED"
+     * }
+     *
+     * 요청 예시 (조치 내용만 기록):
+     * {
+     *   "actionNote": "고객에게 연락 시도 중"
+     * }
+     *
+     * 응답 예시:
+     * {
+     *   "alertId": "uuid",
+     *   "actionNote": "고객 확인 완료. 정상 거래로 판명됨.",
+     *   "status": "COMPLETED",
+     *   "processedAt": "2025-11-11T10:30:00Z"
+     * }
+     *
+     * @param alertId 기록할 알림 ID
+     * @param request 조치 기록 요청 (actionNote, status 필드 포함)
+     * @return ResponseEntity<ActionResponse> 조치 기록 결과
+     *         - 200 OK: 조치 기록 성공
+     *         - 400 Bad Request: 잘못된 요청 (alertId 또는 actionNote가 null, 또는 2000자 초과)
+     *         - 404 Not Found: 알림을 찾을 수 없음
+     */
+    @PostMapping("/alerts/{alertId}/action")
+    public ResponseEntity<ActionResponse> recordAction(
+            @PathVariable String alertId,
+            @RequestBody ActionRequest request) {
+
+        logger.info("조치 기록 요청 수신 - alertId={}, actionNote 길이={}, status={}",
+                alertId,
+                request.getActionNote() != null ? request.getActionNote().length() : 0,
+                request.getStatus());
+
+        // 요청 검증
+        if (alertId == null || alertId.isEmpty()) {
+            logger.warn("조치 기록 실패: alertId가 비어있음");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (request.getActionNote() == null || request.getActionNote().isEmpty()) {
+            logger.warn("조치 기록 실패: actionNote가 비어있음 - alertId={}", alertId);
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 조치 내용 길이 검증 (최대 2000자)
+        if (request.getActionNote().length() > 2000) {
+            logger.warn("조치 기록 실패: actionNote가 2000자를 초과함 - alertId={}, 길이={}",
+                    alertId, request.getActionNote().length());
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 완료 처리 여부 판단
+        boolean complete = (request.getStatus() == AlertStatus.COMPLETED);
+
+        // 조치 내용 기록
+        Alert updatedAlert = alertService.recordAction(alertId, request.getActionNote(), complete);
+
+        if (updatedAlert == null) {
+            logger.warn("조치 기록 실패: 알림을 찾을 수 없음 - alertId={}", alertId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // 응답 생성
+        ActionResponse response = new ActionResponse(
+                updatedAlert.getAlertId(),
+                updatedAlert.getActionNote(),
+                updatedAlert.getStatus(),
+                updatedAlert.getProcessedAt()
+        );
+
+        logger.info("조치 기록 완료 - alertId={}, actionNote 길이={}, status={}, processedAt={}",
+                response.getAlertId(),
+                response.getActionNote() != null ? response.getActionNote().length() : 0,
+                response.getStatus(),
+                response.getProcessedAt());
 
         return ResponseEntity.ok(response);
     }

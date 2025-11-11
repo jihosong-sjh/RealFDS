@@ -169,11 +169,13 @@ public class AlertService {
      * 상태 변경 이벤트를 Kafka로 발행
      *
      * alert-status-changed 토픽에 이벤트를 발행합니다.
-     * 이벤트 스키마:
+     * 이벤트 스키마 (User Story 2 확장):
      * {
      *   "alertId": "uuid",
      *   "status": "IN_PROGRESS",
-     *   "processedAt": "2025-11-11T10:30:00Z" (COMPLETED인 경우만)
+     *   "processedAt": "2025-11-11T10:30:00Z" (COMPLETED인 경우만),
+     *   "assignedTo": "김보안" (할당된 경우만),
+     *   "actionNote": "고객 확인 완료" (기록된 경우만)
      * }
      *
      * @param alert 상태가 변경된 알림 객체
@@ -190,11 +192,22 @@ public class AlertService {
                 event.put("processedAt", alert.getProcessedAt().toString());
             }
 
+            // 담당자가 할당된 경우에만 assignedTo 포함 (User Story 2)
+            if (alert.getAssignedTo() != null) {
+                event.put("assignedTo", alert.getAssignedTo());
+            }
+
+            // 조치 내용이 기록된 경우에만 actionNote 포함 (User Story 2)
+            if (alert.getActionNote() != null) {
+                event.put("actionNote", alert.getActionNote());
+            }
+
             // Kafka로 이벤트 전송
             kafkaTemplate.send(ALERT_STATUS_CHANGED_TOPIC, alert.getAlertId(), event);
 
-            logger.info("상태 변경 이벤트 발행 완료 - topic={}, alertId={}, status={}",
-                    ALERT_STATUS_CHANGED_TOPIC, alert.getAlertId(), alert.getStatus());
+            logger.info("상태 변경 이벤트 발행 완료 - topic={}, alertId={}, status={}, assignedTo={}, actionNote 존재={}",
+                    ALERT_STATUS_CHANGED_TOPIC, alert.getAlertId(), alert.getStatus(),
+                    alert.getAssignedTo(), alert.getActionNote() != null);
 
         } catch (Exception e) {
             // 이벤트 발행 실패 시 로깅만 하고 계속 진행 (알림 상태 변경은 이미 성공)
@@ -255,6 +268,183 @@ public class AlertService {
 
         logger.debug("상태별 필터링 완료 - status={}, 결과 개수={}, 소요 시간={}ms",
             status, filteredAlerts.size(), duration);
+
+        return filteredAlerts;
+    }
+
+    /**
+     * 담당자 할당
+     *
+     * 알림에 담당자를 할당합니다.
+     * - 유효성 검증 (최대 100자)
+     * - 할당 성공 시 구조화된 로깅 (INFO 레벨)
+     * - 할당 실패 시 구조화된 로깅 (ERROR 레벨)
+     *
+     * 구조화된 로깅:
+     * - INFO: 담당자 할당 성공 (alertId, assignedTo 포함)
+     * - ERROR: 할당 실패 (alertId, 오류 원인 포함)
+     *
+     * @param alertId 할당할 알림 ID
+     * @param assignedTo 담당자 이름 (최대 100자)
+     * @return 업데이트된 Alert 객체 (실패 시 null)
+     */
+    public Alert assignAlert(String alertId, String assignedTo) {
+        // 입력 검증: alertId
+        if (alertId == null || alertId.isEmpty()) {
+            logger.error("담당자 할당 실패: alertId={}, 오류 원인=alertId가 비어있음", alertId);
+            return null;
+        }
+
+        // 입력 검증: assignedTo (최대 100자)
+        if (assignedTo != null && assignedTo.length() > 100) {
+            logger.error("담당자 할당 실패: alertId={}, 오류 원인=담당자 이름이 100자를 초과함 (길이={})",
+                alertId, assignedTo.length());
+            return null;
+        }
+
+        try {
+            // 담당자 할당
+            boolean success = alertRepository.assignTo(alertId, assignedTo);
+
+            if (!success) {
+                logger.error("담당자 할당 실패: alertId={}, 오류 원인=알림을 찾을 수 없음", alertId);
+                return null;
+            }
+
+            // 업데이트된 알림 조회
+            Alert updatedAlert = alertRepository.findByAlertId(alertId);
+
+            // 구조화된 로깅: INFO 레벨 (성공)
+            logger.info("담당자 할당 성공: alertId={}, assignedTo={}", alertId, assignedTo);
+
+            // Kafka 이벤트 발행
+            publishStatusChangedEvent(updatedAlert);
+
+            return updatedAlert;
+
+        } catch (Exception e) {
+            // 구조화된 로깅: ERROR 레벨 (실패)
+            logger.error("담당자 할당 실패: alertId={}, 오류 원인={}",
+                alertId, e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * 조치 내용 기록
+     *
+     * 알림에 조치 내용을 기록하고, 선택적으로 완료 처리합니다.
+     * - 유효성 검증 (최대 2000자)
+     * - complete=true 시 status=COMPLETED 및 processedAt 자동 설정
+     * - 기록 성공 시 구조화된 로깅 (INFO 레벨)
+     * - 기록 실패 시 구조화된 로깅 (ERROR 레벨)
+     *
+     * 비즈니스 규칙:
+     * - actionNote는 필수 (null 불가)
+     * - complete=true인 경우 상태가 COMPLETED로 변경됨
+     * - complete=false인 경우 상태는 변경되지 않음
+     *
+     * 구조화된 로깅:
+     * - INFO: 조치 기록 성공 (alertId, actionNote 길이, status 포함)
+     * - ERROR: 기록 실패 (alertId, 오류 원인 포함)
+     *
+     * @param alertId 기록할 알림 ID
+     * @param actionNote 조치 내용 (최대 2000자)
+     * @param complete 완료 처리 여부 (true: COMPLETED, false: 상태 유지)
+     * @return 업데이트된 Alert 객체 (실패 시 null)
+     */
+    public Alert recordAction(String alertId, String actionNote, boolean complete) {
+        // 입력 검증: alertId
+        if (alertId == null || alertId.isEmpty()) {
+            logger.error("조치 기록 실패: alertId={}, 오류 원인=alertId가 비어있음", alertId);
+            return null;
+        }
+
+        // 입력 검증: actionNote (필수)
+        if (actionNote == null || actionNote.isEmpty()) {
+            logger.error("조치 기록 실패: alertId={}, 오류 원인=actionNote가 비어있음", alertId);
+            return null;
+        }
+
+        // 입력 검증: actionNote (최대 2000자)
+        if (actionNote.length() > 2000) {
+            logger.error("조치 기록 실패: alertId={}, 오류 원인=조치 내용이 2000자를 초과함 (길이={})",
+                alertId, actionNote.length());
+            return null;
+        }
+
+        try {
+            // 조치 내용 기록
+            boolean success = alertRepository.updateActionNote(alertId, actionNote);
+
+            if (!success) {
+                logger.error("조치 기록 실패: alertId={}, 오류 원인=알림을 찾을 수 없음", alertId);
+                return null;
+            }
+
+            // complete=true인 경우 상태를 COMPLETED로 변경
+            if (complete) {
+                Alert alert = alertRepository.findByAlertId(alertId);
+                if (alert != null) {
+                    alert.setStatus(AlertStatus.COMPLETED);
+
+                    // COMPLETED 상태로 변경 시 processedAt 자동 설정
+                    if (alert.getProcessedAt() == null) {
+                        alert.setProcessedAt(Instant.now());
+                    }
+                }
+            }
+
+            // 업데이트된 알림 조회
+            Alert updatedAlert = alertRepository.findByAlertId(alertId);
+
+            // 구조화된 로깅: INFO 레벨 (성공)
+            logger.info("조치 기록 성공: alertId={}, actionNote 길이={}, status={}",
+                alertId, actionNote.length(), updatedAlert.getStatus());
+
+            // Kafka 이벤트 발행
+            publishStatusChangedEvent(updatedAlert);
+
+            return updatedAlert;
+
+        } catch (Exception e) {
+            // 구조화된 로깅: ERROR 레벨 (실패)
+            logger.error("조치 기록 실패: alertId={}, 오류 원인={}",
+                alertId, e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * 담당자별 알림 필터링
+     *
+     * 특정 담당자에게 할당된 알림만 필터링하여 반환합니다.
+     * 응답 시간 <100ms 목표 (100개 알림 기준)
+     *
+     * @param assignedTo 필터링할 담당자 이름
+     * @return 필터링된 알림 리스트 (최신순)
+     */
+    public List<Alert> filterByAssignee(String assignedTo) {
+        if (assignedTo == null || assignedTo.isEmpty()) {
+            logger.warn("담당자별 필터링 실패: assignedTo가 비어있음");
+            return List.of();
+        }
+
+        logger.debug("담당자별 필터링 시작 - assignedTo={}", assignedTo);
+
+        long startTime = System.currentTimeMillis();
+
+        // 전체 알림 조회 후 필터링
+        List<Alert> allAlerts = alertRepository.getRecentAlerts(100);
+        List<Alert> filteredAlerts = allAlerts.stream()
+            .filter(alert -> assignedTo.equals(alert.getAssignedTo()))
+            .collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        logger.debug("담당자별 필터링 완료 - assignedTo={}, 결과 개수={}, 소요 시간={}ms",
+            assignedTo, filteredAlerts.size(), duration);
 
         return filteredAlerts;
     }
