@@ -247,42 +247,46 @@
 
 ### Frontend: DateRangePicker Component (User Story 2)
 
-- [ ] T028 [P] [US2] Create DateRangePicker component in alert-dashboard/frontend/src/components/DateRangePicker.tsx
-  - Material-UI DatePicker 사용
+- [X] T028 [P] [US2] Create DateRangePicker component in frontend-dashboard/src/components/DateRangePicker.tsx
+  - Native HTML5 date input 사용 (Material-UI 미설치)
   - startDate, endDate state 관리
   - onChange 콜백 prop
   - 유효성 검사 (startDate ≤ endDate)
   - 한국어 라벨 및 에러 메시지
   - TypeScript 타입 정의
-- [ ] T029 [P] [US2] Unit test for DateRangePicker component in alert-dashboard/frontend/src/components/DateRangePicker.test.tsx
-  - React Testing Library 사용
+- [X] T029 [P] [US2] Unit test for DateRangePicker component in frontend-dashboard/src/components/DateRangePicker.test.tsx
+  - Vitest + React Testing Library 사용
   - 날짜 선택 시 onChange 호출 확인
   - 잘못된 날짜 범위 입력 시 에러 메시지 표시 확인
 
 ### Frontend: Alert History Page Update (User Story 2)
 
-- [ ] T030 [US2] Update AlertHistoryPage to include DateRangePicker in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
-  - DateRangePicker 컴포넌트 추가
+- [X] T030 [US2] Create AlertHistoryPage in frontend-dashboard/src/pages/AlertHistoryPage.tsx
+  - DateRangePicker 컴포넌트 통합
   - 날짜 범위 state 관리
   - 검색 버튼 클릭 시 API 호출
+  - 알림 목록 테이블 표시
+  - 페이지네이션 UI
+  - 로딩/에러 상태 표시
   - 한국어 UI 텍스트
   - TypeScript 타입 정의
-- [ ] T031 [US2] Update alertHistoryService to support date range parameters in alert-dashboard/frontend/src/services/alertHistoryService.ts
+- [X] T031 [US2] Create alertHistoryService in frontend-dashboard/src/services/alertHistoryService.ts
+  - AlertHistoryService 클래스 생성
   - startDate, endDate 쿼리 파라미터 추가
-  - ISO 8601 형식으로 변환
-  - TypeScript 타입 정의
+  - YYYY-MM-DD → ISO 8601 형식 변환
+  - TypeScript 타입 정의 (AlertSearchCriteria, PagedAlertResult)
 
 ### 테스트 (User Story 2 - Frontend) ⚠️
 
-- [ ] T032 [US2] Integration test for date range search in alert-dashboard/frontend/src/pages/AlertHistoryPage.test.tsx
-  - React Testing Library 사용
+- [X] T032 [US2] Integration test for date range search in frontend-dashboard/src/pages/AlertHistoryPage.test.tsx
+  - Vitest + React Testing Library 사용
   - Given-When-Then 구조 사용
   - 날짜 범위 선택 → 검색 → 결과 표시 확인
-  - Mock Service Worker (MSW)로 API 모킹
+  - fetch API 모킹으로 API 응답 시뮬레이션
 
 ### 테스트 (User Story 2 - End-to-End) ⚠️
 
-- [ ] T033 [US2] End-to-end test for date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/e2e/DateRangeSearchE2ETest.kt
+- [X] T033 [US2] End-to-end test for date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/e2e/DateRangeSearchE2ETest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL)
   - Given-When-Then 구조 사용
   - 1주일 분량의 샘플 데이터 생성 (매일 10개씩)
