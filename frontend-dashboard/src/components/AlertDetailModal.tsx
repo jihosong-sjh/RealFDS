@@ -25,8 +25,11 @@ interface AlertDetailModalProps {
 }
 
 export function AlertDetailModal({ alert, isOpen, onClose }: AlertDetailModalProps) {
-  const { changeAlertStatus, isLoading, error } = useAlertManagement('http://localhost:8081');
+  const { changeAlertStatus, assignAlert, recordAction, isLoading, error } = useAlertManagement('http://localhost:8081');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [assignedTo, setAssignedTo] = useState<string>('');
+  const [actionNote, setActionNote] = useState<string>('');
+  const [completeAfterAction, setCompleteAfterAction] = useState<boolean>(false);
 
   // 모달이 닫혀있거나 알림이 없으면 렌더링하지 않음
   if (!isOpen || !alert) {
@@ -42,6 +45,39 @@ export function AlertDetailModal({ alert, isOpen, onClose }: AlertDetailModalPro
       // WebSocket을 통해 실시간 업데이트되므로 모달은 닫지 않음
     } else {
       setLocalError('상태 변경에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // 담당자 할당 핸들러 (User Story 2)
+  const handleAssign = async () => {
+    if (!assignedTo.trim()) {
+      setLocalError('담당자 이름을 입력해주세요.');
+      return;
+    }
+    setLocalError(null);
+    const success = await assignAlert(alert.alertId, assignedTo.trim());
+    if (success) {
+      console.log('[AlertDetailModal] 담당자 할당 성공:', assignedTo);
+      setAssignedTo(''); // 입력 필드 초기화
+    } else {
+      setLocalError('담당자 할당에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // 조치 내용 기록 핸들러 (User Story 2)
+  const handleRecordAction = async () => {
+    if (!actionNote.trim()) {
+      setLocalError('조치 내용을 입력해주세요.');
+      return;
+    }
+    setLocalError(null);
+    const success = await recordAction(alert.alertId, actionNote.trim(), completeAfterAction);
+    if (success) {
+      console.log('[AlertDetailModal] 조치 기록 성공:', actionNote.length, completeAfterAction);
+      setActionNote(''); // 입력 필드 초기화
+      setCompleteAfterAction(false);
+    } else {
+      setLocalError('조치 기록에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -144,6 +180,85 @@ export function AlertDetailModal({ alert, isOpen, onClose }: AlertDetailModalPro
                 <span className="detail-value">{formatTimestamp(alert.originalTransaction.timestamp)}</span>
               </div>
             </div>
+          </div>
+
+          {/* User Story 2: 담당자 할당 섹션 */}
+          <div className="modal-section">
+            <h3 className="section-title">👤 담당자 할당</h3>
+            <div className="detail-grid">
+              <div className="detail-item">
+                <span className="detail-label">현재 담당자:</span>
+                <span className="detail-value">{alert.assignedTo || '미할당'}</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="담당자 이름 입력 (최대 100자)"
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                maxLength={100}
+                disabled={isLoading}
+              />
+              <button
+                className="btn btn-secondary"
+                onClick={handleAssign}
+                disabled={isLoading || !assignedTo.trim()}
+              >
+                {isLoading ? '할당 중...' : '할당하기'}
+              </button>
+            </div>
+          </div>
+
+          {/* User Story 2: 조치 내용 기록 섹션 */}
+          <div className="modal-section">
+            <h3 className="section-title">📝 조치 내용 기록</h3>
+            {alert.actionNote && (
+              <div className="detail-grid">
+                <div className="detail-item">
+                  <span className="detail-label">기록된 조치 내용:</span>
+                  <span className="detail-value">{alert.actionNote}</span>
+                </div>
+              </div>
+            )}
+            <div className="form-group">
+              <textarea
+                className="form-textarea"
+                placeholder="조치 내용 입력 (최대 2000자)\n예: 고객에게 확인 전화. 정상 거래로 확인됨."
+                value={actionNote}
+                onChange={(e) => setActionNote(e.target.value)}
+                maxLength={2000}
+                rows={4}
+                disabled={isLoading}
+              />
+              <div className="char-count">
+                {actionNote.length} / 2000자
+              </div>
+              <div className="checkbox-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={completeAfterAction}
+                    onChange={(e) => setCompleteAfterAction(e.target.checked)}
+                    disabled={isLoading}
+                  />
+                  <span>조치 기록 후 완료 처리</span>
+                </label>
+              </div>
+              <button
+                className="btn btn-secondary"
+                onClick={handleRecordAction}
+                disabled={isLoading || !actionNote.trim()}
+              >
+                {isLoading ? '기록 중...' : '조치 기록하기'}
+              </button>
+            </div>
+            {!alert.actionNote && (
+              <p className="form-hint">
+                💡 조치 내용 입력은 선택 사항이지만, 완료 처리 시 입력을 권장합니다.
+              </p>
+            )}
           </div>
 
           {/* 에러 메시지 표시 */}

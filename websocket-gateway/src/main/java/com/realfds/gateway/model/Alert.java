@@ -19,6 +19,10 @@ import java.util.Objects;
  * - reason: 한국어 설명 (사용자에게 표시될 사유)
  * - severity: 심각도 ("HIGH", "MEDIUM", "LOW")
  * - alertTimestamp: 알림 생성 시각 (ISO 8601 형식)
+ * - status: 처리 상태 ("UNREAD", "IN_PROGRESS", "COMPLETED") - User Story 2에서 추가
+ * - assignedTo: 담당자 이름 (최대 100자, null 허용) - User Story 2에서 추가
+ * - actionNote: 조치 내용 (최대 2000자, null 허용) - User Story 2에서 추가
+ * - processedAt: 처리 완료 시각 (status=COMPLETED 시 자동 설정) - User Story 2에서 추가
  */
 public class Alert {
 
@@ -45,6 +49,19 @@ public class Alert {
 
     @JsonProperty("alertTimestamp")
     private String alertTimestamp;
+
+    // User Story 2 신규 필드: 알림 상태 관리
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("assignedTo")
+    private String assignedTo;
+
+    @JsonProperty("actionNote")
+    private String actionNote;
+
+    @JsonProperty("processedAt")
+    private String processedAt;
 
     // 기본 생성자 (Jackson 역직렬화용)
     public Alert() {
@@ -128,6 +145,39 @@ public class Alert {
 
     public void setAlertTimestamp(String alertTimestamp) {
         this.alertTimestamp = alertTimestamp;
+    }
+
+    // User Story 2 신규 필드 Getters/Setters
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+
+    public String getActionNote() {
+        return actionNote;
+    }
+
+    public void setActionNote(String actionNote) {
+        this.actionNote = actionNote;
+    }
+
+    public String getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(String processedAt) {
+        this.processedAt = processedAt;
     }
 
     @Override

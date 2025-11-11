@@ -276,50 +276,50 @@
 
 #### Backend: websocket-gateway
 
-- [ ] T045 [US2] websocket-gateway: ALERT_STATUS_CHANGED 이벤트에 assignedTo, actionNote 필드 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
+- [X] T045 [US2] websocket-gateway: ALERT_STATUS_CHANGED 이벤트에 assignedTo, actionNote 필드 추가 (websocket-gateway/src/main/java/com/realfds/gateway/handler/AlertWebSocketHandler.java)
   - Event: { type: "ALERT_STATUS_CHANGED", alertId, status, assignedTo, actionNote, processedAt }
   - 기존 브로드캐스트 로직 확장
   - 한국어 주석으로 확장된 스키마 설명
 
 #### Frontend: frontend-dashboard
 
-- [ ] T046 [P] [US2] frontend: Alert 타입에 assignedTo, actionNote 필드 추가 (frontend-dashboard/src/types/alert.ts)
+- [X] T046 [P] [US2] frontend: Alert 타입에 assignedTo, actionNote 필드 추가 (frontend-dashboard/src/types/alert.ts)
   - assignedTo: string | null
   - actionNote: string | null
   - TypeScript 타입 정의
   - 한국어 주석으로 타입 설명
-- [ ] T047 [US2] frontend: useAlertManagement hook에 담당자 할당 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T047 [US2] frontend: useAlertManagement hook에 담당자 할당 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - assignAlert(alertId, assignedTo): 담당자 할당 API 호출
   - 최대 100자 클라이언트 검증
   - 한국어 주석으로 함수 설명
-- [ ] T048 [US2] frontend: useAlertManagement hook에 조치 기록 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
+- [X] T048 [US2] frontend: useAlertManagement hook에 조치 기록 함수 추가 (frontend-dashboard/src/hooks/useAlertManagement.ts)
   - recordAction(alertId, actionNote, complete): 조치 기록 API 호출
   - 최대 2000자 클라이언트 검증
   - 한국어 주석으로 함수 설명
-- [ ] T049 [US2] frontend: AlertItem 컴포넌트에 담당자 표시 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T049 [US2] frontend: AlertItem 컴포넌트에 담당자 표시 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - assignedTo 표시 (미할당 시 "미할당" 표시)
   - 담당자 아이콘 및 이름 표시
   - 한국어 주석으로 UI 설명
-- [ ] T050 [US2] frontend: AlertDetailModal에 담당자 할당 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T050 [US2] frontend: AlertDetailModal에 담당자 할당 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 담당자 입력 필드 (텍스트 인풋, 최대 100자)
   - 할당 버튼
   - 한국어 주석으로 폼 로직 설명
-- [ ] T051 [US2] frontend: AlertDetailModal에 조치 내용 입력 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
+- [X] T051 [US2] frontend: AlertDetailModal에 조치 내용 입력 UI 추가 (frontend-dashboard/src/components/AlertDetailModal.tsx)
   - 조치 내용 텍스트 영역 (최대 2000자)
   - 완료 처리 버튼
   - 입력 권장 메시지 표시
   - 한국어 주석으로 폼 로직 설명
-- [ ] T052 [US2] frontend: AlertFilterPanel에 담당자 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T052 [US2] frontend: AlertFilterPanel에 담당자 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 담당자별 필터 드롭다운 (전체/특정 담당자)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T053 [US2] frontend: WebSocket 이벤트 리스너에 assignedTo, actionNote 필드 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
+- [X] T053 [US2] frontend: WebSocket 이벤트 리스너에 assignedTo, actionNote 필드 처리 추가 (frontend-dashboard/src/hooks/useWebSocket.ts)
   - 이벤트 수신 시 담당자 및 조치 내용 자동 업데이트
   - 한국어 주석으로 동기화 로직 설명
 
 #### Logging & Observability
 
-- [ ] T054 [US2] alert-service: 담당자 할당 및 조치 기록 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T054 [US2] alert-service: 담당자 할당 및 조치 기록 이벤트 구조화 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - INFO 레벨: 담당자 할당 성공 (alertId, assignedTo 포함)
   - INFO 레벨: 조치 기록 성공 (alertId, actionNote 길이, status 포함)
   - ERROR 레벨: 할당/기록 실패 (alertId, 오류 원인 포함)

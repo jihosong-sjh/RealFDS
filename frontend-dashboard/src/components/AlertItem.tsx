@@ -102,6 +102,13 @@ export function AlertItem({ alert, onClick }: AlertItemProps) {
             <span className="detail-label">탐지 규칙:</span>
             <span className="detail-value">{alert.ruleName}</span>
           </div>
+          {/* 002-alert-management User Story 2: 담당자 표시 */}
+          <div className="detail-row">
+            <span className="detail-label">👤 담당자:</span>
+            <span className="detail-value assignee">
+              {alert.assignedTo || '미할당'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

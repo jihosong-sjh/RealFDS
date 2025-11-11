@@ -49,8 +49,8 @@ export function useWebSocket(url: string) {
 
             // 002-alert-management: 이벤트 타입별 처리
             if (message.type === 'ALERT_STATUS_CHANGED') {
-              // 알림 상태 변경 이벤트 처리
-              console.log('[WebSocket] 상태 변경 이벤트 수신:', message.alertId, message.status);
+              // User Story 2: 알림 상태 변경 이벤트 처리 (assignedTo, actionNote 포함)
+              console.log('[WebSocket] 상태 변경 이벤트 수신:', message.alertId, message.status, message.assignedTo, message.actionNote);
 
               setAlerts((prev) =>
                 prev.map((alert) =>
@@ -59,6 +59,8 @@ export function useWebSocket(url: string) {
                         ...alert,
                         status: message.status,
                         processedAt: message.processedAt || alert.processedAt,
+                        assignedTo: message.assignedTo !== undefined ? message.assignedTo : alert.assignedTo,
+                        actionNote: message.actionNote !== undefined ? message.actionNote : alert.actionNote,
                       }
                     : alert
                 )

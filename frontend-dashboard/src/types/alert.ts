@@ -29,4 +29,8 @@ export interface Alert {
   // 002-alert-management: 상태 관리 필드 추가
   status: 'UNREAD' | 'IN_PROGRESS' | 'COMPLETED'; // 처리 상태
   processedAt: string | null;     // 처리 완료 시각 (ISO 8601, status=COMPLETED 시만)
+
+  // 002-alert-management User Story 2: 담당자 할당 및 조치 기록
+  assignedTo: string | null;      // 담당자 이름 (최대 100자, null 허용)
+  actionNote: string | null;      // 조치 내용 (최대 2000자, null 허용)
 }
