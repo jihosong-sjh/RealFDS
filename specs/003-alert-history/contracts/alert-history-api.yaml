@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: Alert History API
+  description: |
+    과거 알림 조회 API (003-alert-history)
+
+    이 API는 PostgreSQL에 저장된 알림 이력을 조회하는 RESTful 엔드포인트를 제공합니다.
+    날짜 범위, 규칙명, 사용자 ID, 상태 등 다양한 필터 조건을 지원하며, 페이지네이션을 통해 효율적으로 데이터를 제공합니다.
+  version: 1.0.0
+  contact:
+    name: RealFDS Team
+servers:
+  - url: http://localhost:8080/api
+    description: 로컬 개발 서버
+  - url: http://localhost:8080/api
+    description: Docker Compose 환경
+
+paths:
+  /alerts/history:
+    get:
+      summary: 알림 이력 조회
+      description: |
+        저장된 알림 이력을 검색 조건에 따라 조회합니다.
+        모든 검색 조건은 선택적이며, 조건이 없을 경우 최근 7일간의 모든 알림을 반환합니다.
+        결과는 최신 순(alertTimestamp DESC)으로 정렬되며, 페이지네이션을 지원합니다.
+      operationId: searchAlerts
+      tags:
+        - Alert History
+      parameters:
+        - name: startDate
+          in: query
+          description: 검색 시작 날짜 (ISO 8601 형식, 포함). 기본값은 7일 전입니다.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2025-11-04T00:00:00Z"
+
+        - name: endDate
+          in: query
+          description: 검색 종료 날짜 (ISO 8601 형식, 포함). 기본값은 현재 시각입니다.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2025-11-11T23:59:59Z"
+
+        - name: ruleName
+          in: query
+          description: 탐지 규칙명 필터
+          required: false
+          schema:
+            type: string
+            enum:
+              - HIGH_AMOUNT
+              - FOREIGN_COUNTRY
+              - RAPID_TRANSACTION
+            example: HIGH_AMOUNT
+
+        - name: userId
+          in: query
+          description: 사용자 ID 필터
+          required: false
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9-]+$'
+            example: user-5
+
+        - name: status
+          in: query
+          description: 알림 처리 상태 필터
+          required: false
+          schema:
+            $ref: '#/components/schemas/AlertStatus'
+
+        - name: page
+          in: query
+          description: 페이지 번호 (0부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+            example: 0
+
+        - name: size
+          in: query
+          description: 페이지 크기 (1~100)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            example: 50
+
+      responses:
+        '200':
+          description: 검색 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedAlertResult'
+              examples:
+                success:
+                  summary: 정상 응답 예시
+                  value:
+                    content:
+                      - alertId: "550e8400-e29b-41d4-a716-446655440000"
+                        schemaVersion: "1.0"
+                        transactionId: "660e8400-e29b-41d4-a716-446655440001"
+                        userId: "user-5"
+                        amount: 1500000
+                        currency: "KRW"
+                        countryCode: "KR"
+                        ruleName: "HIGH_AMOUNT"
+                        reason: "거래 금액이 설정된 임계값(1,000,000원)을 초과했습니다"
+                        severity: "HIGH"
+                        alertTimestamp: "2025-11-11T12:34:56Z"
+                        status: "UNREAD"
+                        assignedTo: null
+                        actionNote: null
+                        processedAt: null
+                        createdAt: "2025-11-11T12:34:57Z"
+                      - alertId: "550e8400-e29b-41d4-a716-446655440001"
+                        schemaVersion: "1.0"
+                        transactionId: "660e8400-e29b-41d4-a716-446655440002"
+                        userId: "user-3"
+                        amount: 850000
+                        currency: "KRW"
+                        countryCode: "CN"
+                        ruleName: "FOREIGN_COUNTRY"
+                        reason: "해외(CN) 국가에서 거래가 발생했습니다"
+                        severity: "MEDIUM"
+                        alertTimestamp: "2025-11-11T11:30:00Z"
+                        status: "IN_PROGRESS"
+                        assignedTo: "admin-1"
+                        actionNote: null
+                        processedAt: null
+                        createdAt: "2025-11-11T11:30:01Z"
+                    totalElements: 1250
+                    totalPages: 25
+                    currentPage: 0
+                    pageSize: 50
+                    hasNext: true
+                    hasPrevious: false
+
+                emptyResult:
+                  summary: 검색 결과 없음
+                  value:
+                    content: []
+                    totalElements: 0
+                    totalPages: 0
+                    currentPage: 0
+                    pageSize: 50
+                    hasNext: false
+                    hasPrevious: false
+
+        '400':
+          description: 잘못된 요청 (유효성 검증 실패)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidDateRange:
+                  summary: 잘못된 날짜 범위
+                  value:
+                    error: "BAD_REQUEST"
+                    message: "시작 날짜는 종료 날짜보다 늦을 수 없습니다"
+                    timestamp: "2025-11-11T12:34:56Z"
+
+                invalidPageNumber:
+                  summary: 잘못된 페이지 번호
+                  value:
+                    error: "BAD_REQUEST"
+                    message: "페이지 번호는 0 이상이어야 합니다"
+                    timestamp: "2025-11-11T12:34:56Z"
+
+                invalidPageSize:
+                  summary: 잘못된 페이지 크기
+                  value:
+                    error: "BAD_REQUEST"
+                    message: "페이지 크기는 1~100 사이여야 합니다"
+                    timestamp: "2025-11-11T12:34:56Z"
+
+        '500':
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                databaseError:
+                  summary: 데이터베이스 연결 오류
+                  value:
+                    error: "INTERNAL_SERVER_ERROR"
+                    message: "알림 이력을 불러올 수 없습니다. 잠시 후 다시 시도해주세요"
+                    timestamp: "2025-11-11T12:34:56Z"
+
+        '503':
+          description: 서비스 일시 중단 (데이터베이스 연결 불가)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                serviceUnavailable:
+                  summary: 서비스 일시 중단
+                  value:
+                    error: "SERVICE_UNAVAILABLE"
+                    message: "서비스를 일시적으로 사용할 수 없습니다"
+                    timestamp: "2025-11-11T12:34:56Z"
+
+components:
+  schemas:
+    Alert:
+      type: object
+      description: 사기 탐지 알림 엔티티
+      required:
+        - alertId
+        - schemaVersion
+        - transactionId
+        - userId
+        - amount
+        - currency
+        - countryCode
+        - ruleName
+        - reason
+        - severity
+        - alertTimestamp
+        - status
+        - createdAt
+      properties:
+        alertId:
+          type: string
+          format: uuid
+          description: 알림 고유 식별자
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        schemaVersion:
+          type: string
+          description: 스키마 버전
+          example: "1.0"
+
+        transactionId:
+          type: string
+          format: uuid
+          description: 원본 거래 ID
+          example: "660e8400-e29b-41d4-a716-446655440001"
+
+        userId:
+          type: string
+          description: 사용자 ID
+          pattern: '^[a-zA-Z0-9-]+$'
+          example: "user-5"
+
+        amount:
+          type: integer
+          format: int64
+          description: 거래 금액 (KRW)
+          minimum: 1
+          example: 1500000
+
+        currency:
+          type: string
+          description: 통화 코드
+          pattern: '^[A-Z]{3}$'
+          example: "KRW"
+
+        countryCode:
+          type: string
+          description: 국가 코드
+          pattern: '^[A-Z]{2}$'
+          example: "KR"
+
+        ruleName:
+          type: string
+          description: 탐지 규칙명
+          enum:
+            - HIGH_AMOUNT
+            - FOREIGN_COUNTRY
+            - RAPID_TRANSACTION
+          example: "HIGH_AMOUNT"
+
+        reason:
+          type: string
+          description: 알림 발생 이유 (한국어 설명)
+          minLength: 10
+          maxLength: 1000
+          example: "거래 금액이 설정된 임계값(1,000,000원)을 초과했습니다"
+
+        severity:
+          $ref: '#/components/schemas/Severity'
+
+        alertTimestamp:
+          type: string
+          format: date-time
+          description: 알림 발생 시각 (ISO 8601)
+          example: "2025-11-11T12:34:56Z"
+
+        status:
+          $ref: '#/components/schemas/AlertStatus'
+
+        assignedTo:
+          type: string
+          description: 담당자 ID (선택적)
+          nullable: true
+          pattern: '^[a-zA-Z0-9-]+$'
+          example: "admin-1"
+
+        actionNote:
+          type: string
+          description: 처리 내용 메모 (선택적)
+          nullable: true
+          maxLength: 2000
+          example: "오탐으로 확인됨. 정상 거래입니다."
+
+        processedAt:
+          type: string
+          format: date-time
+          description: 처리 완료 시각 (선택적)
+          nullable: true
+          example: "2025-11-11T13:00:00Z"
+
+        createdAt:
+          type: string
+          format: date-time
+          description: 데이터베이스 생성 시각
+          example: "2025-11-11T12:34:57Z"
+
+    AlertStatus:
+      type: string
+      description: 알림 처리 상태
+      enum:
+        - UNREAD
+        - IN_PROGRESS
+        - COMPLETED
+      example: UNREAD
+
+    Severity:
+      type: string
+      description: 알림 심각도
+      enum:
+        - HIGH
+        - MEDIUM
+        - LOW
+      example: HIGH
+
+    PagedAlertResult:
+      type: object
+      description: 페이지네이션된 알림 목록 응답
+      required:
+        - content
+        - totalElements
+        - totalPages
+        - currentPage
+        - pageSize
+        - hasNext
+        - hasPrevious
+      properties:
+        content:
+          type: array
+          description: 현재 페이지의 알림 목록
+          items:
+            $ref: '#/components/schemas/Alert'
+
+        totalElements:
+          type: integer
+          format: int64
+          description: 전체 알림 개수
+          example: 1250
+
+        totalPages:
+          type: integer
+          description: 전체 페이지 수
+          example: 25
+
+        currentPage:
+          type: integer
+          description: 현재 페이지 번호 (0부터 시작)
+          example: 0
+
+        pageSize:
+          type: integer
+          description: 페이지 크기
+          example: 50
+
+        hasNext:
+          type: boolean
+          description: 다음 페이지 존재 여부
+          example: true
+
+        hasPrevious:
+          type: boolean
+          description: 이전 페이지 존재 여부
+          example: false
+
+    ErrorResponse:
+      type: object
+      description: 에러 응답
+      required:
+        - error
+        - message
+        - timestamp
+      properties:
+        error:
+          type: string
+          description: 에러 코드
+          enum:
+            - BAD_REQUEST
+            - INTERNAL_SERVER_ERROR
+            - SERVICE_UNAVAILABLE
+          example: BAD_REQUEST
+
+        message:
+          type: string
+          description: 에러 메시지 (한국어)
+          example: "시작 날짜는 종료 날짜보다 늦을 수 없습니다"
+
+        timestamp:
+          type: string
+          format: date-time
+          description: 에러 발생 시각
+          example: "2025-11-11T12:34:56Z"
+
+tags:
+  - name: Alert History
+    description: 과거 알림 조회 API
