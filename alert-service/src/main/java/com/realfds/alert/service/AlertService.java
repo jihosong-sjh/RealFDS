@@ -448,4 +448,106 @@ public class AlertService {
 
         return filteredAlerts;
     }
+
+    /**
+     * 심각도별 알림 필터링
+     *
+     * 특정 심각도의 알림만 필터링하여 반환합니다.
+     * 응답 시간 <100ms 목표 (100개 알림 기준)
+     *
+     * @param severity 필터링할 심각도 (LOW, MEDIUM, HIGH, CRITICAL)
+     * @return 필터링된 알림 리스트 (최신순)
+     */
+    public List<Alert> filterBySeverity(com.realfds.alert.model.Severity severity) {
+        if (severity == null) {
+            logger.warn("심각도별 필터링 실패: severity가 null");
+            return List.of();
+        }
+
+        logger.debug("심각도별 필터링 시작 - severity={}", severity);
+
+        long startTime = System.currentTimeMillis();
+
+        // Severity enum을 문자열로 변환 (Alert 모델의 severity 필드는 String)
+        String severityStr = severity.name();
+
+        // 전체 알림 조회 후 필터링
+        List<Alert> allAlerts = alertRepository.getRecentAlerts(100);
+        List<Alert> filteredAlerts = allAlerts.stream()
+            .filter(alert -> severityStr.equals(alert.getSeverity()))
+            .collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        logger.debug("심각도별 필터링 완료 - severity={}, 결과 개수={}, 소요 시간={}ms",
+            severity, filteredAlerts.size(), duration);
+
+        return filteredAlerts;
+    }
+
+    /**
+     * 심각도별 알림 정렬
+     *
+     * 알림을 심각도 순서로 정렬하여 반환합니다.
+     * 정렬 순서: CRITICAL → HIGH → MEDIUM → LOW (우선순위 내림차순)
+     *
+     * 비즈니스 규칙:
+     * - 심각도가 높은 알림이 먼저 표시됨
+     * - Severity enum의 priority 필드 사용 (4 → 3 → 2 → 1)
+     * - Comparator 구현으로 효율적인 정렬
+     *
+     * @param alerts 정렬할 알림 리스트
+     * @return 심각도순으로 정렬된 알림 리스트
+     */
+    public List<Alert> sortBySeverity(List<Alert> alerts) {
+        if (alerts == null || alerts.isEmpty()) {
+            logger.debug("심각도별 정렬 실패: alerts가 비어있음");
+            return List.of();
+        }
+
+        logger.debug("심각도별 정렬 시작 - 알림 개수={}", alerts.size());
+
+        long startTime = System.currentTimeMillis();
+
+        // 심각도 우선순위 기준 정렬 (높은 우선순위 → 낮은 우선순위)
+        List<Alert> sortedAlerts = alerts.stream()
+            .sorted((a1, a2) -> {
+                // Alert의 severity는 String이므로 Severity enum으로 변환하여 priority 비교
+                int priority1 = getSeverityPriority(a1.getSeverity());
+                int priority2 = getSeverityPriority(a2.getSeverity());
+                return Integer.compare(priority2, priority1); // 역순 정렬 (높은 우선순위 먼저)
+            })
+            .collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        logger.debug("심각도별 정렬 완료 - 알림 개수={}, 소요 시간={}ms",
+            sortedAlerts.size(), duration);
+
+        return sortedAlerts;
+    }
+
+    /**
+     * 심각도 문자열을 우선순위로 변환
+     *
+     * Alert 모델의 severity 필드는 String이므로, Severity enum으로 변환하여 priority를 반환합니다.
+     *
+     * @param severityStr 심각도 문자열 (예: "HIGH", "MEDIUM", "LOW", "CRITICAL")
+     * @return 우선순위 (1-4, 유효하지 않은 경우 0)
+     */
+    private int getSeverityPriority(String severityStr) {
+        if (severityStr == null || severityStr.isEmpty()) {
+            return 0;
+        }
+
+        try {
+            com.realfds.alert.model.Severity severity = com.realfds.alert.model.Severity.valueOf(severityStr.toUpperCase());
+            return severity.getPriority();
+        } catch (IllegalArgumentException e) {
+            logger.warn("유효하지 않은 severity 값: {}", severityStr);
+            return 0;
+        }
+    }
 }

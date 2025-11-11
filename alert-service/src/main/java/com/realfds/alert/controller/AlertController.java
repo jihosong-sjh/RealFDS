@@ -2,6 +2,7 @@ package com.realfds.alert.controller;
 
 import com.realfds.alert.model.Alert;
 import com.realfds.alert.model.AlertStatus;
+import com.realfds.alert.model.Severity;
 import com.realfds.alert.model.UpdateStatusRequest;
 import com.realfds.alert.model.UpdateStatusResponse;
 import com.realfds.alert.model.AssignRequest;
@@ -67,20 +68,31 @@ public class AlertController {
      * GET /api/alerts?assignedTo=김보안
      * - 특정 담당자에게 할당된 알림만 필터링하여 반환
      *
+     * GET /api/alerts?severity=HIGH
+     * - 특정 심각도의 알림만 필터링하여 반환
+     *
+     * GET /api/alerts?sortBy=severity
+     * - 알림을 심각도순으로 정렬하여 반환 (CRITICAL → HIGH → MEDIUM → LOW)
+     *
      * @param status 필터링할 상태 (선택 사항: UNREAD, IN_PROGRESS, COMPLETED)
      * @param assignedTo 필터링할 담당자 이름 (선택 사항)
-     * @return Mono<List<Alert>> 최근 알림 리스트 (최신순)
+     * @param severity 필터링할 심각도 (선택 사항: LOW, MEDIUM, HIGH, CRITICAL)
+     * @param sortBy 정렬 기준 (선택 사항: "severity")
+     * @return Mono<List<Alert>> 최근 알림 리스트 (최신순 또는 정렬 기준 적용)
      */
     @GetMapping("/alerts")
     public Mono<List<Alert>> getAlerts(
             @RequestParam(required = false) AlertStatus status,
-            @RequestParam(required = false) String assignedTo) {
+            @RequestParam(required = false) String assignedTo,
+            @RequestParam(required = false) Severity severity,
+            @RequestParam(required = false) String sortBy) {
 
-        logger.debug("알림 조회 요청 수신 - limit={}, status={}, assignedTo={}",
-                DEFAULT_ALERT_LIMIT, status, assignedTo);
+        logger.debug("알림 조회 요청 수신 - limit={}, status={}, assignedTo={}, severity={}, sortBy={}",
+                DEFAULT_ALERT_LIMIT, status, assignedTo, severity, sortBy);
 
         List<Alert> alerts;
 
+        // 필터링 적용 (우선순위: status → assignedTo → severity)
         if (status != null) {
             // 상태별 필터링
             logger.debug("상태별 필터링 시작 - status={}", status);
@@ -89,9 +101,19 @@ public class AlertController {
             // 담당자별 필터링
             logger.debug("담당자별 필터링 시작 - assignedTo={}", assignedTo);
             alerts = alertService.filterByAssignee(assignedTo);
+        } else if (severity != null) {
+            // 심각도별 필터링
+            logger.debug("심각도별 필터링 시작 - severity={}", severity);
+            alerts = alertService.filterBySeverity(severity);
         } else {
             // 전체 알림 조회
             alerts = alertService.getRecentAlerts(DEFAULT_ALERT_LIMIT);
+        }
+
+        // 정렬 적용 (sortBy 파라미터)
+        if ("severity".equalsIgnoreCase(sortBy)) {
+            logger.debug("심각도별 정렬 시작 - 알림 개수={}", alerts.size());
+            alerts = alertService.sortBySeverity(alerts);
         }
 
         logger.debug("알림 조회 완료 - 반환 개수={}", alerts.size());

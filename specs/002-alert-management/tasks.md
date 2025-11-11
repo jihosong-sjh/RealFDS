@@ -346,15 +346,15 @@
 
 > **중요: 테스트를 먼저 작성하고, 실패하는지 확인한 후 구현 시작**
 
-- [ ] T055 [P] [US3] fraud-detector: 규칙별 severity 설정 단위 테스트 작성 (fraud-detector/src/test/scala/com/realfds/detector/rules/SeverityAssignmentTest.scala)
+- [X] T055 [P] [US3] fraud-detector: 규칙별 severity 설정 단위 테스트 작성 (fraud-detector/src/test/scala/com/realfds/detector/rules/SeverityAssignmentTest.scala)
   - Given: HighValueRule 실행, When: 알림 생성, Then: severity=HIGH 확인
   - Given: ForeignCountryRule 실행, When: 알림 생성, Then: severity=MEDIUM 확인
   - Given: HighFrequencyRule 실행, When: 알림 생성, Then: severity=HIGH 확인
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T056 [P] [US3] alert-service: 심각도별 필터링 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterBySeverityTest.java)
+- [X] T056 [P] [US3] alert-service: 심각도별 필터링 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertFilterBySeverityTest.java)
   - Given: 다양한 심각도의 알림 목록, When: severity=HIGH 필터 적용, Then: HIGH 알림만 반환
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T057 [P] [US3] alert-service: 심각도별 정렬 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertSortBySeverityTest.java)
+- [X] T057 [P] [US3] alert-service: 심각도별 정렬 단위 테스트 작성 (alert-service/src/test/java/com/realfds/alert/service/AlertSortBySeverityTest.java)
   - Given: 다양한 심각도의 알림 목록, When: 심각도별 정렬, Then: CRITICAL → HIGH → MEDIUM → LOW 순서 확인
   - 한국어 주석으로 정렬 로직 설명
 
@@ -366,52 +366,52 @@
 
 #### Backend: alert-service
 
-- [ ] T058 [US3] alert-service: AlertService에 심각도별 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T058 [US3] alert-service: AlertService에 심각도별 필터링 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - filterBySeverity(Severity severity): 심각도별 필터링
   - 응답 시간 <100ms 목표
   - 한국어 주석으로 필터링 로직 설명
-- [ ] T059 [US3] alert-service: AlertService에 심각도별 정렬 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T059 [US3] alert-service: AlertService에 심각도별 정렬 로직 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - sortBySeverity(): CRITICAL → HIGH → MEDIUM → LOW 순서 정렬
   - Comparator 구현
   - 한국어 주석으로 정렬 로직 설명
-- [ ] T060 [US3] alert-service: GET /api/alerts에 severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T060 [US3] alert-service: GET /api/alerts에 severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?severity=LOW | MEDIUM | HIGH | CRITICAL
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
-- [ ] T061 [US3] alert-service: GET /api/alerts에 sortBy=severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
+- [X] T061 [US3] alert-service: GET /api/alerts에 sortBy=severity 쿼리 파라미터 지원 추가 (alert-service/src/main/java/com/realfds/alert/controller/AlertController.java)
   - Query: ?sortBy=severity
   - 기존 엔드포인트 확장
   - 한국어 주석으로 파라미터 설명
 
 #### Frontend: frontend-dashboard
 
-- [ ] T062 [P] [US3] frontend: Severity enum 타입 정의 (frontend-dashboard/src/types/severity.ts)
+- [X] T062 [P] [US3] frontend: Severity enum 타입 정의 (frontend-dashboard/src/types/severity.ts)
   - LOW, MEDIUM, HIGH, CRITICAL
   - 한국어 주석으로 심각도 설명
-- [ ] T063 [P] [US3] frontend: SeverityBadge 컴포넌트 생성 (frontend-dashboard/src/components/SeverityBadge.tsx)
+- [X] T063 [P] [US3] frontend: SeverityBadge 컴포넌트 생성 (frontend-dashboard/src/components/SeverityBadge.tsx)
   - CRITICAL: 빨간색, HIGH: 주황색, MEDIUM: 노란색, LOW: 파란색
   - 심각도 텍스트 표시 (낮음/보통/높음/긴급)
   - 한국어 주석으로 컴포넌트 설명
-- [ ] T064 [US3] frontend: AlertItem 컴포넌트에 SeverityBadge 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T064 [US3] frontend: AlertItem 컴포넌트에 SeverityBadge 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - severity 필드를 SeverityBadge에 전달
   - 색상 코딩으로 긴급 알림 시각적 구분
   - 한국어 주석으로 UI 설명
-- [ ] T065 [US3] frontend: AlertItem 컴포넌트에 심각도별 배경색 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T065 [US3] frontend: AlertItem 컴포넌트에 심각도별 배경색 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - CRITICAL: 빨간색 배경 (연한색), HIGH: 주황색 배경, MEDIUM: 노란색 배경, LOW: 파란색 배경
   - 시각적 구분 강화
   - 한국어 주석으로 스타일 설명
-- [ ] T066 [US3] frontend: AlertFilterPanel에 심각도 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T066 [US3] frontend: AlertFilterPanel에 심각도 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 심각도별 필터 드롭다운 (전체/낮음/보통/높음/긴급)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T067 [US3] frontend: AlertList에 심각도별 정렬 기능 추가 (frontend-dashboard/src/components/AlertList.tsx)
+- [X] T067 [US3] frontend: AlertList에 심각도별 정렬 기능 추가 (frontend-dashboard/src/components/AlertList.tsx)
   - 정렬 버튼 (심각도순)
   - 정렬 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 정렬 로직 설명
 
 #### Logging & Observability
 
-- [ ] T068 [US3] alert-service: 심각도별 필터링 및 정렬 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T068 [US3] alert-service: 심각도별 필터링 및 정렬 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - DEBUG 레벨: 필터링/정렬 요청 (severity, 결과 개수 포함)
   - 로그 메시지는 한국어로 작성
 
