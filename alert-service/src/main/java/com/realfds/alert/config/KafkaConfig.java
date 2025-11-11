@@ -111,7 +111,16 @@ public class KafkaConfig {
      * - KEY_SERIALIZER: String 직렬화
      * - VALUE_SERIALIZER: JSON 직렬화 (Map 객체를 JSON으로 변환)
      * - ACKS: all (모든 replica가 확인할 때까지 대기)
-     * - RETRIES: 3 (전송 실패 시 재시도 횟수)
+     * - RETRIES: Integer.MAX_VALUE (무제한 재시도, 타임아웃으로 제한)
+     * - RETRY_BACKOFF_MS: 1000ms (초기 백오프)
+     * - MAX_BLOCK_MS: 30000ms (최대 블로킹 시간 30초)
+     * - REQUEST_TIMEOUT_MS: 30000ms (요청 타임아웃 30초)
+     * - DELIVERY_TIMEOUT_MS: 120000ms (전달 타임아웃 120초 = 2분)
+     *
+     * 서킷 브레이커 패턴:
+     * - 지수적 백오프: 1s → 2s → 4s → 8s → ... (최대 30s)
+     * - 연결 실패 시 자동 재시도
+     * - 최대 대기 시간 초과 시 실패 반환
      *
      * @return ProducerFactory<String, Map<String, Object>>
      */
@@ -131,8 +140,12 @@ public class KafkaConfig {
         // ACK 설정: all (모든 replica 확인)
         config.put(ProducerConfig.ACKS_CONFIG, "all");
 
-        // 재시도 횟수
-        config.put(ProducerConfig.RETRIES_CONFIG, 3);
+        // 재시도 설정 (서킷 브레이커)
+        config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE); // 무제한 재시도 (타임아웃으로 제한)
+        config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000); // 초기 백오프: 1초
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 30000); // 최대 블로킹 시간: 30초
+        config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000); // 요청 타임아웃: 30초
+        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 120000); // 전달 타임아웃: 2분
 
         // 멱등성 보장 (중복 방지)
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);

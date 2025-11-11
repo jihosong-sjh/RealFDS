@@ -3,6 +3,9 @@ package com.realfds.alert.service;
 import com.realfds.alert.model.Alert;
 import com.realfds.alert.model.AlertStatus;
 import com.realfds.alert.repository.AlertRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -28,6 +31,11 @@ import java.util.stream.Collectors;
  * - 알림 저장 로깅
  * - 최근 알림 조회
  * - 상태 변경 및 이벤트 발행
+ *
+ * Micrometer 메트릭:
+ * - alerts_status_changed_total: 상태 변경 횟수 (counter)
+ * - alerts_assigned_total: 담당자 할당 횟수 (counter)
+ * - alert_status_change_latency: 상태 변경 지연 시간 (histogram)
  */
 @Service
 public class AlertService {
@@ -37,17 +45,39 @@ public class AlertService {
 
     private final AlertRepository alertRepository;
     private final KafkaTemplate<String, Map<String, Object>> kafkaTemplate;
+    private final MeterRegistry meterRegistry;
+
+    // Micrometer 메트릭
+    private final Counter statusChangedCounter;
+    private final Counter alertsAssignedCounter;
+    private final Timer statusChangeLatencyTimer;
 
     /**
      * 생성자 기반 의존성 주입
      *
      * @param alertRepository 알림 저장소
      * @param kafkaTemplate Kafka 메시지 전송 템플릿
+     * @param meterRegistry Micrometer 메트릭 레지스트리
      */
     public AlertService(AlertRepository alertRepository,
-                        KafkaTemplate<String, Map<String, Object>> kafkaTemplate) {
+                        KafkaTemplate<String, Map<String, Object>> kafkaTemplate,
+                        MeterRegistry meterRegistry) {
         this.alertRepository = alertRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.meterRegistry = meterRegistry;
+
+        // Micrometer 메트릭 초기화
+        this.statusChangedCounter = Counter.builder("alerts_status_changed_total")
+                .description("알림 상태 변경 총 횟수")
+                .register(meterRegistry);
+
+        this.alertsAssignedCounter = Counter.builder("alerts_assigned_total")
+                .description("담당자 할당 총 횟수")
+                .register(meterRegistry);
+
+        this.statusChangeLatencyTimer = Timer.builder("alert_status_change_latency")
+                .description("알림 상태 변경 지연 시간")
+                .register(meterRegistry);
     }
 
     /**
@@ -109,60 +139,70 @@ public class AlertService {
      * - INFO: 상태 변경 성공 (alertId, oldStatus, newStatus, processedAt 포함)
      * - ERROR: 상태 변경 실패 (alertId, 오류 원인 포함)
      *
+     * Micrometer 메트릭:
+     * - alerts_status_changed_total: 상태 변경 성공 시 카운터 증가
+     * - alert_status_change_latency: 상태 변경 소요 시간 기록
+     *
      * @param alertId 변경할 알림 ID
      * @param newStatus 새로운 상태 (UNREAD, IN_PROGRESS, COMPLETED)
      * @return 업데이트된 Alert 객체 (실패 시 null)
      */
     public Alert changeStatus(String alertId, AlertStatus newStatus) {
-        // 입력 검증: alertId
-        if (alertId == null || alertId.isEmpty()) {
-            logger.error("상태 변경 실패: alertId={}, 오류 원인=alertId가 비어있음", alertId);
-            return null;
-        }
-
-        // 입력 검증: newStatus
-        if (newStatus == null) {
-            logger.error("상태 변경 실패: alertId={}, 오류 원인=newStatus가 null", alertId);
-            return null;
-        }
-
-        // 알림 조회
-        Alert alert = alertRepository.findByAlertId(alertId);
-        if (alert == null) {
-            logger.error("상태 변경 실패: alertId={}, 오류 원인=알림을 찾을 수 없음", alertId);
-            return null;
-        }
-
-        AlertStatus oldStatus = alert.getStatus();
-
-        try {
-            // 상태 변경
-            alert.setStatus(newStatus);
-
-            // COMPLETED 상태로 변경 시 processedAt 자동 설정
-            if (newStatus == AlertStatus.COMPLETED && alert.getProcessedAt() == null) {
-                alert.setProcessedAt(Instant.now());
-
-                // 구조화된 로깅: INFO 레벨 (성공 - processedAt 포함)
-                logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
-                    alertId, oldStatus, newStatus, alert.getProcessedAt());
-            } else {
-                // 구조화된 로깅: INFO 레벨 (성공)
-                logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
-                    alertId, oldStatus, newStatus, alert.getProcessedAt());
+        // 상태 변경 지연 시간 측정 시작
+        return statusChangeLatencyTimer.record(() -> {
+            // 입력 검증: alertId
+            if (alertId == null || alertId.isEmpty()) {
+                logger.error("상태 변경 실패: alertId={}, 오류 원인=alertId가 비어있음", alertId);
+                return null;
             }
 
-            // Kafka 이벤트 발행
-            publishStatusChangedEvent(alert);
+            // 입력 검증: newStatus
+            if (newStatus == null) {
+                logger.error("상태 변경 실패: alertId={}, 오류 원인=newStatus가 null", alertId);
+                return null;
+            }
 
-            return alert;
+            // 알림 조회
+            Alert alert = alertRepository.findByAlertId(alertId);
+            if (alert == null) {
+                logger.error("상태 변경 실패: alertId={}, 오류 원인=알림을 찾을 수 없음", alertId);
+                return null;
+            }
 
-        } catch (Exception e) {
-            // 구조화된 로깅: ERROR 레벨 (실패)
-            logger.error("상태 변경 실패: alertId={}, oldStatus={}, newStatus={}, 오류 원인={}",
-                alertId, oldStatus, newStatus, e.getMessage(), e);
-            return null;
-        }
+            AlertStatus oldStatus = alert.getStatus();
+
+            try {
+                // 상태 변경
+                alert.setStatus(newStatus);
+
+                // COMPLETED 상태로 변경 시 processedAt 자동 설정
+                if (newStatus == AlertStatus.COMPLETED && alert.getProcessedAt() == null) {
+                    alert.setProcessedAt(Instant.now());
+
+                    // 구조화된 로깅: INFO 레벨 (성공 - processedAt 포함)
+                    logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
+                        alertId, oldStatus, newStatus, alert.getProcessedAt());
+                } else {
+                    // 구조화된 로깅: INFO 레벨 (성공)
+                    logger.info("상태 변경 성공: alertId={}, oldStatus={}, newStatus={}, processedAt={}",
+                        alertId, oldStatus, newStatus, alert.getProcessedAt());
+                }
+
+                // Micrometer 메트릭: 상태 변경 성공 카운터 증가
+                statusChangedCounter.increment();
+
+                // Kafka 이벤트 발행
+                publishStatusChangedEvent(alert);
+
+                return alert;
+
+            } catch (Exception e) {
+                // 구조화된 로깅: ERROR 레벨 (실패)
+                logger.error("상태 변경 실패: alertId={}, oldStatus={}, newStatus={}, 오류 원인={}",
+                    alertId, oldStatus, newStatus, e.getMessage(), e);
+                return null;
+            }
+        });
     }
 
     /**
@@ -284,6 +324,9 @@ public class AlertService {
      * - INFO: 담당자 할당 성공 (alertId, assignedTo 포함)
      * - ERROR: 할당 실패 (alertId, 오류 원인 포함)
      *
+     * Micrometer 메트릭:
+     * - alerts_assigned_total: 담당자 할당 성공 시 카운터 증가
+     *
      * @param alertId 할당할 알림 ID
      * @param assignedTo 담당자 이름 (최대 100자)
      * @return 업데이트된 Alert 객체 (실패 시 null)
@@ -316,6 +359,9 @@ public class AlertService {
 
             // 구조화된 로깅: INFO 레벨 (성공)
             logger.info("담당자 할당 성공: alertId={}, assignedTo={}", alertId, assignedTo);
+
+            // Micrometer 메트릭: 담당자 할당 성공 카운터 증가
+            alertsAssignedCounter.increment();
 
             // Kafka 이벤트 발행
             publishStatusChangedEvent(updatedAlert);
