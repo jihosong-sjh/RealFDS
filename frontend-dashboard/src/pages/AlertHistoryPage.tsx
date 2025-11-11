@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import type { SortingState } from '@tanstack/react-table';
 import { DateRangePicker } from '../components/DateRangePicker';
 import { AlertHistoryFilters, type FilterValues } from '../components/AlertHistoryFilters';
-import { alertHistoryService, type PagedAlertResult } from '../services/alertHistoryService';
-import type { Alert } from '../types/alert';
+import { AlertHistoryTable } from '../components/AlertHistoryTable';
+import { Pagination } from '../components/Pagination';
+import { alertHistoryService } from '../services/alertHistoryService';
 import '../styles/AlertHistoryPage.css';
 
 /**
@@ -11,9 +14,9 @@ import '../styles/AlertHistoryPage.css';
  * 알림 이력 조회 페이지입니다.
  * - DateRangePicker를 통해 날짜 범위 선택
  * - AlertHistoryFilters를 통해 다중 필터링 (규칙명, 사용자ID, 상태)
- * - 검색 버튼 클릭 시 API 호출
- * - 알림 목록을 테이블로 표시
- * - 페이지네이션 지원
+ * - AlertHistoryTable로 알림 목록 표시 (정렬 기능 포함)
+ * - Pagination으로 페이지네이션 지원
+ * - React Query를 사용한 서버 상태 관리
  * - 로딩 상태 및 에러 상태 표시
  */
 export function AlertHistoryPage() {
@@ -28,41 +31,42 @@ export function AlertHistoryPage() {
     status: '',
   });
 
+  // 상태 관리: 페이지네이션
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize] = useState<number>(50);
 
-  // 상태 관리: 검색 결과
-  const [searchResult, setSearchResult] = useState<PagedAlertResult | null>(null);
+  // 상태 관리: 테이블 정렬
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'alertTimestamp', desc: true },
+  ]);
 
-  // 상태 관리: 로딩 상태
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // 상태 관리: 에러 메시지
-  const [error, setError] = useState<string | null>(null);
-
-  /**
-   * 날짜 범위 변경 핸들러
-   */
-  const handleDateRangeChange = (start: string | null, end: string | null) => {
-    setStartDate(start);
-    setEndDate(end);
-  };
+  // 상태 관리: 검색 트리거
+  const [searchTrigger, setSearchTrigger] = useState<number>(0);
 
   /**
-   * 필터 값 변경 핸들러
+   * React Query를 사용한 알림 이력 검색
+   * - 자동 로딩 상태 관리
+   * - 자동 에러 처리
+   * - 캐싱 및 재시도 지원
    */
-  const handleFilterChange = (newFilters: FilterValues) => {
-    setFilters(newFilters);
-  };
-
-  /**
-   * 검색 실행 핸들러 (모든 검색 조건 포함)
-   */
-  const handleSearch = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
+  const {
+    data: searchResult,
+    isLoading,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: [
+      'alertHistory',
+      startDate,
+      endDate,
+      filters.ruleName,
+      filters.userId,
+      filters.status,
+      currentPage,
+      pageSize,
+      searchTrigger,
+    ],
+    queryFn: async () => {
       console.log('[AlertHistoryPage] 검색 시작:', {
         startDate,
         endDate,
@@ -83,15 +87,37 @@ export function AlertHistoryPage() {
         size: pageSize,
       });
 
-      setSearchResult(result);
       console.log('[AlertHistoryPage] 검색 완료:', result.totalElements, '개');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '알림 이력 조회에 실패했습니다';
-      setError(errorMessage);
-      console.error('[AlertHistoryPage] 검색 실패:', err);
-    } finally {
-      setIsLoading(false);
-    }
+      return result;
+    },
+    enabled: true,
+    staleTime: 1000 * 60 * 2, // 2분
+  });
+
+  /**
+   * 날짜 범위 변경 핸들러
+   */
+  const handleDateRangeChange = (start: string | null, end: string | null) => {
+    setStartDate(start);
+    setEndDate(end);
+    setCurrentPage(0); // 날짜 범위 변경 시 첫 페이지로 이동
+  };
+
+  /**
+   * 필터 값 변경 핸들러
+   */
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    setCurrentPage(0); // 필터 변경 시 첫 페이지로 이동
+  };
+
+  /**
+   * 검색 실행 핸들러
+   * - searchTrigger를 증가시켜 React Query 재실행
+   */
+  const handleSearch = () => {
+    setCurrentPage(0); // 검색 시 첫 페이지로 이동
+    setSearchTrigger((prev) => prev + 1);
   };
 
   /**
@@ -100,22 +126,6 @@ export function AlertHistoryPage() {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-
-  /**
-   * currentPage 변경 시 자동으로 검색 실행
-   */
-  useEffect(() => {
-    if (searchResult !== null) {
-      handleSearch();
-    }
-  }, [currentPage]);
-
-  /**
-   * 컴포넌트 마운트 시 초기 검색 실행 (최근 7일 기본값)
-   */
-  useEffect(() => {
-    handleSearch();
-  }, []);
 
   return (
     <div className="alert-history-page">
@@ -145,7 +155,7 @@ export function AlertHistoryPage() {
       </section>
 
       {/* 로딩 상태 */}
-      {isLoading && (
+      {(isLoading || isFetching) && (
         <div className="alert-history-page__loading">
           <div className="alert-history-page__spinner"></div>
           <p>알림을 검색하고 있습니다...</p>
@@ -155,7 +165,8 @@ export function AlertHistoryPage() {
       {/* 에러 메시지 */}
       {error && !isLoading && (
         <div className="alert-history-page__error" role="alert">
-          <strong>오류 발생:</strong> {error}
+          <strong>오류 발생:</strong>{' '}
+          {error instanceof Error ? error.message : '알림 이력 조회에 실패했습니다'}
         </div>
       )}
 
@@ -170,78 +181,25 @@ export function AlertHistoryPage() {
             </p>
           </section>
 
-          {/* 알림 테이블 */}
-          {searchResult.content.length > 0 ? (
-            <section className="alert-history-page__table-container">
-              <table className="alert-history-page__table">
-                <thead>
-                  <tr>
-                    <th>알림 ID</th>
-                    <th>사용자 ID</th>
-                    <th>금액</th>
-                    <th>규칙명</th>
-                    <th>심각도</th>
-                    <th>발생 시각</th>
-                    <th>상태</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResult.content.map((alert: Alert) => (
-                    <tr key={alert.alertId}>
-                      <td className="alert-history-page__table-cell--id">
-                        {alert.alertId.substring(0, 8)}...
-                      </td>
-                      <td>{alert.originalTransaction?.userId || 'N/A'}</td>
-                      <td className="alert-history-page__table-cell--amount">
-                        {alert.originalTransaction?.amount.toLocaleString()} {alert.originalTransaction?.currency}
-                      </td>
-                      <td>{alert.ruleName}</td>
-                      <td>
-                        <span className={`alert-history-page__severity alert-history-page__severity--${alert.severity.toLowerCase()}`}>
-                          {alert.severity}
-                        </span>
-                      </td>
-                      <td className="alert-history-page__table-cell--timestamp">
-                        {new Date(alert.alertTimestamp).toLocaleString('ko-KR')}
-                      </td>
-                      <td>
-                        <span className={`alert-history-page__status alert-history-page__status--${alert.status.toLowerCase()}`}>
-                          {alert.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
-          ) : (
-            <div className="alert-history-page__empty">
-              <p>검색 조건에 맞는 알림이 없습니다.</p>
-            </div>
-          )}
+          {/* 알림 테이블 (TanStack Table 사용) */}
+          <section className="alert-history-page__table-container">
+            <AlertHistoryTable
+              data={searchResult.content}
+              sorting={sorting}
+              onSortingChange={setSorting}
+            />
+          </section>
 
           {/* 페이지네이션 */}
           {searchResult.totalPages > 1 && (
             <section className="alert-history-page__pagination">
-              <button
-                className="alert-history-page__pagination-button"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={!searchResult.hasPrevious}
-              >
-                이전
-              </button>
-
-              <span className="alert-history-page__pagination-info">
-                페이지 {currentPage + 1} / {searchResult.totalPages}
-              </span>
-
-              <button
-                className="alert-history-page__pagination-button"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={!searchResult.hasNext}
-              >
-                다음
-              </button>
+              <Pagination
+                currentPage={searchResult.currentPage}
+                totalPages={searchResult.totalPages}
+                hasPrevious={searchResult.hasPrevious}
+                hasNext={searchResult.hasNext}
+                onPageChange={handlePageChange}
+              />
             </section>
           )}
         </>

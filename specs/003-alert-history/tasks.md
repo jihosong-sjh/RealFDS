@@ -465,20 +465,20 @@
 
 ### Frontend: Alert History Table & Pagination (Cross-Cutting)
 
-- [ ] T058 [P] Create AlertHistoryTable component in alert-dashboard/frontend/src/components/AlertHistoryTable.tsx
+- [X] T058 [P] Create AlertHistoryTable component in alert-dashboard/frontend/src/components/AlertHistoryTable.tsx
   - TanStack Table (React Table v8) 사용
   - 알림 목록 표시 (alertId, userId, amount, ruleName, severity, alertTimestamp, status)
   - 정렬 기능 (alertTimestamp 기본 내림차순)
   - 한국어 컬럼 헤더
   - TypeScript 타입 정의
-- [ ] T059 [P] Create Pagination component in alert-dashboard/frontend/src/components/Pagination.tsx
-  - Material-UI Pagination 사용
+- [X] T059 [P] Create Pagination component in alert-dashboard/frontend/src/components/Pagination.tsx
+  - 커스텀 Pagination 컴포넌트 구현 (Material-UI 미설치)
   - 현재 페이지, 전체 페이지 표시
   - 이전/다음 버튼
   - 페이지 번호 클릭 이벤트
   - 한국어 라벨
   - TypeScript 타입 정의
-- [ ] T060 Update AlertHistoryPage to integrate table and pagination in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
+- [X] T060 Update AlertHistoryPage to integrate table and pagination in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
   - AlertHistoryTable 컴포넌트 추가
   - Pagination 컴포넌트 추가
   - React Query (TanStack Query) 사용하여 서버 상태 관리
