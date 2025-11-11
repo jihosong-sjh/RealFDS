@@ -414,16 +414,16 @@
 
 ### Documentation (Constitution VI - MANDATORY)
 
-- [ ] T049 [P] Write README.md for alert-history feature in specs/003-alert-history/README.md
+- [X] T049 [P] Write README.md for alert-history feature in specs/003-alert-history/README.md
   - 기능 개요 (한국어)
   - 빠른 시작 가이드
   - 환경 변수 문서화
   - 문제 해결 섹션
-- [ ] T050 [P] Add Korean comments to all complex logic
+- [X] T050 [P] Add Korean comments to all complex logic
   - 동적 쿼리 생성 로직 주석
   - 필터링 로직 주석
   - 에러 처리 로직 주석
-- [ ] T051 [P] Update main README.md to include alert-history feature
+- [X] T051 [P] Update main README.md to include alert-history feature
   - 기능 목록에 Alert History 추가
   - 관련 문서 링크 추가
 

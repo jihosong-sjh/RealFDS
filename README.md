@@ -17,7 +17,12 @@ RealFDS는 학습 및 포트폴리오 목적으로 개발된 실시간 스트리
 - **알림 상태 관리**: 알림 처리 상태 추적 (미확인/확인중/완료)
 - **담당자 할당 및 조치 기록**: 알림 담당자 할당 및 처리 내역 기록
 - **심각도별 우선순위**: 탐지 규칙별 심각도 자동 할당 및 색상 구분 (낮음/보통/높음/긴급)
-- **대시보드**: 실시간 알림 모니터링 웹 UI
+- **알림 이력 조회**: PostgreSQL 기반 과거 알림 영구 저장 및 검색
+  - 날짜 범위 검색
+  - 다중 조건 필터링 (규칙명, 사용자 ID, 상태)
+  - 페이지네이션 지원
+  - 10,000개 알림 중 500ms 이내 검색
+- **대시보드**: 실시간 알림 모니터링 및 이력 조회 웹 UI
 
 ### 시스템 구성 요소
 
@@ -34,6 +39,7 @@ RealFDS는 5개의 독립적인 마이크로서비스로 구성됩니다:
 - **메시지 브로커**: Apache Kafka 3.6+
 - **스트림 처리**: Apache Flink 1.18+ (Scala)
 - **백엔드**: Spring Boot 3.2+ (WebFlux, Reactive)
+- **데이터베이스**: PostgreSQL 15+ (R2DBC)
 - **프론트엔드**: React 18+ with TypeScript + Vite
 - **컨테이너**: Docker + Docker Compose
 
@@ -245,6 +251,8 @@ bash scripts/measure-latency.sh
 - [문제 해결 가이드](docs/troubleshooting.md)
 - [빠른 시작 가이드 - 실시간 FDS](specs/001-realtime-fds/quickstart.md)
 - [빠른 시작 가이드 - 알림 관리](specs/002-alert-management/quickstart.md)
+- [빠른 시작 가이드 - 알림 이력 조회](specs/003-alert-history/quickstart.md)
+- [기능 가이드 - 알림 이력 조회](specs/003-alert-history/README.md)
 
 ## 각 서비스 상세 문서
 
