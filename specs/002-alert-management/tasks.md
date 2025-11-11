@@ -450,20 +450,20 @@
 
 ### Documentation (Constitution VI - MANDATORY)
 
-- [ ] T075 [P] 프로젝트 루트 README.md 업데이트 (README.md)
+- [X] T075 [P] 프로젝트 루트 README.md 업데이트 (README.md)
   - 알림 상태 관리 기능 설명 추가
   - 담당자 할당 및 조치 기록 기능 설명 추가
   - 심각도별 우선순위 기능 설명 추가
   - 한국어로 작성
-- [ ] T076 [P] alert-service: README.md 생성 또는 업데이트 (alert-service/README.md)
+- [X] T076 [P] alert-service: README.md 생성 또는 업데이트 (alert-service/README.md)
   - 서비스 목적 및 책임 설명
   - 새로운 API 엔드포인트 문서화
   - 상태 관리 로직 설명
   - 한국어로 작성
-- [ ] T077 [P] websocket-gateway: README.md 업데이트 (websocket-gateway/README.md)
+- [X] T077 [P] websocket-gateway: README.md 업데이트 (websocket-gateway/README.md)
   - ALERT_STATUS_CHANGED 이벤트 스키마 문서화
   - 한국어로 작성
-- [ ] T078 [P] frontend-dashboard: README.md 업데이트 (frontend-dashboard/README.md)
+- [X] T078 [P] frontend-dashboard: README.md 업데이트 (frontend-dashboard/README.md)
   - 새로운 컴포넌트 설명 (AlertDetailModal, AlertFilterPanel, SeverityBadge)
   - 상태 관리 hook 사용법 설명
   - 한국어로 작성
