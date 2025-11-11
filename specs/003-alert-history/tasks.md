@@ -63,24 +63,24 @@
 
 ### 데이터베이스 스키마 및 마이그레이션
 
-- [ ] T006 Create Flyway migration V1__create_alerts_table.sql in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T006 Create Flyway migration V1__create_alerts_table.sql in alert-dashboard/backend/src/main/resources/db/migration/
   - alerts 테이블 생성 (data-model.md의 스키마 참조)
   - 인덱스 생성 (idx_alert_timestamp, idx_rule_name, idx_user_id, idx_status)
   - 제약 조건 설정 (CHECK constraints, NOT NULL)
   - 한국어 주석으로 테이블 및 컬럼 설명
-- [ ] T007 Create Flyway migration V2__insert_sample_alerts.sql in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T007 Create Flyway migration V2__insert_sample_alerts.sql in alert-dashboard/backend/src/main/resources/db/migration/
   - 개발/테스트용 샘플 알림 데이터 3개 삽입
   - data-model.md의 Sample Data 참조
 
 ### 도메인 엔티티 및 Enum
 
-- [ ] T008 [P] Create AlertStatus enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/AlertStatus.kt
+- [X] T008 [P] Create AlertStatus enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/AlertStatus.kt
   - UNREAD, IN_PROGRESS, COMPLETED 상태 정의
   - 한국어 주석으로 각 상태 설명
-- [ ] T009 [P] Create Severity enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Severity.kt
+- [X] T009 [P] Create Severity enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Severity.kt
   - HIGH, MEDIUM, LOW 심각도 정의
   - 한국어 주석으로 각 심각도 설명
-- [ ] T010 Create Alert entity in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Alert.kt
+- [X] T010 Create Alert entity in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Alert.kt
   - @Table("alerts") 어노테이션 추가
   - data-model.md의 모든 필드 포함
   - 한국어 주석으로 각 필드 설명
@@ -88,14 +88,14 @@
 
 ### 환경 설정 및 Docker Compose
 
-- [ ] T011 Add PostgreSQL service to docker-compose.yml
+- [X] T011 Add PostgreSQL service to docker-compose.yml
   - PostgreSQL 15-alpine 이미지 사용
   - 환경 변수 설정 (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
   - 포트 매핑 (5432:5432)
   - 볼륨 설정 (postgres_data)
   - healthcheck 설정 (pg_isready)
   - 한국어 주석으로 설정 설명
-- [ ] T012 Update alert-dashboard service in docker-compose.yml
+- [X] T012 Update alert-dashboard service in docker-compose.yml
   - R2DBC 환경 변수 추가 (SPRING_R2DBC_URL, USERNAME, PASSWORD)
   - Flyway 환경 변수 추가 (SPRING_FLYWAY_URL, USER, PASSWORD)
   - depends_on 설정 (postgres service_healthy 조건)

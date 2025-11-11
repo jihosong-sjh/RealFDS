@@ -1,0 +1,145 @@
+# Alert Dashboard Backend 설정
+# Alert History (과거 알림 조회) 기능을 위한 Spring Boot 설정
+
+server:
+  port: ${SERVER_PORT:8084}  # 서버 포트 (기본값: 8084)
+  shutdown: graceful  # 우아한 종료 (진행 중인 요청 완료 후 종료)
+
+spring:
+  application:
+    name: alert-dashboard  # 애플리케이션 이름
+
+  # R2DBC 설정 (비동기 데이터베이스 연결)
+  r2dbc:
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/realfds}
+    username: ${SPRING_R2DBC_USERNAME:realfds_user}
+    password: ${SPRING_R2DBC_PASSWORD:realfds_password}
+    pool:
+      initial-size: 5  # 초기 커넥션 수
+      max-size: 20  # 최대 커넥션 수 (동시 사용자 50명 고려)
+      max-idle-time: 30m  # 유휴 커넥션 유지 시간
+      validation-query: SELECT 1  # 커넥션 검증 쿼리
+
+  # Flyway 설정 (데이터베이스 마이그레이션)
+  flyway:
+    enabled: true  # Flyway 활성화
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/realfds}
+    user: ${SPRING_FLYWAY_USER:realfds_user}
+    password: ${SPRING_FLYWAY_PASSWORD:realfds_password}
+    baseline-on-migrate: true  # 기존 데이터베이스에 마이그레이션 적용
+    baseline-version: 0  # 베이스라인 버전
+    locations: classpath:db/migration  # 마이그레이션 스크립트 위치
+    validate-on-migrate: true  # 마이그레이션 전 검증
+    out-of-order: false  # 순서대로 마이그레이션 실행
+
+  # Kafka 설정 (알림 이벤트 수신)
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: alert-dashboard-group  # Consumer 그룹 ID
+      auto-offset-reset: earliest  # 오프셋 초기화 전략
+      enable-auto-commit: true  # 자동 커밋 활성화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"  # 모든 패키지 신뢰 (개발 환경)
+
+  # Jackson 설정 (JSON 직렬화/역직렬화)
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false  # ISO 8601 날짜 형식 사용
+    deserialization:
+      fail-on-unknown-properties: false  # 알 수 없는 속성 무시
+
+# Alert History 기능 설정
+alert-history:
+  default-page-size: ${ALERT_HISTORY_DEFAULT_PAGE_SIZE:50}  # 기본 페이지 크기
+  max-page-size: ${ALERT_HISTORY_MAX_PAGE_SIZE:100}  # 최대 페이지 크기
+  default-date-range-days: ${ALERT_HISTORY_DEFAULT_DATE_RANGE_DAYS:7}  # 기본 날짜 범위 (7일)
+
+# Spring Boot Actuator 설정 (헬스 체크, 메트릭)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus  # 노출할 엔드포인트
+      base-path: /actuator  # Actuator 베이스 경로
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:always}  # 헬스 체크 상세 정보 표시
+      probes:
+        enabled: true  # Kubernetes 프로브 활성화
+  health:
+    livenessstate:
+      enabled: true  # 활성 프로브
+    readinessstate:
+      enabled: true  # 준비성 프로브
+  metrics:
+    export:
+      prometheus:
+        enabled: true  # Prometheus 메트릭 내보내기
+    tags:
+      application: ${spring.application.name}  # 메트릭 태그
+
+# 로깅 설정
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}  # 전체 로그 레벨
+    io.realfds: ${LOG_LEVEL_APP:INFO}  # 애플리케이션 로그 레벨
+    org.springframework.r2dbc: ${LOG_LEVEL_R2DBC:DEBUG}  # R2DBC 로그 레벨
+    org.springframework.data.r2dbc: ${LOG_LEVEL_R2DBC:DEBUG}
+    org.flywaydb: INFO  # Flyway 로그 레벨
+    org.springframework.kafka: INFO  # Kafka 로그 레벨
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 콘솔 로그 패턴
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"  # 파일 로그 패턴
+
+---
+# 개발 환경 프로파일
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  flyway:
+    clean-disabled: false  # 개발 환경에서 clean 명령 허용
+
+logging:
+  level:
+    io.realfds: DEBUG  # 개발 환경에서 디버그 로그 활성화
+    org.springframework.r2dbc: DEBUG
+    org.springframework.data.r2dbc: TRACE
+
+---
+# 테스트 환경 프로파일
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  r2dbc:
+    url: r2dbc:tc:postgresql:///test?TC_IMAGE_TAG=15-alpine  # Testcontainers 사용
+
+  flyway:
+    url: jdbc:tc:postgresql:///test?TC_IMAGE_TAG=15-alpine
+
+logging:
+  level:
+    io.realfds: DEBUG
+    org.springframework.r2dbc: DEBUG
+
+---
+# 프로덕션 환경 프로파일
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  flyway:
+    clean-disabled: true  # 프로덕션에서 clean 명령 비활성화
+    validate-on-migrate: true  # 마이그레이션 전 반드시 검증
+
+logging:
+  level:
+    root: WARN  # 프로덕션에서는 WARN 레벨
+    io.realfds: INFO
