@@ -52,7 +52,7 @@ export function useAlertManagement(baseUrl: string) {
         }
       }
 
-      const data = await response.json();
+      await response.json();
       console.log('[useAlertManagement] 상태 변경 성공:', alertId, newStatus);
       return true;
     } catch (err) {
@@ -105,7 +105,7 @@ export function useAlertManagement(baseUrl: string) {
         }
       }
 
-      const data = await response.json();
+      await response.json();
       console.log('[useAlertManagement] 담당자 할당 성공:', alertId, assignedTo);
       return true;
     } catch (err) {
@@ -165,7 +165,7 @@ export function useAlertManagement(baseUrl: string) {
         }
       }
 
-      const data = await response.json();
+      await response.json();
       console.log('[useAlertManagement] 조치 기록 성공:', alertId, actionNote.length, complete);
       return true;
     } catch (err) {

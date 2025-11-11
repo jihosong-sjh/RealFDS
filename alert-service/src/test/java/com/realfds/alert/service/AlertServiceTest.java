@@ -3,17 +3,22 @@ package com.realfds.alert.service;
 import com.realfds.alert.model.Alert;
 import com.realfds.alert.model.Transaction;
 import com.realfds.alert.repository.AlertRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,6 +39,12 @@ class AlertServiceTest {
 
     @Mock
     private AlertRepository alertRepository;
+
+    @Mock
+    private KafkaTemplate<String, Map<String, Object>> kafkaTemplate;
+
+    @Spy
+    private MeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @InjectMocks
     private AlertService alertService;

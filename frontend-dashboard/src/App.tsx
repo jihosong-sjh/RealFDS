@@ -13,8 +13,11 @@ function App() {
   // WebSocket URL 환경 변수 또는 기본값 사용
   const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8082/ws/alerts';
 
+  // alert-service REST API URL 환경 변수 또는 기본값 사용
+  const alertServiceUrl = import.meta.env.VITE_ALERT_SERVICE_URL || 'http://localhost:8081';
+
   // useWebSocket hook으로 WebSocket 연결 및 알림 수신
-  const { alerts, connectionState } = useWebSocket(websocketUrl);
+  const { alerts, connectionState } = useWebSocket(websocketUrl, alertServiceUrl);
 
   return (
     <div className="app-container">

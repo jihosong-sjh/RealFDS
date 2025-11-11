@@ -1,5 +1,6 @@
 package com.realfds.alert.controller;
 
+import com.realfds.alert.repository.AlertRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -17,12 +18,16 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class HealthControllerTest {
 
     private WebTestClient webTestClient;
+    private AlertRepository alertRepository;
 
     @BeforeEach
     void setUp() {
+        // AlertRepository 인스턴스 생성
+        this.alertRepository = new AlertRepository();
+
         // WebTestClient를 HealthController와 함께 바인딩
         this.webTestClient = WebTestClient
-                .bindToController(new HealthController())
+                .bindToController(new HealthController(alertRepository))
                 .build();
     }
 

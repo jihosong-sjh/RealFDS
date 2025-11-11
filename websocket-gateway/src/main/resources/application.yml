@@ -21,6 +21,17 @@ spring:
     deserialization:
       fail-on-unknown-properties: false  # 알 수 없는 필드 무시
 
+  # Kafka 설정
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}  # Kafka 브로커 주소
+    consumer:
+      group-id: websocket-gateway-group  # Consumer Group ID
+      auto-offset-reset: latest  # 최신 메시지부터 읽기
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"  # 모든 패키지 신뢰 (개발용)
+
 # 로깅 설정
 logging:
   level:

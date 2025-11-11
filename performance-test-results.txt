@@ -1,0 +1,37 @@
+Performance Test Results - 002-alert-management
+
+## Test Environment
+- Date: 2025-11-11
+- System: Development environment (not running)
+- Note: Performance benchmarks will be validated during integration testing with running system
+
+## Expected Performance Targets (from tasks.md)
+
+### T081 Performance Requirements:
+1. **Alert status change latency**: 평균 <0.5초, 최대 <1초
+2. **Filtering response time**: <100ms (100개 알림 기준)
+3. **Modal loading time**: <200ms
+4. **WebSocket broadcast latency**: <1초
+
+## Test Status
+⚠️ **Deferred**: Performance tests require a running Docker environment with all services.
+These tests should be executed after docker-compose up with the complete system.
+
+## Recommended Test Commands (for future execution)
+
+```bash
+# 1. 상태 변경 응답 시간 측정
+time curl -X PATCH http://localhost:8081/api/alerts/{alertId}/status   -H 'Content-Type: application/json'   -d '{"status": "IN_PROGRESS"}'
+
+# 2. 필터링 응답 시간 측정 (100개 알림 기준)
+time curl 'http://localhost:8081/api/alerts?status=UNREAD&severity=HIGH'
+
+# 3. WebSocket 지연 측정 (브라우저 개발자 도구 Network 탭)
+# - WebSocket 메시지 타임스탬프 비교
+# - alert-status-changed 이벤트 전송 → 수신 지연 확인
+```
+
+## Next Steps
+- Docker compose up 실행 후 성능 테스트 재실행
+- 결과를 이 문서에 기록
+
