@@ -385,33 +385,33 @@
 
 #### Frontend: frontend-dashboard
 
-- [ ] T062 [P] [US3] frontend: Severity enum 타입 정의 (frontend-dashboard/src/types/severity.ts)
+- [X] T062 [P] [US3] frontend: Severity enum 타입 정의 (frontend-dashboard/src/types/severity.ts)
   - LOW, MEDIUM, HIGH, CRITICAL
   - 한국어 주석으로 심각도 설명
-- [ ] T063 [P] [US3] frontend: SeverityBadge 컴포넌트 생성 (frontend-dashboard/src/components/SeverityBadge.tsx)
+- [X] T063 [P] [US3] frontend: SeverityBadge 컴포넌트 생성 (frontend-dashboard/src/components/SeverityBadge.tsx)
   - CRITICAL: 빨간색, HIGH: 주황색, MEDIUM: 노란색, LOW: 파란색
   - 심각도 텍스트 표시 (낮음/보통/높음/긴급)
   - 한국어 주석으로 컴포넌트 설명
-- [ ] T064 [US3] frontend: AlertItem 컴포넌트에 SeverityBadge 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T064 [US3] frontend: AlertItem 컴포넌트에 SeverityBadge 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - severity 필드를 SeverityBadge에 전달
   - 색상 코딩으로 긴급 알림 시각적 구분
   - 한국어 주석으로 UI 설명
-- [ ] T065 [US3] frontend: AlertItem 컴포넌트에 심각도별 배경색 추가 (frontend-dashboard/src/components/AlertItem.tsx)
+- [X] T065 [US3] frontend: AlertItem 컴포넌트에 심각도별 배경색 추가 (frontend-dashboard/src/components/AlertItem.tsx)
   - CRITICAL: 빨간색 배경 (연한색), HIGH: 주황색 배경, MEDIUM: 노란색 배경, LOW: 파란색 배경
   - 시각적 구분 강화
   - 한국어 주석으로 스타일 설명
-- [ ] T066 [US3] frontend: AlertFilterPanel에 심각도 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
+- [X] T066 [US3] frontend: AlertFilterPanel에 심각도 필터 추가 (frontend-dashboard/src/components/AlertFilterPanel.tsx)
   - 심각도별 필터 드롭다운 (전체/낮음/보통/높음/긴급)
   - 필터 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 필터 로직 설명
-- [ ] T067 [US3] frontend: AlertList에 심각도별 정렬 기능 추가 (frontend-dashboard/src/components/AlertList.tsx)
+- [X] T067 [US3] frontend: AlertList에 심각도별 정렬 기능 추가 (frontend-dashboard/src/components/AlertList.tsx)
   - 정렬 버튼 (심각도순)
   - 정렬 적용 시 API 호출 및 목록 업데이트
   - 한국어 주석으로 정렬 로직 설명
 
 #### Logging & Observability
 
-- [ ] T068 [US3] alert-service: 심각도별 필터링 및 정렬 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
+- [X] T068 [US3] alert-service: 심각도별 필터링 및 정렬 로깅 추가 (alert-service/src/main/java/com/realfds/alert/service/AlertService.java)
   - DEBUG 레벨: 필터링/정렬 요청 (severity, 결과 개수 포함)
   - 로그 메시지는 한국어로 작성
 
