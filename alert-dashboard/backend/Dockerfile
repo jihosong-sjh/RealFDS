@@ -32,8 +32,8 @@ WORKDIR /app
 # 빌드 결과물 복사
 COPY --from=build /app/build/libs/alert-dashboard.jar ./app.jar
 
-# 소유권 변경
-RUN chown spring:spring app.jar
+# 로그 디렉토리 생성 및 권한 설정
+RUN mkdir -p logs && chown spring:spring app.jar logs
 
 # 사용자 전환
 USER spring:spring
