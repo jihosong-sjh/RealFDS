@@ -117,14 +117,14 @@
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 > **Constitution V 요구사항**: ≥70% 커버리지, Given-When-Then 구조 사용
 
-- [ ] T011 [P] [US1] HealthCheckCollector 단위 테스트 in alert-dashboard/backend/src/test/java/com/realfds/dashboard/service/HealthCheckCollectorTest.java
+- [X] T011 [P] [US1] HealthCheckCollector 단위 테스트 in alert-dashboard/backend/src/test/java/com/realfds/dashboard/service/HealthCheckCollectorTest.java
   - Given-When-Then 구조 사용
   - 테스트 시나리오:
     - Given 모든 서비스 정상 작동, When Health Check 수집, Then 5개 서비스 모두 UP 상태
     - Given 한 서비스 중단, When Health Check 수집, Then 해당 서비스 DOWN, errorType 설정
     - Given 한 서비스 타임아웃, When Health Check 수집, Then 3초 이내 타임아웃 처리
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T012 [P] [US1] ServiceHealthCard 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/ServiceHealthCard.test.tsx
+- [X] T012 [P] [US1] ServiceHealthCard 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/ServiceHealthCard.test.tsx
   - Given UP 상태 서비스, When 렌더링, Then 녹색 카드 표시
   - Given DOWN 상태 서비스, When 렌더링, Then 빨간색 카드 표시
   - Given 상태 카드 클릭, When 클릭 이벤트, Then 상세 정보 모달 열림
@@ -132,23 +132,23 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] HealthCheckCollector 구현 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/HealthCheckCollector.java
+- [X] T013 [US1] HealthCheckCollector 구현 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/HealthCheckCollector.java
   - Spring WebClient로 5개 서비스 /actuator/health 호출 (3초 타임아웃)
   - 비동기 병렬 호출 (Mono.zip)
   - UP/DOWN 상태 판단 및 errorType 설정 (TIMEOUT, HTTP_ERROR, NETWORK_ERROR)
   - 한국어 주석으로 Health Check 로직 설명
   - 함수 길이 ≤50줄 준수
   - SLF4J 로깅 (INFO: 수집 시작/완료, WARN: 타임아웃, ERROR: 연결 실패)
-- [ ] T014 [P] [US1] ServiceHealthCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/ServiceHealthCard.tsx
+- [X] T014 [P] [US1] ServiceHealthCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/ServiceHealthCard.tsx
   - 서비스 이름, 상태(UP/DOWN), 마지막 확인 시간 표시
   - UP: 녹색, DOWN: 빨간색
   - 클릭 시 상세 정보 모달 열기 (onCardClick prop)
   - 한국어 주석으로 UI 로직 설명
-- [ ] T015 [P] [US1] ServiceDetailModal 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/ServiceDetailModal.tsx
+- [X] T015 [P] [US1] ServiceDetailModal 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/ServiceDetailModal.tsx
   - 메모리 사용량, 평균 응답 시간 표시
   - DOWN 상태 시 errorType, errorMessage 표시
   - 한국어 주석으로 모달 로직 설명
-- [ ] T016 [US1] MetricsScheduler에 Health Check 통합 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsScheduler.java
+- [X] T016 [US1] MetricsScheduler에 Health Check 통합 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsScheduler.java
   - @Scheduled(fixedRate = 5000) 메서드 생성
   - HealthCheckCollector 호출 후 MetricsStore에 저장
   - 한국어 주석으로 스케줄링 로직 설명
