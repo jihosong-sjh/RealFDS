@@ -29,6 +29,21 @@ dependencies {
     // Spring Boot Actuator (헬스 체크, 모니터링)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // Spring Data R2DBC (Reactive 데이터베이스 액세스)
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // PostgreSQL R2DBC Driver (PostgreSQL 비동기 드라이버)
+    implementation 'org.postgresql:r2dbc-postgresql:1.0.7.RELEASE'
+
+    // Flyway Core (데이터베이스 마이그레이션)
+    implementation 'org.flywaydb:flyway-core:10.21.0'
+
+    // Flyway Database Support - PostgreSQL
+    implementation 'org.flywaydb:flyway-database-postgresql:10.21.0'
+
+    // PostgreSQL JDBC Driver (Flyway는 JDBC를 사용하여 마이그레이션 수행)
+    runtimeOnly 'org.postgresql:postgresql:42.7.4'
+
     // Jackson (JSON 직렬화/역직렬화)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
@@ -46,6 +61,7 @@ dependencies {
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.testcontainers:testcontainers'
     testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.mockito:mockito-junit-jupiter'

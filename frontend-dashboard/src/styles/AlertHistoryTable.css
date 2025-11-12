@@ -1,0 +1,179 @@
+/* AlertHistoryTable 스타일 */
+
+.alert-history-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.alert-history-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 테이블 헤더 */
+.alert-history-table__thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.alert-history-table__header-row {
+  border-bottom: 2px solid #dee2e6;
+}
+
+.alert-history-table__header-cell {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+  user-select: none;
+}
+
+.alert-history-table__header-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 정렬 인디케이터 */
+.alert-history-table__sort-indicator {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* 테이블 바디 */
+.alert-history-table__tbody {
+  background-color: #ffffff;
+}
+
+.alert-history-table__row {
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.alert-history-table__row:hover {
+  background-color: #f8f9fa;
+}
+
+.alert-history-table__row:last-child {
+  border-bottom: none;
+}
+
+.alert-history-table__cell {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #212529;
+}
+
+/* 알림 ID 셀 */
+.alert-history-table__cell--id {
+  font-family: 'Courier New', monospace;
+  color: #6c757d;
+  font-size: 12px;
+  cursor: help;
+}
+
+/* 금액 셀 */
+.alert-history-table__cell--amount {
+  font-weight: 500;
+  color: #212529;
+}
+
+/* 발생 시각 셀 */
+.alert-history-table__cell--timestamp {
+  white-space: nowrap;
+  color: #495057;
+}
+
+/* 심각도 뱃지 */
+.alert-history-table__severity {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.alert-history-table__severity--high {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.alert-history-table__severity--medium {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.alert-history-table__severity--low {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* 상태 뱃지 */
+.alert-history-table__status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.alert-history-table__status--unread {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.alert-history-table__status--in_progress {
+  background-color: #fef9c3;
+  color: #ca8a04;
+  border: 1px solid #fde047;
+}
+
+.alert-history-table__status--completed {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* 빈 결과 메시지 */
+.alert-history-table__empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.alert-history-table__empty p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .alert-history-table__header-cell,
+  .alert-history-table__cell {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .alert-history-table__cell--id {
+    font-size: 10px;
+  }
+
+  .alert-history-table__severity,
+  .alert-history-table__status {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+}

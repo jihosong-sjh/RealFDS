@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--
+        Alert Dashboard Logback 설정
+        구조화된 JSON 로깅을 통해 관찰 가능성(Observability)을 향상시킵니다.
+        Constitution V: 포괄적인 로깅 필수
+    -->
+
+    <!-- 콘솔 출력용 Appender (개발 환경) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- JSON 로깅 Appender (프로덕션 환경) -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/alert-dashboard.log</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- 기본 필드 추가 -->
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>alertId</includeMdcKeyName>
+            <includeMdcKeyName>ruleName</includeMdcKeyName>
+
+            <!-- 커스텀 필드 추가 -->
+            <customFields>{"service":"alert-dashboard","environment":"${ENVIRONMENT:-dev}"}</customFields>
+
+            <!-- 스택 트레이스 포함 -->
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <maxLength>2048</maxLength>
+                <shortenedClassNameLength>20</shortenedClassNameLength>
+                <exclude>^sun\.reflect\..*\.invoke</exclude>
+                <exclude>^net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+            </throwableConverter>
+        </encoder>
+
+        <!-- 로그 파일 롤링 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 일별 로그 파일 생성 -->
+            <fileNamePattern>logs/alert-dashboard-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 30일간 보관 -->
+            <maxHistory>30</maxHistory>
+            <!-- 최대 파일 크기 10GB -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- JSON 콘솔 Appender (프로덕션 환경용 구조화된 로깅) -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>alertId</includeMdcKeyName>
+            <includeMdcKeyName>ruleName</includeMdcKeyName>
+            <customFields>{"service":"alert-dashboard","environment":"${ENVIRONMENT:-prod}"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- 비동기 Appender (성능 향상) -->
+    <appender name="ASYNC_JSON_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="JSON_FILE"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+    </appender>
+
+    <!-- 개발 환경 프로파일 (dev) -->
+    <springProfile name="dev">
+        <logger name="io.realfds" level="DEBUG"/>
+        <logger name="org.springframework.r2dbc" level="DEBUG"/>
+        <logger name="org.springframework.data.r2dbc" level="DEBUG"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 테스트 환경 프로파일 (test) -->
+    <springProfile name="test">
+        <logger name="io.realfds" level="DEBUG"/>
+        <logger name="org.springframework.r2dbc" level="WARN"/>
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 프로덕션 환경 프로파일 (prod) -->
+    <springProfile name="prod">
+        <logger name="io.realfds" level="INFO"/>
+        <logger name="org.springframework.r2dbc" level="WARN"/>
+        <logger name="org.springframework.data.r2dbc" level="WARN"/>
+        <logger name="org.springframework.boot" level="WARN"/>
+        <root level="WARN">
+            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="ASYNC_JSON_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 기본 설정 (프로파일 지정 없을 때) -->
+    <springProfile name="!dev &amp; !test &amp; !prod">
+        <logger name="io.realfds" level="INFO"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_JSON_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 특정 라이브러리 로그 레벨 조정 -->
+    <logger name="org.flywaydb" level="INFO"/>
+    <logger name="org.springframework.kafka" level="INFO"/>
+    <logger name="reactor.netty" level="INFO"/>
+    <logger name="io.r2dbc" level="INFO"/>
+</configuration>

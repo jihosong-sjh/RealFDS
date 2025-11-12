@@ -13,6 +13,40 @@ spring:
   application:
     name: alert-service  # 애플리케이션 이름
 
+  # R2DBC 설정 (Reactive 데이터베이스 연결)
+  r2dbc:
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/realfds}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
+    pool:
+      # 커넥션 풀 설정
+      initial-size: ${R2DBC_POOL_INITIAL_SIZE:10}  # 초기 커넥션 수
+      max-size: ${R2DBC_POOL_MAX_SIZE:30}  # 최대 커넥션 수
+      max-idle-time: ${R2DBC_POOL_MAX_IDLE_TIME:30m}  # 최대 유휴 시간
+      validation-query: SELECT 1  # 커넥션 검증 쿼리
+
+  # Flyway 설정 (데이터베이스 마이그레이션)
+  flyway:
+    # Flyway는 JDBC를 사용하므로 별도의 JDBC URL 필요
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/realfds}
+    user: ${SPRING_FLYWAY_USER:postgres}
+    password: ${SPRING_FLYWAY_PASSWORD:postgres}
+    # 마이그레이션 스크립트 위치
+    locations: classpath:db/migration
+    # 마이그레이션 활성화
+    enabled: ${SPRING_FLYWAY_ENABLED:true}
+    # 기본 스키마
+    default-schema: public
+    # 마이그레이션 테이블 이름
+    table: flyway_schema_history
+    # 베이스라인 설정
+    baseline-on-migrate: ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: 1.0
+    # 마이그레이션 검증
+    validate-on-migrate: ${SPRING_FLYWAY_VALIDATE_ON_MIGRATE:true}
+    # 스키마 자동 생성
+    create-schemas: true
+
   # Kafka 설정
   kafka:
     # Kafka 브로커 주소
@@ -57,6 +91,8 @@ logging:
     com.realfds.alert: ${LOG_LEVEL_APP:INFO}  # 애플리케이션 로그 레벨
     org.springframework.kafka: ${LOG_LEVEL_KAFKA:INFO}  # Spring Kafka 로그 레벨
     org.apache.kafka: ${LOG_LEVEL_KAFKA_CLIENT:WARN}  # Kafka 클라이언트 로그 레벨
+    org.springframework.r2dbc: ${LOG_LEVEL_R2DBC:INFO}  # R2DBC 로그 레벨
+    org.flywaydb: ${LOG_LEVEL_FLYWAY:INFO}  # Flyway 로그 레벨
 
 # Management 엔드포인트 설정 (Health Check 등)
 management:

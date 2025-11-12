@@ -1,0 +1,169 @@
+/* Pagination 스타일 */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  flex-wrap: wrap;
+}
+
+/* 이전/다음 버튼 */
+.pagination__button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.pagination__button:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pagination__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.pagination__button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.pagination__button-text {
+  font-size: 14px;
+}
+
+/* 페이지 번호 컨테이너 */
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 페이지 번호 버튼 */
+.pagination__page-button {
+  min-width: 40px;
+  height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.pagination__page-button:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pagination__page-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* 활성 페이지 */
+.pagination__page-button--active {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+  cursor: default;
+}
+
+.pagination__page-button--active:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* 생략 부호 (...) */
+.pagination__ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 페이지 정보 */
+.pagination__info {
+  margin-left: 16px;
+  padding: 8px 12px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #f9fafb;
+  border-radius: 6px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pagination__button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination__pages {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination__page-button {
+    min-width: 36px;
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .pagination__ellipsis {
+    min-width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .pagination__info {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .pagination__button-text {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination__page-button {
+    min-width: 32px;
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .pagination__ellipsis {
+    min-width: 32px;
+    height: 32px;
+  }
+}

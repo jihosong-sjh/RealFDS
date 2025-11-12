@@ -47,11 +47,11 @@
 
 **Purpose**: 프로젝트 초기화 및 기본 구조 설정
 
-- [ ] T001 Create database migration directory structure in alert-dashboard/backend/src/main/resources/db/migration/
-- [ ] T002 [P] Add PostgreSQL R2DBC dependencies to alert-dashboard/backend/build.gradle.kts (Spring Data R2DBC, PostgreSQL R2DBC Driver)
-- [ ] T003 [P] Add Flyway dependency to alert-dashboard/backend/build.gradle.kts
-- [ ] T004 [P] Configure R2DBC connection in alert-dashboard/backend/src/main/resources/application.yml
-- [ ] T005 [P] Configure Flyway settings in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T001 Create database migration directory structure in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T002 [P] Add PostgreSQL R2DBC dependencies to alert-dashboard/backend/build.gradle.kts (Spring Data R2DBC, PostgreSQL R2DBC Driver)
+- [X] T003 [P] Add Flyway dependency to alert-dashboard/backend/build.gradle.kts
+- [X] T004 [P] Configure R2DBC connection in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T005 [P] Configure Flyway settings in alert-dashboard/backend/src/main/resources/application.yml
 
 ---
 
@@ -63,24 +63,24 @@
 
 ### 데이터베이스 스키마 및 마이그레이션
 
-- [ ] T006 Create Flyway migration V1__create_alerts_table.sql in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T006 Create Flyway migration V1__create_alerts_table.sql in alert-dashboard/backend/src/main/resources/db/migration/
   - alerts 테이블 생성 (data-model.md의 스키마 참조)
   - 인덱스 생성 (idx_alert_timestamp, idx_rule_name, idx_user_id, idx_status)
   - 제약 조건 설정 (CHECK constraints, NOT NULL)
   - 한국어 주석으로 테이블 및 컬럼 설명
-- [ ] T007 Create Flyway migration V2__insert_sample_alerts.sql in alert-dashboard/backend/src/main/resources/db/migration/
+- [X] T007 Create Flyway migration V2__insert_sample_alerts.sql in alert-dashboard/backend/src/main/resources/db/migration/
   - 개발/테스트용 샘플 알림 데이터 3개 삽입
   - data-model.md의 Sample Data 참조
 
 ### 도메인 엔티티 및 Enum
 
-- [ ] T008 [P] Create AlertStatus enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/AlertStatus.kt
+- [X] T008 [P] Create AlertStatus enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/AlertStatus.kt
   - UNREAD, IN_PROGRESS, COMPLETED 상태 정의
   - 한국어 주석으로 각 상태 설명
-- [ ] T009 [P] Create Severity enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Severity.kt
+- [X] T009 [P] Create Severity enum in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Severity.kt
   - HIGH, MEDIUM, LOW 심각도 정의
   - 한국어 주석으로 각 심각도 설명
-- [ ] T010 Create Alert entity in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Alert.kt
+- [X] T010 Create Alert entity in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/domain/Alert.kt
   - @Table("alerts") 어노테이션 추가
   - data-model.md의 모든 필드 포함
   - 한국어 주석으로 각 필드 설명
@@ -88,14 +88,14 @@
 
 ### 환경 설정 및 Docker Compose
 
-- [ ] T011 Add PostgreSQL service to docker-compose.yml
+- [X] T011 Add PostgreSQL service to docker-compose.yml
   - PostgreSQL 15-alpine 이미지 사용
   - 환경 변수 설정 (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD)
   - 포트 매핑 (5432:5432)
   - 볼륨 설정 (postgres_data)
   - healthcheck 설정 (pg_isready)
   - 한국어 주석으로 설정 설명
-- [ ] T012 Update alert-dashboard service in docker-compose.yml
+- [X] T012 Update alert-dashboard service in docker-compose.yml
   - R2DBC 환경 변수 추가 (SPRING_R2DBC_URL, USERNAME, PASSWORD)
   - Flyway 환경 변수 추가 (SPRING_FLYWAY_URL, USER, PASSWORD)
   - depends_on 설정 (postgres service_healthy 조건)
@@ -113,12 +113,12 @@
 
 ### DTO 및 검색 조건 (User Story 1)
 
-- [ ] T013 [P] [US1] Create AlertSearchCriteria DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
+- [X] T013 [P] [US1] Create AlertSearchCriteria DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
   - startDate, endDate, page, size 필드 포함 (규칙명, 사용자ID, 상태는 US3에서 추가)
   - 검증 로직 (init 블록에서 page ≥ 0, size 1~100, startDate ≤ endDate 등)
   - 기본값 설정 (page=0, size=50)
   - 한국어 주석으로 각 필드 및 검증 규칙 설명
-- [ ] T014 [P] [US1] Create PagedAlertResult DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/PagedAlertResult.kt
+- [X] T014 [P] [US1] Create PagedAlertResult DTO in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/PagedAlertResult.kt
   - content, totalElements, totalPages, currentPage, pageSize, hasNext, hasPrevious 필드 포함
   - 한국어 주석으로 각 필드 설명
 
@@ -126,12 +126,12 @@
 
 > **CRITICAL: 테스트를 먼저 작성하고, FAIL 확인 후 구현을 시작하세요**
 
-- [ ] T015 [P] [US1] Unit test for Alert entity validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/domain/AlertTest.kt
+- [X] T015 [P] [US1] Unit test for Alert entity validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/domain/AlertTest.kt
   - Given-When-Then 구조 사용
   - 유효한 Alert 생성 테스트
   - 필드 검증 테스트 (amount > 0, reason 길이 등)
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T016 [P] [US1] Unit test for AlertSearchCriteria validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/dto/AlertSearchCriteriaTest.kt
+- [X] T016 [P] [US1] Unit test for AlertSearchCriteria validation in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/dto/AlertSearchCriteriaTest.kt
   - Given-When-Then 구조 사용
   - 날짜 범위 검증 테스트 (startDate ≤ endDate)
   - 페이지 번호/크기 검증 테스트
@@ -139,14 +139,14 @@
 
 ### Repository (User Story 1)
 
-- [ ] T017 [US1] Create AlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/AlertRepository.kt
+- [X] T017 [US1] Create AlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/AlertRepository.kt
   - R2dbcRepository<Alert, UUID> 확장
   - 기본 CRUD 메서드 상속
   - 한국어 주석으로 Repository 목적 설명
-- [ ] T018 [US1] Create CustomAlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepository.kt
+- [X] T018 [US1] Create CustomAlertRepository interface in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepository.kt
   - 동적 쿼리 메서드 정의 (findByCriteria, countByCriteria)
   - 한국어 주석으로 메서드 설명
-- [ ] T019 [US1] Implement CustomAlertRepositoryImpl in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
+- [X] T019 [US1] Implement CustomAlertRepositoryImpl in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
   - R2dbcEntityTemplate 사용하여 동적 쿼리 생성
   - 날짜 범위 필터링 구현 (startDate, endDate)
   - 페이지네이션 구현 (LIMIT, OFFSET)
@@ -156,13 +156,13 @@
 
 ### 테스트 (User Story 1 - Repository Layer) ⚠️
 
-- [ ] T020 [US1] Integration test for AlertRepository basic operations in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/AlertRepositoryTest.kt
+- [X] T020 [US1] Integration test for AlertRepository basic operations in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/AlertRepositoryTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - Alert 저장 및 조회 테스트
   - 시스템 재시작 시뮬레이션 테스트 (영속성 확인)
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T021 [US1] Integration test for CustomAlertRepository date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CustomAlertRepositoryTest.kt
+- [X] T021 [US1] Integration test for CustomAlertRepository date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CustomAlertRepositoryTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 날짜 범위 검색 테스트 (1주일 전 ~ 오늘)
@@ -172,7 +172,7 @@
 
 ### Service (User Story 1)
 
-- [ ] T022 [US1] Create AlertHistoryService in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertHistoryService.kt
+- [X] T022 [US1] Create AlertHistoryService in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertHistoryService.kt
   - searchAlerts 메서드 구현 (AlertSearchCriteria 받아서 PagedAlertResult 반환)
   - 기본 날짜 범위 설정 (최근 7일)
   - 구조화된 로깅 추가 (검색 시작, 완료, 결과 개수)
@@ -183,7 +183,7 @@
 
 ### 테스트 (User Story 1 - Service Layer) ⚠️
 
-- [ ] T023 [US1] Unit test for AlertHistoryService search logic in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertHistoryServiceTest.kt
+- [X] T023 [US1] Unit test for AlertHistoryService search logic in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertHistoryServiceTest.kt
   - Mockito로 Repository 모킹
   - Reactor Test (StepVerifier) 사용
   - Given-When-Then 구조 사용
@@ -194,7 +194,7 @@
 
 ### Controller (User Story 1)
 
-- [ ] T024 [US1] Create AlertHistoryController in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/controller/AlertHistoryController.kt
+- [X] T024 [US1] Create AlertHistoryController in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/controller/AlertHistoryController.kt
   - GET /api/alerts/history 엔드포인트 구현
   - @Valid로 AlertSearchCriteria 검증
   - ResponseEntity로 응답 반환
@@ -206,7 +206,7 @@
 
 ### 테스트 (User Story 1 - Controller Layer) ⚠️
 
-- [ ] T025 [US1] Integration test for AlertHistoryController GET /api/alerts/history in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/controller/AlertHistoryControllerTest.kt
+- [X] T025 [US1] Integration test for AlertHistoryController GET /api/alerts/history in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/controller/AlertHistoryControllerTest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL)
   - WebTestClient 사용
   - Given-When-Then 구조 사용
@@ -218,7 +218,7 @@
 
 ### 알림 저장 통합 (User Story 1)
 
-- [ ] T026 [US1] Update AlertService to save alerts to PostgreSQL in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertService.kt
+- [X] T026 [US1] Update AlertService to save alerts to PostgreSQL in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/AlertService.kt
   - Kafka에서 AlertEvent 수신 시 AlertRepository.save() 호출
   - 저장 성공/실패 로깅
   - 저장 실패 시 재시도 로직 (최대 3회)
@@ -228,7 +228,7 @@
 
 ### 테스트 (User Story 1 - Alert Persistence) ⚠️
 
-- [ ] T027 [US1] Integration test for alert persistence in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertServicePersistenceTest.kt
+- [X] T027 [US1] Integration test for alert persistence in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/service/AlertServicePersistenceTest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL + Kafka)
   - Given-When-Then 구조 사용
   - Kafka로 AlertEvent 전송 → 데이터베이스 저장 확인
@@ -247,42 +247,46 @@
 
 ### Frontend: DateRangePicker Component (User Story 2)
 
-- [ ] T028 [P] [US2] Create DateRangePicker component in alert-dashboard/frontend/src/components/DateRangePicker.tsx
-  - Material-UI DatePicker 사용
+- [X] T028 [P] [US2] Create DateRangePicker component in frontend-dashboard/src/components/DateRangePicker.tsx
+  - Native HTML5 date input 사용 (Material-UI 미설치)
   - startDate, endDate state 관리
   - onChange 콜백 prop
   - 유효성 검사 (startDate ≤ endDate)
   - 한국어 라벨 및 에러 메시지
   - TypeScript 타입 정의
-- [ ] T029 [P] [US2] Unit test for DateRangePicker component in alert-dashboard/frontend/src/components/DateRangePicker.test.tsx
-  - React Testing Library 사용
+- [X] T029 [P] [US2] Unit test for DateRangePicker component in frontend-dashboard/src/components/DateRangePicker.test.tsx
+  - Vitest + React Testing Library 사용
   - 날짜 선택 시 onChange 호출 확인
   - 잘못된 날짜 범위 입력 시 에러 메시지 표시 확인
 
 ### Frontend: Alert History Page Update (User Story 2)
 
-- [ ] T030 [US2] Update AlertHistoryPage to include DateRangePicker in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
-  - DateRangePicker 컴포넌트 추가
+- [X] T030 [US2] Create AlertHistoryPage in frontend-dashboard/src/pages/AlertHistoryPage.tsx
+  - DateRangePicker 컴포넌트 통합
   - 날짜 범위 state 관리
   - 검색 버튼 클릭 시 API 호출
+  - 알림 목록 테이블 표시
+  - 페이지네이션 UI
+  - 로딩/에러 상태 표시
   - 한국어 UI 텍스트
   - TypeScript 타입 정의
-- [ ] T031 [US2] Update alertHistoryService to support date range parameters in alert-dashboard/frontend/src/services/alertHistoryService.ts
+- [X] T031 [US2] Create alertHistoryService in frontend-dashboard/src/services/alertHistoryService.ts
+  - AlertHistoryService 클래스 생성
   - startDate, endDate 쿼리 파라미터 추가
-  - ISO 8601 형식으로 변환
-  - TypeScript 타입 정의
+  - YYYY-MM-DD → ISO 8601 형식 변환
+  - TypeScript 타입 정의 (AlertSearchCriteria, PagedAlertResult)
 
 ### 테스트 (User Story 2 - Frontend) ⚠️
 
-- [ ] T032 [US2] Integration test for date range search in alert-dashboard/frontend/src/pages/AlertHistoryPage.test.tsx
-  - React Testing Library 사용
+- [X] T032 [US2] Integration test for date range search in frontend-dashboard/src/pages/AlertHistoryPage.test.tsx
+  - Vitest + React Testing Library 사용
   - Given-When-Then 구조 사용
   - 날짜 범위 선택 → 검색 → 결과 표시 확인
-  - Mock Service Worker (MSW)로 API 모킹
+  - fetch API 모킹으로 API 응답 시뮬레이션
 
 ### 테스트 (User Story 2 - End-to-End) ⚠️
 
-- [ ] T033 [US2] End-to-end test for date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/e2e/DateRangeSearchE2ETest.kt
+- [X] T033 [US2] End-to-end test for date range search in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/e2e/DateRangeSearchE2ETest.kt
   - @SpringBootTest + Testcontainers (PostgreSQL)
   - Given-When-Then 구조 사용
   - 1주일 분량의 샘플 데이터 생성 (매일 10개씩)
@@ -302,11 +306,11 @@
 
 ### Backend: Multi-Filter Support (User Story 3)
 
-- [ ] T034 [US3] Update AlertSearchCriteria to include ruleName, userId, status filters in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
+- [X] T034 [US3] Update AlertSearchCriteria to include ruleName, userId, status filters in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/dto/AlertSearchCriteria.kt
   - ruleName, userId, status 필드 추가 (모두 nullable)
   - 검증 로직 추가 (ruleName은 Enum 값, userId는 패턴 검증)
   - 한국어 주석으로 필터 설명
-- [ ] T035 [US3] Update CustomAlertRepositoryImpl to support multi-filter search in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
+- [X] T035 [US3] Update CustomAlertRepositoryImpl to support multi-filter search in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/repository/CustomAlertRepositoryImpl.kt
   - ruleName 필터링 추가 (WHERE rule_name = :ruleName)
   - userId 필터링 추가 (WHERE user_id = :userId)
   - status 필터링 추가 (WHERE status = :status)
@@ -315,25 +319,25 @@
 
 ### 테스트 (User Story 3 - Backend Multi-Filter) ⚠️
 
-- [ ] T036 [P] [US3] Integration test for ruleName filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/RuleNameFilterTest.kt
+- [X] T036 [P] [US3] Integration test for ruleName filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/RuleNameFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 규칙의 알림 생성 (HIGH_AMOUNT, FOREIGN_COUNTRY, RAPID_TRANSACTION)
   - ruleName="HIGH_AMOUNT" 검색 → 해당 규칙의 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T037 [P] [US3] Integration test for userId filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/UserIdFilterTest.kt
+- [X] T037 [P] [US3] Integration test for userId filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/UserIdFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 여러 사용자의 알림 생성 (user-1 ~ user-10)
   - userId="user-5" 검색 → 해당 사용자의 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T038 [P] [US3] Integration test for status filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/StatusFilterTest.kt
+- [X] T038 [P] [US3] Integration test for status filter in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/StatusFilterTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 상태의 알림 생성 (UNREAD, IN_PROGRESS, COMPLETED)
   - status="UNREAD" 검색 → 미확인 알림만 반환 확인
   - 한국어 주석으로 테스트 시나리오 설명
-- [ ] T039 [US3] Integration test for combined filters in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CombinedFiltersTest.kt
+- [X] T039 [US3] Integration test for combined filters in alert-dashboard/backend/src/test/kotlin/io/realfds/alert/repository/CombinedFiltersTest.kt
   - Testcontainers (PostgreSQL) 사용
   - Given-When-Then 구조 사용
   - 다양한 조합의 알림 생성
@@ -343,7 +347,7 @@
 
 ### Frontend: Filter Components (User Story 3)
 
-- [ ] T040 [P] [US3] Create AlertHistoryFilters component in alert-dashboard/frontend/src/components/AlertHistoryFilters.tsx
+- [X] T040 [P] [US3] Create AlertHistoryFilters component in frontend-dashboard/src/components/AlertHistoryFilters.tsx
   - 규칙명 드롭다운 (HIGH_AMOUNT, FOREIGN_COUNTRY, RAPID_TRANSACTION)
   - 사용자 ID 입력 필드
   - 상태 드롭다운 (UNREAD, IN_PROGRESS, COMPLETED)
@@ -351,13 +355,13 @@
   - 초기화 버튼
   - 한국어 라벨
   - TypeScript 타입 정의
-- [ ] T041 [US3] Update AlertHistoryPage to include AlertHistoryFilters in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
+- [X] T041 [US3] Update AlertHistoryPage to include AlertHistoryFilters in frontend-dashboard/src/pages/AlertHistoryPage.tsx
   - AlertHistoryFilters 컴포넌트 추가
   - 필터 state 관리
   - 검색 버튼 클릭 시 API 호출 (모든 필터 포함)
   - 한국어 UI 텍스트
   - TypeScript 타입 정의
-- [ ] T042 [US3] Update alertHistoryService to support all filter parameters in alert-dashboard/frontend/src/services/alertHistoryService.ts
+- [X] T042 [US3] Update alertHistoryService to support all filter parameters in frontend-dashboard/src/services/alertHistoryService.ts
   - ruleName, userId, status 쿼리 파라미터 추가
   - TypeScript 타입 정의
 
@@ -393,16 +397,16 @@
 
 ### Observability & Monitoring (Constitution V - MANDATORY)
 
-- [ ] T046 [P] Implement health check endpoint for alert-dashboard in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/health/AlertDashboardHealthIndicator.kt
+- [X] T046 [P] Implement health check endpoint for alert-dashboard in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/health/AlertDashboardHealthIndicator.kt
   - PostgreSQL 연결 상태 확인
   - R2DBC 커넥션 풀 상태 확인
   - 한국어 주석으로 헬스 체크 로직 설명
-- [ ] T047 [P] Add structured logging (SLF4J + JSON) to all services
-  - Logback JSON encoder 설정 (alert-dashboard/backend/src/main/resources/logback.xml)
+- [X] T047 [P] Add structured logging (SLF4J + JSON) to all services
+  - Logback JSON encoder 설정 (alert-dashboard/backend/src/main/resources/logback-spring.xml)
   - 서비스 생명주기 이벤트 로깅
   - 중요 비즈니스 이벤트 로깅 (알림 저장, 검색)
   - 로그 메시지는 한국어로 작성
-- [ ] T048 [P] Add metrics collection (Micrometer) in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/metrics/AlertHistoryMetrics.kt
+- [X] T048 [P] Add metrics collection (Micrometer) in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/metrics/AlertHistoryMetrics.kt
   - alert.history.search.count (검색 횟수)
   - alert.history.search.duration (검색 응답 시간)
   - alert.persistence.success.count (저장 성공 횟수)
@@ -410,16 +414,16 @@
 
 ### Documentation (Constitution VI - MANDATORY)
 
-- [ ] T049 [P] Write README.md for alert-history feature in specs/003-alert-history/README.md
+- [X] T049 [P] Write README.md for alert-history feature in specs/003-alert-history/README.md
   - 기능 개요 (한국어)
   - 빠른 시작 가이드
   - 환경 변수 문서화
   - 문제 해결 섹션
-- [ ] T050 [P] Add Korean comments to all complex logic
+- [X] T050 [P] Add Korean comments to all complex logic
   - 동적 쿼리 생성 로직 주석
   - 필터링 로직 주석
   - 에러 처리 로직 주석
-- [ ] T051 [P] Update main README.md to include alert-history feature
+- [X] T051 [P] Update main README.md to include alert-history feature
   - 기능 목록에 Alert History 추가
   - 관련 문서 링크 추가
 
@@ -461,20 +465,20 @@
 
 ### Frontend: Alert History Table & Pagination (Cross-Cutting)
 
-- [ ] T058 [P] Create AlertHistoryTable component in alert-dashboard/frontend/src/components/AlertHistoryTable.tsx
+- [X] T058 [P] Create AlertHistoryTable component in alert-dashboard/frontend/src/components/AlertHistoryTable.tsx
   - TanStack Table (React Table v8) 사용
   - 알림 목록 표시 (alertId, userId, amount, ruleName, severity, alertTimestamp, status)
   - 정렬 기능 (alertTimestamp 기본 내림차순)
   - 한국어 컬럼 헤더
   - TypeScript 타입 정의
-- [ ] T059 [P] Create Pagination component in alert-dashboard/frontend/src/components/Pagination.tsx
-  - Material-UI Pagination 사용
+- [X] T059 [P] Create Pagination component in alert-dashboard/frontend/src/components/Pagination.tsx
+  - 커스텀 Pagination 컴포넌트 구현 (Material-UI 미설치)
   - 현재 페이지, 전체 페이지 표시
   - 이전/다음 버튼
   - 페이지 번호 클릭 이벤트
   - 한국어 라벨
   - TypeScript 타입 정의
-- [ ] T060 Update AlertHistoryPage to integrate table and pagination in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
+- [X] T060 Update AlertHistoryPage to integrate table and pagination in alert-dashboard/frontend/src/pages/AlertHistoryPage.tsx
   - AlertHistoryTable 컴포넌트 추가
   - Pagination 컴포넌트 추가
   - React Query (TanStack Query) 사용하여 서버 상태 관리
