@@ -52,13 +52,13 @@
 
 **목적**: 프로젝트 초기화 및 기본 구조 설정
 
-- [ ] T001 백엔드 의존성 추가 in alert-dashboard/backend/build.gradle
+- [X] T001 백엔드 의존성 추가 in alert-dashboard/backend/build.gradle.kts
   - Spring Boot Actuator, Spring WebSocket, Spring WebFlux (WebClient) 추가
   - 한국어 주석으로 각 의존성 목적 설명
-- [ ] T002 [P] 프론트엔드 의존성 추가 in alert-dashboard/frontend/package.json
+- [X] T002 [P] 프론트엔드 의존성 추가 in frontend-dashboard/package.json
   - Recharts, WebSocket 타입 정의 추가
   - 한국어 주석으로 각 의존성 목적 설명
-- [ ] T003 [P] application.yml 기본 설정 in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T003 [P] application.yml 기본 설정 in alert-dashboard/backend/src/main/resources/application.yml
   - 5초 스케줄링 간격, 1시간 데이터 보관 설정
   - 5개 서비스 URL 환경 변수 설정
   - 한국어 주석으로 각 설정 설명

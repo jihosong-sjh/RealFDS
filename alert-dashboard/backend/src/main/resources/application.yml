@@ -57,6 +57,41 @@ alert-history:
   max-page-size: ${ALERT_HISTORY_MAX_PAGE_SIZE:100}  # 최대 페이지 크기
   default-date-range-days: ${ALERT_HISTORY_DEFAULT_DATE_RANGE_DAYS:7}  # 기본 날짜 범위 (7일)
 
+# 실시간 대시보드 메트릭 수집 설정 (004-dashboard-realtime)
+dashboard-metrics:
+  # 메트릭 수집 스케줄링 설정
+  collection:
+    interval-ms: ${METRICS_COLLECTION_INTERVAL_MS:5000}  # 메트릭 수집 간격 (밀리초, 기본값: 5000ms = 5초)
+    timeout-ms: ${METRICS_COLLECTION_TIMEOUT_MS:3000}  # Health Check 타임아웃 (밀리초, 기본값: 3초)
+
+  # 메트릭 데이터 보관 설정
+  storage:
+    retention-hours: ${METRICS_RETENTION_HOURS:1}  # 메트릭 데이터 보관 시간 (기본값: 1시간)
+    max-data-points: ${METRICS_MAX_DATA_POINTS:720}  # 최대 데이터 포인트 수 (1시간 = 720 × 5초)
+
+  # 5개 마이크로서비스 Health Check URL 설정
+  services:
+    transaction-generator:
+      name: "transaction-generator"
+      url: ${SERVICE_URL_TGS:http://transaction-generator:8080}  # TGS 서비스 URL
+      health-endpoint: "/actuator/health"  # Health Check 엔드포인트
+    fraud-detector:
+      name: "fraud-detector"
+      url: ${SERVICE_URL_FDE:http://fraud-detector:8081}  # FDE (Fraud Detector) 서비스 URL
+      health-endpoint: "/actuator/health"
+    alert-service:
+      name: "alert-service"
+      url: ${SERVICE_URL_ALS:http://alert-service:8082}  # ALS (Alert Service) 서비스 URL
+      health-endpoint: "/actuator/health"
+    websocket-gateway:
+      name: "websocket-gateway"
+      url: ${SERVICE_URL_WSG:http://websocket-gateway:8083}  # WSG (WebSocket Gateway) 서비스 URL
+      health-endpoint: "/actuator/health"
+    alert-dashboard:
+      name: "alert-dashboard"
+      url: ${SERVICE_URL_RAD:http://alert-dashboard:8084}  # RAD (Real-time Alert Dashboard) 서비스 URL (자기 자신)
+      health-endpoint: "/actuator/health"
+
 # Spring Boot Actuator 설정 (헬스 체크, 메트릭)
 management:
   endpoints:

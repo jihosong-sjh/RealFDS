@@ -39,6 +39,11 @@ dependencies {
     // Spring Boot Actuator (헬스 체크, 메트릭)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Spring Boot WebSocket (실시간 메트릭 브로드캐스트용)
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+    // Spring WebClient는 이미 spring-boot-starter-webflux에 포함되어 있음 (비동기 HTTP 클라이언트)
+
     // Micrometer (메트릭 수집)
     implementation("io.micrometer:micrometer-core")
 
