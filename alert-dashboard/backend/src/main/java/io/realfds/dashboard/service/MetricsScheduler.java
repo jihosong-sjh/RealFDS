@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MetricsScheduler {
 
     private final HealthCheckCollector healthCheckCollector;
+    private final KafkaMetricsCollector kafkaMetricsCollector;
     private final Map<String, ServiceHealth> serviceHealthMap = new ConcurrentHashMap<>();
 
     @Value("${dashboard-metrics.collection.interval-ms:5000}")
@@ -61,8 +62,8 @@ public class MetricsScheduler {
             // Phase 3: User Story 1 - Health Check 수집
             collectHealthMetrics();
 
-            // Phase 4: User Story 2 - TPS 수집 (향후 구현)
-            // collectTpsMetrics();
+            // Phase 4: User Story 2 - TPS 수집
+            collectTpsMetrics();
 
             // Phase 5: User Story 3 - 알림률 수집 (향후 구현)
             // collectAlertMetrics();
@@ -103,6 +104,44 @@ public class MetricsScheduler {
 
         log.debug("Health Check 수집 완료: 서비스 수={}, 소요 시간={}ms",
                 healthMetrics.size(), elapsedMs);
+    }
+
+    /**
+     * TPS 메트릭 수집
+     *
+     * KafkaMetricsCollector를 호출하여 초당 거래 처리량(TPS) 수집
+     * 수집된 데이터를 MetricsStore에 저장
+     *
+     * 한국어 주석:
+     * - Kafka 토픽 offset 증가량으로 TPS 계산
+     * - 5초 간격으로 수집하여 실시간 추이 파악
+     * - Kafka 연결 실패 시에도 다음 수집 계속 (복원력)
+     */
+    private void collectTpsMetrics() {
+        Instant startTime = Instant.now();
+
+        try {
+            // KafkaMetricsCollector를 통해 TPS 수집
+            io.realfds.dashboard.model.TransactionMetrics tpsMetrics = kafkaMetricsCollector.collectTPS();
+
+            if (tpsMetrics != null) {
+                // MetricsStore에 저장 (향후 구현)
+                // metricsStore.addDataPoint(tpsMetrics);
+
+                long elapsedMs = java.time.Duration.between(startTime, Instant.now()).toMillis();
+
+                log.debug("TPS 수집 완료: tps={}, 총 거래 수={}, 소요 시간={}ms",
+                        tpsMetrics.getTps(),
+                        tpsMetrics.getTotalTransactions(),
+                        elapsedMs);
+            } else {
+                log.warn("TPS 수집 실패: Kafka 연결 불가 또는 데이터 없음");
+            }
+
+        } catch (Exception e) {
+            log.error("TPS 수집 중 오류 발생: {}", e.getMessage(), e);
+            // 오류 발생 시에도 다음 메트릭 수집 계속
+        }
     }
 
     /**

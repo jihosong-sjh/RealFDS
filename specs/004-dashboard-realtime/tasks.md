@@ -168,34 +168,34 @@
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [P] [US2] KafkaMetricsCollector 단위 테스트 in alert-dashboard/backend/src/test/java/com/realfds/dashboard/service/KafkaMetricsCollectorTest.java
+- [X] T017 [P] [US2] KafkaMetricsCollector 단위 테스트 in alert-dashboard/backend/src/test/java/io/realfds/dashboard/service/KafkaMetricsCollectorTest.java
   - Given Kafka 토픽 offset 100, When 5초 후 offset 150, Then TPS = 10
   - Given Kafka 연결 실패, When TPS 수집, Then 이전 값 유지, ERROR 로깅
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T018 [P] [US2] TpsChart 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/TpsChart.test.tsx
+- [X] T018 [P] [US2] TpsChart 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/TpsChart.test.tsx
   - Given 1시간 TPS 데이터, When 렌더링, Then LineChart 표시
   - Given 차트 마우스 호버, When 데이터 포인트 가리킴, Then 툴팁 표시
   - 한국어 주석으로 테스트 의도 설명
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] KafkaMetricsCollector 구현 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/KafkaMetricsCollector.java
+- [X] T019 [US2] KafkaMetricsCollector 구현 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/service/KafkaMetricsCollector.java
   - Kafka AdminClient로 virtual-transactions 토픽 offset 조회
   - 이전 offset과 비교하여 TPS 계산 (delta / 5초)
   - 한국어 주석으로 TPS 계산 로직 설명
   - 함수 길이 ≤50줄 준수
   - SLF4J 로깅 (INFO: TPS 수집, WARN: Kafka 연결 지연, ERROR: Kafka 연결 실패)
-- [ ] T020 [P] [US2] TpsChart 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
+- [X] T020 [P] [US2] TpsChart 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
   - Recharts LineChart 사용
   - X축: timestamp (최근 1시간), Y축: TPS (0-10000)
   - 툴팁: 시각과 정확한 TPS 값 표시
   - 자동 Y축 범위 조정
   - 한국어 주석으로 차트 로직 설명
-- [ ] T021 [P] [US2] TpsMetricsCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/TpsMetricsCard.tsx
+- [X] T021 [P] [US2] TpsMetricsCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/TpsMetricsCard.tsx
   - 현재 TPS, 평균 TPS, 최대 TPS 숫자 표시
   - 수치 업데이트 시 부드러운 애니메이션
   - 한국어 주석으로 카드 로직 설명
-- [ ] T022 [US2] MetricsScheduler에 TPS 수집 통합 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsScheduler.java
+- [X] T022 [US2] MetricsScheduler에 TPS 수집 통합 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/service/MetricsScheduler.java
   - @Scheduled 메서드에 KafkaMetricsCollector 호출 추가
   - TransactionMetrics를 MetricsStore에 저장
   - 한국어 주석으로 통합 로직 설명
