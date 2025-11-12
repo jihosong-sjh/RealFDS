@@ -258,12 +258,12 @@
 
 ### Tests for WebSocket (MANDATORY per Constitution V) ⚠️
 
-- [ ] T029 [P] MetricsWebSocketHandler 통합 테스트 in alert-dashboard/backend/src/test/java/com/realfds/dashboard/websocket/MetricsWebSocketHandlerTest.java
+- [X] T029 [P] MetricsWebSocketHandler 통합 테스트 in alert-dashboard/backend/src/test/java/io/realfds/dashboard/websocket/MetricsWebSocketHandlerTest.java
   - Given WebSocket 연결, When 5초마다 METRICS_UPDATE 전송, Then 모든 세션에 브로드캐스트
   - Given BACKFILL_REQUEST 수신, When lastReceivedTimestamp 제공, Then BACKFILL_RESPONSE 전송
   - Given 잘못된 메시지 형식, When 수신, Then ERROR 메시지 전송
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T030 [P] useWebSocket 훅 테스트 in alert-dashboard/frontend/src/tests/hooks/useWebSocket.test.ts
+- [X] T030 [P] useWebSocket 훅 테스트 in alert-dashboard/frontend/src/tests/hooks/useWebSocket.test.ts
   - Given WebSocket 연결, When METRICS_UPDATE 수신, Then 상태 업데이트
   - Given 연결 끊김, When 재연결, Then Exponential Backoff (1s, 2s, 4s...)
   - Given 재연결 성공, When BACKFILL_REQUEST 전송, Then 누락 데이터 복구
@@ -271,12 +271,12 @@
 
 ### Implementation for WebSocket
 
-- [ ] T031 MetricsMessage DTO 생성 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/websocket/MetricsMessage.java
+- [X] T031 MetricsMessage DTO 생성 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/websocket/MetricsMessage.java
   - type (METRICS_UPDATE, BACKFILL_REQUEST, BACKFILL_RESPONSE, ERROR)
   - payload (MetricsDataPoint 또는 에러 정보)
   - timestamp
   - 한국어 주석으로 각 필드 설명
-- [ ] T032 MetricsWebSocketHandler 구현 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/websocket/MetricsWebSocketHandler.java
+- [X] T032 MetricsWebSocketHandler 구현 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/websocket/MetricsWebSocketHandler.java
   - afterConnectionEstablished(): 새 세션 등록
   - handleTextMessage(): BACKFILL_REQUEST 처리
   - broadcast(): 모든 세션에 METRICS_UPDATE 전송
@@ -284,17 +284,17 @@
   - 한국어 주석으로 WebSocket 로직 설명
   - 함수 길이 ≤50줄 준수
   - SLF4J 로깅 (INFO: 연결/해제, WARN: 메시지 파싱 실패, ERROR: 브로드캐스트 실패)
-- [ ] T033 MetricsScheduler에 브로드캐스트 통합 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsScheduler.java
+- [X] T033 MetricsScheduler에 브로드캐스트 통합 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/service/MetricsScheduler.java
   - @Scheduled 메서드에서 MetricsStore 최신 데이터 조회
   - MetricsWebSocketHandler.broadcast() 호출
   - 한국어 주석으로 브로드캐스트 타이밍 설명
-- [ ] T034 useWebSocket 커스텀 훅 in alert-dashboard/frontend/src/hooks/useWebSocket.ts
+- [X] T034 useWebSocket 커스텀 훅 in alert-dashboard/frontend/src/hooks/useWebSocket.ts
   - WebSocket 연결 관리 (ws://localhost:8083/ws/metrics)
   - METRICS_UPDATE 수신 시 상태 업데이트
   - Exponential Backoff 재연결 (1s, 2s, 4s, 8s, 16s, 32s max)
   - 재연결 시 BACKFILL_REQUEST 전송
   - 한국어 주석으로 재연결 로직 설명
-- [ ] T035 [P] ConnectionStatus 배너 컴포넌트 in alert-dashboard/frontend/src/components/common/ConnectionStatus.tsx
+- [X] T035 [P] ConnectionStatus 배너 컴포넌트 in alert-dashboard/frontend/src/components/common/ConnectionStatus.tsx
   - 연결 끊김 시 "연결 끊김" 경고 배너 표시
   - 재연결 중 "재연결 중..." 표시
   - 한국어 주석으로 연결 상태 로직 설명
@@ -305,17 +305,17 @@
 
 **목적**: 모든 컴포넌트를 통합하여 완전한 대시보드 UI 구성
 
-- [ ] T036 DashboardLayout 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/DashboardLayout.tsx
+- [X] T036 DashboardLayout 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/DashboardLayout.tsx
   - useWebSocket 훅 호출
   - ConnectionStatus 배너
   - 상단: 5개 ServiceHealthCard (그리드 레이아웃)
   - 중간: TpsChart + TpsMetricsCard
   - 하단: AlertRateChart + AlertMetricsCard
   - 한국어 주석으로 레이아웃 구조 설명
-- [ ] T037 Dashboard 페이지 라우팅 in alert-dashboard/frontend/src/App.tsx
+- [X] T037 Dashboard 페이지 라우팅 in alert-dashboard/frontend/src/App.tsx
   - /dashboard 경로에 DashboardLayout 연결
   - 한국어 주석으로 라우팅 설명
-- [ ] T038 [P] REST API 엔드포인트 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/controller/MetricsRestController.java
+- [X] T038 [P] REST API 엔드포인트 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/controller/MetricsRestController.java
   - GET /api/v1/services: 5개 서비스 목록 반환
   - GET /api/v1/metrics/current: 현재 메트릭 스냅샷 반환 (optional)
   - 한국어 주석으로 엔드포인트 설명

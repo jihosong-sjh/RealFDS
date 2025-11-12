@@ -110,6 +110,22 @@ export interface AlertsAggregated {
 }
 
 /**
+ * 시계열 메트릭 데이터 포인트 (통합 wrapper)
+ *
+ * 5초마다 수집되는 모든 메트릭을 하나의 데이터 포인트로 통합합니다.
+ */
+export interface MetricsDataPoint {
+  /** 측정 시각 (ISO-8601) */
+  timestamp: string;
+  /** 5개 마이크로서비스의 Health Check 상태 */
+  services: ServiceHealth[];
+  /** 거래량 메트릭 */
+  transactionMetrics: TransactionMetrics;
+  /** 알림 발생률 메트릭 */
+  alertMetrics: AlertMetrics;
+}
+
+/**
  * 메트릭 업데이트 메시지 (Server → Client)
  */
 export interface MetricsUpdateMessage {
@@ -156,6 +172,11 @@ export interface ErrorMessage {
   message: string;
   timestamp: string;
 }
+
+/**
+ * WebSocket 메시지 타입 (문자열 리터럴)
+ */
+export type WebSocketMessageType = 'METRICS_UPDATE' | 'BACKFILL_REQUEST' | 'BACKFILL_RESPONSE' | 'ERROR';
 
 /**
  * WebSocket 메시지 Union Type

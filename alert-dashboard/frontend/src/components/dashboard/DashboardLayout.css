@@ -1,0 +1,253 @@
+/**
+ * DashboardLayout 스타일시트
+ *
+ * 실시간 시스템 대시보드의 레이아웃 및 스타일 정의
+ * 반응형 디자인, 그리드 레이아웃, 애니메이션 포함
+ */
+
+/* 대시보드 최상위 컨테이너 */
+.dashboard-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* 대시보드 헤더 */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.last-update-label {
+  font-weight: 500;
+}
+
+.last-update-time {
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+/* 섹션 공통 스타일 */
+.dashboard-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+/* 서비스 상태 그리드 레이아웃 (5개 카드) */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* 반응형 조정: 큰 화면에서는 5개를 한 줄에 표시 */
+@media (min-width: 1400px) {
+  .services-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* 메트릭 행 레이아웃 (차트 + 메트릭 카드) */
+.metrics-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* 반응형 조정: 작은 화면에서는 세로 배치 */
+@media (max-width: 1024px) {
+  .metrics-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 차트 컨테이너 */
+.chart-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 300px;
+}
+
+/* 메트릭 카드 컨테이너 */
+.metrics-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 로딩 컨테이너 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 로딩 텍스트 */
+.loading-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.loading-subtext {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 대시보드 푸터 */
+.dashboard-footer {
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.footer-subtext {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 애니메이션: 섹션 페이드 인 */
+.dashboard-section {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 반응형 디자인: 태블릿 */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    padding: 15px;
+    min-height: 250px;
+  }
+}
+
+/* 반응형 디자인: 모바일 */
+@media (max-width: 480px) {
+  .dashboard-layout {
+    padding: 10px;
+  }
+
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-subtitle {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .dashboard-section {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .chart-container {
+    padding: 12px;
+    min-height: 200px;
+  }
+
+  .footer-text {
+    font-size: 0.875rem;
+  }
+
+  .footer-subtext {
+    font-size: 0.75rem;
+  }
+}
