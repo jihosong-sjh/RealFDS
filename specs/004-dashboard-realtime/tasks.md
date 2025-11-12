@@ -328,11 +328,11 @@
 
 ### Observability & Monitoring (Constitution V - MANDATORY)
 
-- [ ] T039 [P] Health Check 엔드포인트 검증 in alert-dashboard/backend/src/main/resources/application.yml
+- [X] T039 [P] Health Check 엔드포인트 검증 in alert-dashboard/backend/src/main/resources/application.yml
   - /actuator/health 엔드포인트 활성화 확인
   - WebSocket 연결 수, 브로드캐스트 수 포함
   - 한국어 주석으로 헬스 체크 설정 설명
-- [ ] T040 [P] 구조화된 로깅 검증
+- [X] T040 [P] 구조화된 로깅 검증
   - 모든 서비스에 SLF4J + Logback JSON 레이아웃 적용 확인
   - 서비스 생명주기 이벤트 로깅 (INFO 레벨)
   - 중요 비즈니스 이벤트 로깅 (메트릭 수집, WebSocket 연결)
@@ -341,28 +341,28 @@
 
 ### Edge Case 처리
 
-- [ ] T041 서비스 응답 지연 처리 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/HealthCheckCollector.java
+- [X] T041 서비스 응답 지연 처리 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/HealthCheckCollector.java
   - Health Check 응답 5초 이상 → DOWN 상태, errorType: TIMEOUT
   - 한국어 주석으로 타임아웃 로직 설명
-- [ ] T042 데이터 없음 처리 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
+- [X] T042 데이터 없음 처리 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
   - 시스템 초기 시작 시 "데이터 수집 중..." 메시지 표시
   - 한국어 주석으로 빈 상태 로직 설명
-- [ ] T043 급격한 값 변화 처리 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
+- [X] T043 급격한 값 변화 처리 in alert-dashboard/frontend/src/components/dashboard/TpsChart.tsx
   - TPS 10배 증가 시 Y축 자동 범위 조정
   - 한국어 주석으로 Y축 조정 로직 설명
-- [ ] T044 브라우저 탭 비활성화 처리 in alert-dashboard/frontend/src/hooks/useWebSocket.ts
+- [X] T044 브라우저 탭 비활성화 처리 in alert-dashboard/frontend/src/hooks/useWebSocket.ts
   - 탭 전환 후 복귀 시 BACKFILL_REQUEST 전송하여 누락 데이터 백필
   - 한국어 주석으로 백필 로직 설명
 
 ### Documentation (Constitution VI - MANDATORY)
 
-- [ ] T045 [P] README.md 업데이트 in alert-dashboard/README.md
+- [X] T045 [P] README.md 업데이트 in alert-dashboard/README.md
   - 실시간 대시보드 기능 설명 (한국어)
   - 빠른 시작 가이드 (docker-compose up)
   - 대시보드 접속 URL (http://localhost:8083/dashboard)
   - 환경 변수 문서화
   - 문제 해결 섹션
-- [ ] T046 [P] 모든 복잡한 로직에 한국어 주석 추가
+- [X] T046 [P] 모든 복잡한 로직에 한국어 주석 추가
   - Circular buffer 로직
   - Exponential backoff 재연결 로직
   - TPS 계산 로직
