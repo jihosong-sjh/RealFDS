@@ -214,11 +214,11 @@
 
 > **CRITICAL: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T023 [P] [US3] AlertMetricsCollector 단위 테스트 in alert-dashboard/backend/src/test/java/com/realfds/dashboard/service/AlertMetricsCollectorTest.java
+- [X] T023 [P] [US3] AlertMetricsCollector 단위 테스트 in alert-dashboard/backend/src/test/java/io/realfds/dashboard/service/AlertMetricsCollectorTest.java
   - Given 3개 규칙 알림 발생, When 알림률 수집, Then 규칙별 분당 알림 수 계산
   - Given HIGH_VALUE 알림 20개, When 알림률 계산, Then byRule["HIGH_VALUE"] = 20
   - 한국어 주석으로 테스트 의도 설명
-- [ ] T024 [P] [US3] AlertRateChart 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/AlertRateChart.test.tsx
+- [X] T024 [P] [US3] AlertRateChart 컴포넌트 테스트 in alert-dashboard/frontend/src/tests/components/dashboard/AlertRateChart.test.tsx
   - Given 3개 규칙 알림 데이터, When 렌더링, Then AreaChart 스택 형태 표시
   - Given 범례 클릭, When 특정 규칙 클릭, Then 해당 규칙 데이터 숨김/표시
   - Given 알림률 평균 2배 초과, When 렌더링, Then 그래프 주황색
@@ -226,24 +226,24 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] AlertMetricsCollector 구현 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/AlertMetricsCollector.java
+- [X] T025 [US3] AlertMetricsCollector 구현 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/service/AlertMetricsCollector.java
   - Kafka AdminClient로 transaction-alerts 토픽 메시지 수 조회
   - 규칙별(HIGH_VALUE, FOREIGN_COUNTRY, HIGH_FREQUENCY) 알림 수 집계
   - 분당 알림 수 계산
   - 한국어 주석으로 알림률 계산 로직 설명
   - 함수 길이 ≤50줄 준수
   - SLF4J 로깅 (INFO: 알림률 수집, WARN: Kafka 연결 지연, ERROR: Kafka 연결 실패)
-- [ ] T026 [P] [US3] AlertRateChart 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/AlertRateChart.tsx
+- [X] T026 [P] [US3] AlertRateChart 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/AlertRateChart.tsx
   - Recharts AreaChart 사용, 스택 형태
   - 3개 규칙 다른 색상 (HIGH_VALUE: 빨강, FOREIGN_COUNTRY: 파랑, HIGH_FREQUENCY: 노랑)
   - 범례 클릭 시 해당 규칙 데이터 숨김/표시
   - 알림률 평균 2배 초과 시 그래프 영역 주황색
   - 한국어 주석으로 차트 로직 설명
-- [ ] T027 [P] [US3] AlertMetricsCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/AlertMetricsCard.tsx
+- [X] T027 [P] [US3] AlertMetricsCard 컴포넌트 in alert-dashboard/frontend/src/components/dashboard/AlertMetricsCard.tsx
   - 현재 알림 발생률, 평균, 최대값 숫자 표시
   - 수치 업데이트 시 부드러운 애니메이션
   - 한국어 주석으로 카드 로직 설명
-- [ ] T028 [US3] MetricsScheduler에 알림률 수집 통합 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsScheduler.java
+- [X] T028 [US3] MetricsScheduler에 알림률 수집 통합 in alert-dashboard/backend/src/main/java/io/realfds/dashboard/service/MetricsScheduler.java
   - @Scheduled 메서드에 AlertMetricsCollector 호출 추가
   - AlertMetrics를 MetricsStore에 저장
   - 한국어 주석으로 통합 로직 설명

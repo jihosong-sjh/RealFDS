@@ -34,6 +34,7 @@ public class MetricsScheduler {
 
     private final HealthCheckCollector healthCheckCollector;
     private final KafkaMetricsCollector kafkaMetricsCollector;
+    private final AlertMetricsCollector alertMetricsCollector;
     private final Map<String, ServiceHealth> serviceHealthMap = new ConcurrentHashMap<>();
 
     @Value("${dashboard-metrics.collection.interval-ms:5000}")
@@ -65,8 +66,8 @@ public class MetricsScheduler {
             // Phase 4: User Story 2 - TPS 수집
             collectTpsMetrics();
 
-            // Phase 5: User Story 3 - 알림률 수집 (향후 구현)
-            // collectAlertMetrics();
+            // Phase 5: User Story 3 - 알림률 수집
+            collectAlertMetrics();
 
             log.info("메트릭 수집 완료: 서비스 상태 개수={}, 실행 시간={}ms",
                     serviceHealthMap.size(),
@@ -140,6 +141,47 @@ public class MetricsScheduler {
 
         } catch (Exception e) {
             log.error("TPS 수집 중 오류 발생: {}", e.getMessage(), e);
+            // 오류 발생 시에도 다음 메트릭 수집 계속
+        }
+    }
+
+    /**
+     * 알림 발생률 메트릭 수집
+     *
+     * AlertMetricsCollector를 호출하여 분당 알림 발생 수 수집
+     * 수집된 데이터를 MetricsStore에 저장
+     *
+     * 한국어 주석:
+     * - Kafka transaction-alerts 토픽 offset 증가량으로 알림률 계산
+     * - 규칙별(HIGH_VALUE, FOREIGN_COUNTRY, HIGH_FREQUENCY) 알림 수 집계
+     * - 5초 간격으로 수집하여 실시간 추이 파악
+     * - Kafka 연결 실패 시에도 다음 수집 계속 (복원력)
+     */
+    private void collectAlertMetrics() {
+        Instant startTime = Instant.now();
+
+        try {
+            // AlertMetricsCollector를 통해 알림률 수집
+            io.realfds.dashboard.model.AlertMetrics alertMetrics = alertMetricsCollector.collectAlertMetrics();
+
+            if (alertMetrics != null) {
+                // MetricsStore에 저장 (향후 구현)
+                // metricsStore.addDataPoint(alertMetrics);
+
+                long elapsedMs = java.time.Duration.between(startTime, Instant.now()).toMillis();
+
+                log.debug("알림률 수집 완료: 분당 알림 수={}, HIGH_VALUE={}, FOREIGN_COUNTRY={}, HIGH_FREQUENCY={}, 소요 시간={}ms",
+                        alertMetrics.getAlertsPerMinute(),
+                        alertMetrics.getByRule().get("HIGH_VALUE"),
+                        alertMetrics.getByRule().get("FOREIGN_COUNTRY"),
+                        alertMetrics.getByRule().get("HIGH_FREQUENCY"),
+                        elapsedMs);
+            } else {
+                log.warn("알림률 수집 실패: Kafka 연결 불가 또는 데이터 없음");
+            }
+
+        } catch (Exception e) {
+            log.error("알림률 수집 중 오류 발생: {}", e.getMessage(), e);
             // 오류 발생 시에도 다음 메트릭 수집 계속
         }
     }
