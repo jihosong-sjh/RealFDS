@@ -71,37 +71,38 @@
 
 **⚠️ CRITICAL**: 이 단계가 완료되기 전까지 사용자 스토리 작업을 시작할 수 없습니다
 
-- [ ] T004 [P] ServiceHealth 엔티티 생성 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/model/ServiceHealth.java
+- [X] T004 [P] ServiceHealth 엔티티 생성 in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/model/ServiceHealth.kt
   - serviceName, status, lastChecked, responseTime, memoryUsage, errorType, errorMessage 필드
   - 한국어 주석으로 각 필드 설명
   - data-model.md의 Validation Rules 구현
-- [ ] T005 [P] TransactionMetrics 엔티티 생성 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/model/TransactionMetrics.java
+- [X] T005 [P] TransactionMetrics 엔티티 생성 in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/model/TransactionMetrics.kt
   - timestamp, tps, totalTransactions 필드
   - 한국어 주석으로 각 필드 설명
-- [ ] T006 [P] AlertMetrics 엔티티 생성 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/model/AlertMetrics.java
+- [X] T006 [P] AlertMetrics 엔티티 생성 in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/model/AlertMetrics.kt
   - timestamp, alertsPerMinute, byRule 필드
   - 한국어 주석으로 각 필드 설명
   - byRule은 Map<String, Long> 타입 (HIGH_VALUE, FOREIGN_COUNTRY, HIGH_FREQUENCY)
-- [ ] T007 [P] MetricsDataPoint 클래스 생성 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/model/MetricsDataPoint.java
+- [X] T007 [P] MetricsDataPoint 클래스 생성 in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/model/MetricsDataPoint.kt
   - 시계열 데이터 포인트 wrapper 클래스
   - services, transactionMetrics, alertMetrics 필드
   - 한국어 주석으로 각 필드 설명
-- [ ] T008 MetricsStore 구현 (Circular Buffer) in alert-dashboard/backend/src/main/java/com/realfds/dashboard/service/MetricsStore.java
+- [X] T008 MetricsStore 구현 (Circular Buffer) in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/service/MetricsStore.kt
   - ConcurrentLinkedDeque 기반 circular buffer
   - 1시간(720개) 데이터 포인트 자동 관리
-  - addDataPoint(), getRecentDataPoints(), getDataPointsSince() 메서드
+  - addDataPoint(), getAll(), getDataSince() 메서드
   - 한국어 주석으로 circular buffer 로직 설명
   - 함수 길이 ≤50줄 준수
-- [ ] T009 [P] WebSocket 설정 in alert-dashboard/backend/src/main/java/com/realfds/dashboard/config/WebSocketConfig.java
-  - ws://localhost:8083/ws/metrics 엔드포인트 등록
+- [X] T009 [P] WebSocket 설정 in alert-dashboard/backend/src/main/kotlin/io/realfds/alert/config/WebSocketConfig.kt
+  - ws://localhost:8082/ws/metrics 엔드포인트 등록
   - CORS 설정 (로컬 개발용)
   - 한국어 주석으로 설정 설명
-- [ ] T010 [P] TypeScript 타입 정의 in alert-dashboard/frontend/src/types/metrics.ts
+  - MetricsWebSocketHandler placeholder 생성 (Phase 6에서 완전 구현)
+- [X] T010 [P] TypeScript 타입 정의 in frontend-dashboard/src/types/metrics.ts
   - ServiceHealth, TransactionMetrics, AlertMetrics 인터페이스
   - WebSocket 메시지 타입 (METRICS_UPDATE, BACKFILL_REQUEST, BACKFILL_RESPONSE, ERROR)
   - 한국어 주석으로 각 타입 설명
 
-**Checkpoint**: 기반 완성 - 사용자 스토리 구현을 병렬로 시작할 수 있음
+**Checkpoint**: ✅ 기반 완성 - 사용자 스토리 구현을 병렬로 시작할 수 있음
 
 ---
 
