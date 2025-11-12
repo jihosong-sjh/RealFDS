@@ -1,0 +1,490 @@
+openapi: 3.0.0
+info:
+  title: Dashboard Realtime REST API
+  description: |
+    실시간 시스템 대시보드의 REST API 엔드포인트
+
+    이 API는 대시보드 서비스의 헬스 체크, 초기 데이터 로드, 서비스 목록 조회를 제공합니다.
+    실시간 메트릭 업데이트는 WebSocket을 통해 제공되며 (websocket-protocol.md 참고),
+    이 REST API는 초기 연결 및 설정 용도로만 사용됩니다.
+
+  version: 1.0.0
+  contact:
+    name: RealFDS Team
+    email: realfds@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8083
+    description: 로컬 개발 환경
+  - url: http://dashboard-service:8083
+    description: Docker Compose 환경
+
+tags:
+  - name: Health
+    description: 서비스 헬스 체크 엔드포인트
+  - name: Services
+    description: 모니터링 대상 서비스 정보 조회
+  - name: Metrics
+    description: 초기 메트릭 데이터 로드 (선택적)
+
+paths:
+  /actuator/health:
+    get:
+      tags:
+        - Health
+      summary: 대시보드 서비스 헬스 체크
+      description: |
+        대시보드 서비스 자체의 상태를 확인합니다.
+        Spring Boot Actuator 표준 형식을 사용합니다.
+
+      operationId: getHealthCheck
+      responses:
+        '200':
+          description: 서비스 정상 (UP)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  summary: 정상 상태
+                  value:
+                    status: UP
+                    components:
+                      diskSpace:
+                        status: UP
+                        details:
+                          total: 499963174912
+                          free: 189474095104
+                          threshold: 10485760
+                          exists: true
+                      memory:
+                        status: UP
+                        details:
+                          total: 4294967296
+                          used: 2147483648
+                          free: 2147483648
+                      ping:
+                        status: UP
+        '503':
+          description: 서비스 중단 (DOWN)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                unhealthy:
+                  summary: 중단 상태
+                  value:
+                    status: DOWN
+                    components:
+                      diskSpace:
+                        status: DOWN
+                        details:
+                          error: "Disk space below threshold"
+
+  /api/v1/services:
+    get:
+      tags:
+        - Services
+      summary: 모니터링 대상 서비스 목록 조회
+      description: |
+        대시보드가 모니터링하는 5개 마이크로서비스의 목록과 기본 정보를 조회합니다.
+        서비스 이름, URL, 설명 등의 정적 정보를 반환합니다.
+
+      operationId: getServiceList
+      responses:
+        '200':
+          description: 서비스 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceListResponse'
+              examples:
+                success:
+                  summary: 정상 응답
+                  value:
+                    services:
+                      - serviceName: transaction-generator
+                        displayName: 거래 생성기
+                        description: 가상 거래 데이터를 생성하여 Kafka로 전송
+                        healthCheckUrl: http://transaction-generator:8080/actuator/health
+                        port: 8080
+                      - serviceName: fraud-detector
+                        displayName: 사기 탐지기
+                        description: 거래 데이터를 분석하여 사기 패턴 탐지
+                        healthCheckUrl: http://fraud-detector:8081/actuator/health
+                        port: 8081
+                      - serviceName: alert-service
+                        displayName: 알림 서비스
+                        description: 사기 탐지 결과를 기반으로 알림 생성 및 전송
+                        healthCheckUrl: http://alert-service:8082/actuator/health
+                        port: 8082
+                      - serviceName: websocket-gateway
+                        displayName: WebSocket 게이트웨이
+                        description: 실시간 데이터를 클라이언트에 푸시
+                        healthCheckUrl: http://websocket-gateway:8083/actuator/health
+                        port: 8083
+                      - serviceName: frontend-dashboard
+                        displayName: 프론트엔드 대시보드
+                        description: 사용자 인터페이스 및 시각화
+                        healthCheckUrl: http://frontend-dashboard:3000/actuator/health
+                        port: 3000
+                    totalCount: 5
+        '500':
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/metrics/current:
+    get:
+      tags:
+        - Metrics
+      summary: 현재 메트릭 스냅샷 조회 (선택적)
+      description: |
+        대시보드 초기 로딩 시 현재 메트릭 데이터를 한 번에 가져옵니다.
+        이 엔드포인트는 선택적이며, WebSocket 연결 후 첫 METRICS_UPDATE 메시지로 대체 가능합니다.
+
+        **주의**: 이 엔드포인트는 초기 로딩 최적화 용도이며, 실시간 업데이트는 WebSocket을 사용해야 합니다.
+
+      operationId: getCurrentMetrics
+      responses:
+        '200':
+          description: 현재 메트릭 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsSnapshot'
+              examples:
+                success:
+                  summary: 정상 응답
+                  value:
+                    timestamp: "2025-11-12T10:30:05Z"
+                    services:
+                      - serviceName: transaction-generator
+                        status: UP
+                        lastChecked: "2025-11-12T10:30:05Z"
+                        responseTime: 45
+                        memoryUsage: 128
+                        errorType: null
+                        errorMessage: null
+                      - serviceName: fraud-detector
+                        status: UP
+                        lastChecked: "2025-11-12T10:30:05Z"
+                        responseTime: 92
+                        memoryUsage: 1024
+                        errorType: null
+                        errorMessage: null
+                      - serviceName: alert-service
+                        status: DOWN
+                        lastChecked: "2025-11-12T10:30:02Z"
+                        responseTime: null
+                        memoryUsage: null
+                        errorType: TIMEOUT
+                        errorMessage: "Health check 응답 시간 초과 (>3초)"
+                      - serviceName: websocket-gateway
+                        status: UP
+                        lastChecked: "2025-11-12T10:30:05Z"
+                        responseTime: 38
+                        memoryUsage: 256
+                        errorType: null
+                        errorMessage: null
+                      - serviceName: frontend-dashboard
+                        status: UP
+                        lastChecked: "2025-11-12T10:30:05Z"
+                        responseTime: 15
+                        memoryUsage: 512
+                        errorType: null
+                        errorMessage: null
+                    tps:
+                      current: 87
+                      average: 65
+                      max: 150
+                    alerts:
+                      current: 12
+                      average: 8
+                      max: 25
+                      byRule:
+                        HIGH_VALUE: 5
+                        FOREIGN_COUNTRY: 4
+                        HIGH_FREQUENCY: 3
+        '500':
+          description: 서버 내부 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      description: Spring Boot Actuator 표준 헬스 체크 응답
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [UP, DOWN, OUT_OF_SERVICE, UNKNOWN]
+          description: 전체 서비스 상태
+          example: UP
+        components:
+          type: object
+          description: 각 컴포넌트별 상태 (diskSpace, memory, ping 등)
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [UP, DOWN]
+              details:
+                type: object
+                additionalProperties: true
+
+    ServiceListResponse:
+      type: object
+      description: 모니터링 대상 서비스 목록
+      required:
+        - services
+        - totalCount
+      properties:
+        services:
+          type: array
+          minItems: 5
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/ServiceInfo'
+        totalCount:
+          type: integer
+          description: 총 서비스 수 (항상 5)
+          example: 5
+
+    ServiceInfo:
+      type: object
+      description: 서비스 기본 정보
+      required:
+        - serviceName
+        - displayName
+        - healthCheckUrl
+        - port
+      properties:
+        serviceName:
+          type: string
+          enum:
+            - transaction-generator
+            - fraud-detector
+            - alert-service
+            - websocket-gateway
+            - frontend-dashboard
+          description: 서비스 식별자 (영문)
+          example: transaction-generator
+        displayName:
+          type: string
+          description: 서비스 표시 이름 (한글)
+          example: 거래 생성기
+        description:
+          type: string
+          description: 서비스 설명
+          example: 가상 거래 데이터를 생성하여 Kafka로 전송
+        healthCheckUrl:
+          type: string
+          format: uri
+          description: Health Check 엔드포인트 URL
+          example: http://transaction-generator:8080/actuator/health
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+          description: 서비스 포트 번호
+          example: 8080
+
+    MetricsSnapshot:
+      type: object
+      description: 현재 메트릭 스냅샷 (초기 로딩 용도)
+      required:
+        - timestamp
+        - services
+        - tps
+        - alerts
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: 메트릭 생성 시각 (ISO-8601)
+          example: "2025-11-12T10:30:05Z"
+        services:
+          type: array
+          minItems: 5
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/ServiceHealth'
+        tps:
+          $ref: '#/components/schemas/TpsMetrics'
+        alerts:
+          $ref: '#/components/schemas/AlertMetrics'
+
+    ServiceHealth:
+      type: object
+      description: 서비스 Health Check 상태
+      required:
+        - serviceName
+        - status
+        - lastChecked
+      properties:
+        serviceName:
+          type: string
+          enum:
+            - transaction-generator
+            - fraud-detector
+            - alert-service
+            - websocket-gateway
+            - frontend-dashboard
+          example: transaction-generator
+        status:
+          type: string
+          enum: [UP, DOWN]
+          description: 현재 서비스 상태
+          example: UP
+        lastChecked:
+          type: string
+          format: date-time
+          description: 마지막 Health Check 수행 시각
+          example: "2025-11-12T10:30:05Z"
+        responseTime:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 5000
+          description: Health Check 응답 시간 (밀리초). DOWN 시 null
+          example: 45
+        memoryUsage:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 8192
+          description: JVM 메모리 사용량 (메가바이트). DOWN 시 null
+          example: 128
+        errorType:
+          type: string
+          nullable: true
+          enum: [TIMEOUT, HTTP_ERROR, NETWORK_ERROR, null]
+          description: DOWN 상태 시 오류 유형. UP 시 null
+          example: TIMEOUT
+        errorMessage:
+          type: string
+          nullable: true
+          maxLength: 256
+          description: DOWN 상태 시 오류 메시지. UP 시 null
+          example: "Health check 응답 시간 초과 (>3초)"
+
+    TpsMetrics:
+      type: object
+      description: 거래량 메트릭 (집계)
+      required:
+        - current
+        - average
+        - max
+      properties:
+        current:
+          type: integer
+          minimum: 0
+          maximum: 10000
+          description: 현재 TPS (초당 거래 수)
+          example: 87
+        average:
+          type: integer
+          minimum: 0
+          description: 1시간 평균 TPS
+          example: 65
+        max:
+          type: integer
+          minimum: 0
+          description: 1시간 최대 TPS
+          example: 150
+
+    AlertMetrics:
+      type: object
+      description: 알림 발생률 메트릭 (집계)
+      required:
+        - current
+        - average
+        - max
+        - byRule
+      properties:
+        current:
+          type: integer
+          minimum: 0
+          maximum: 1000
+          description: 현재 분당 알림 수
+          example: 12
+        average:
+          type: integer
+          minimum: 0
+          description: 1시간 평균 알림 발생률
+          example: 8
+        max:
+          type: integer
+          minimum: 0
+          description: 1시간 최대 알림 발생률
+          example: 25
+        byRule:
+          type: object
+          description: 규칙별 알림 수
+          required:
+            - HIGH_VALUE
+            - FOREIGN_COUNTRY
+            - HIGH_FREQUENCY
+          properties:
+            HIGH_VALUE:
+              type: integer
+              minimum: 0
+              example: 5
+            FOREIGN_COUNTRY:
+              type: integer
+              minimum: 0
+              example: 4
+            HIGH_FREQUENCY:
+              type: integer
+              minimum: 0
+              example: 3
+
+    ErrorResponse:
+      type: object
+      description: 오류 응답
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: 오류 발생 시각
+          example: "2025-11-12T10:30:05Z"
+        status:
+          type: integer
+          description: HTTP 상태 코드
+          example: 500
+        error:
+          type: string
+          description: 오류 유형
+          example: "Internal Server Error"
+        message:
+          type: string
+          description: 오류 메시지 (한글)
+          example: "메트릭 데이터를 조회할 수 없습니다"
+        path:
+          type: string
+          description: 요청 경로
+          example: "/api/v1/metrics/current"
+
+  securitySchemes: {}
+
+security: []
