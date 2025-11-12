@@ -71,6 +71,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:7.4") // JSON 로깅
 
+    // Lombok (Java 클래스용 - @Slf4j 등)
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
     // 개발 도구
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

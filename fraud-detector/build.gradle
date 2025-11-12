@@ -137,6 +137,14 @@ shadowJar {
 // build 태스크가 shadowJar를 포함하도록 설정
 build.dependsOn shadowJar
 
+// application plugin의 distribution 태스크 비활성화 (shadowJar만 사용)
+tasks.named('distTar').configure { enabled = false }
+tasks.named('distZip').configure { enabled = false }
+tasks.named('startScripts').configure { enabled = false }
+tasks.named('startShadowScripts').configure { enabled = false }
+tasks.named('shadowDistTar').configure { enabled = false }
+tasks.named('shadowDistZip').configure { enabled = false }
+
 // JaCoCo 커버리지 설정
 jacoco {
     toolVersion = "0.8.11"

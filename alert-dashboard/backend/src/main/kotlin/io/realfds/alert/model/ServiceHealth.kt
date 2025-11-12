@@ -143,4 +143,45 @@ data class ServiceHealth(
         HTTP_ERROR,     // HTTP 4xx/5xx 에러
         NETWORK_ERROR   // 네트워크 연결 실패 (Connection Refused, DNS 실패)
     }
+
+    companion object {
+        /**
+         * Java 호환을 위한 Builder 패턴 지원
+         */
+        @JvmStatic
+        fun builder(): ServiceHealthBuilder = ServiceHealthBuilder()
+    }
+
+    /**
+     * Java 호환 Builder 클래스
+     */
+    class ServiceHealthBuilder {
+        private var serviceName: String? = null
+        private var status: ServiceStatus? = null
+        private var lastChecked: Instant? = null
+        private var responseTime: Long? = null
+        private var memoryUsage: Long? = null
+        private var errorType: ErrorType? = null
+        private var errorMessage: String? = null
+
+        fun serviceName(serviceName: String) = apply { this.serviceName = serviceName }
+        fun status(status: ServiceStatus) = apply { this.status = status }
+        fun lastChecked(lastChecked: Instant) = apply { this.lastChecked = lastChecked }
+        fun responseTime(responseTime: Long?) = apply { this.responseTime = responseTime }
+        fun memoryUsage(memoryUsage: Long?) = apply { this.memoryUsage = memoryUsage }
+        fun errorType(errorType: ErrorType?) = apply { this.errorType = errorType }
+        fun errorMessage(errorMessage: String?) = apply { this.errorMessage = errorMessage }
+
+        fun build(): ServiceHealth {
+            return ServiceHealth(
+                serviceName = requireNotNull(serviceName) { "serviceName is required" },
+                status = requireNotNull(status) { "status is required" },
+                lastChecked = requireNotNull(lastChecked) { "lastChecked is required" },
+                responseTime = responseTime,
+                memoryUsage = memoryUsage,
+                errorType = errorType,
+                errorMessage = errorMessage
+            )
+        }
+    }
 }
