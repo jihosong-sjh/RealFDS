@@ -71,15 +71,86 @@ flink-savepoints/
 *.log
 
 # ============================================
+# Kafka
+# ============================================
+kafka-data/
+kafka-logs/
+zookeeper-data/
+*.jks
+*.truststore
+*.keystore
+kafka.properties.local
+consumer.properties.local
+producer.properties.local
+
+# ============================================
 # 환경 변수 및 비밀 정보
 # ============================================
 .env
+.env*
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.staging
 *.secret
 credentials.json
+secrets.yaml
+secrets.yml
 *.key
 *.pem
+*.cert
+*.crt
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+config.local.*
+application-local.properties
+application-local.yml
+application-local.yaml
+application-*.properties
+application-secret*.yml
+
+# Kubernetes Secrets
+k8s/**/*-secret.yaml
+k8s/**/*-secrets.yaml
+k8s/**/secret-*.yaml
+k8s/overlays/*/secrets/
+**/kustomization-local.yaml
+
+# 데이터베이스 관련
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz
+*.dump
+*.backup
+postgres-data/
+postgresql-data/
+db-backups/
+*.mdf
+*.ldf
+
+# API Keys & Tokens
+*.token
+.api-keys
+api-keys.json
+service-account*.json
+
+# AWS & Cloud Credentials
+.aws/
+.azure/
+.gcloud/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# 설정 파일 백업
+config.backup
+*.config.bak
+settings.local.*
 
 # ============================================
 # IDE 설정 파일
@@ -106,8 +177,36 @@ test-results/
 test-reports/
 
 # ============================================
+# 로그 및 모니터링
+# ============================================
+logs/
+*.log.*
+*.log.gz
+audit.log
+transaction-*.log
+fraud-detection-*.log
+alert-*.log
+monitoring-data/
+metrics-data/
+
+# ============================================
+# 민감 데이터 및 테스트 데이터
+# ============================================
+test-data/transactions/
+sample-transactions.json
+user-data/
+customer-data/
+*.csv.local
+sensitive-*.json
+mock-data.local.*
+
+# ============================================
 # 기타
 # ============================================
 *.bak
 *.orig
 *.rej
+.history/
+tmp/
+temp/
+*.tmp

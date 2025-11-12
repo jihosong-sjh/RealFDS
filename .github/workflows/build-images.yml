@@ -1,0 +1,109 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/realfds
+
+jobs:
+  # Docker 이미지 빌드 & Push
+  build-and-push:
+    name: Build ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: transaction-generator
+            context: ./transaction-generator
+            dockerfile: ./transaction-generator/Dockerfile
+          - service: fraud-detector
+            context: ./fraud-detector
+            dockerfile: ./fraud-detector/Dockerfile
+          - service: alert-service
+            context: ./alert-service
+            dockerfile: ./alert-service/Dockerfile
+          - service: websocket-gateway
+            context: ./websocket-gateway
+            dockerfile: ./websocket-gateway/Dockerfile
+          - service: alert-dashboard-backend
+            context: ./alert-dashboard/backend
+            dockerfile: ./alert-dashboard/backend/Dockerfile
+          - service: frontend-dashboard
+            context: ./frontend-dashboard
+            dockerfile: ./frontend-dashboard/Dockerfile
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            # Git tag (v1.2.3 → 1.2.3)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            # Branch name
+            type=ref,event=branch
+            # PR number
+            type=ref,event=pr
+            # Commit SHA
+            type=sha,prefix=sha-
+            # Latest tag for main branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Image digest
+        run: echo "Image pushed with digest ${{ steps.meta.outputs.digest }}"
+
+  # 빌드 완료 확인
+  build-success:
+    name: All Images Built
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Summary
+        run: |
+          echo "✅ All Docker images built and pushed successfully!"
+          echo "🏷️ Images available at: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-*"
+          echo "📦 Registry: GitHub Container Registry"

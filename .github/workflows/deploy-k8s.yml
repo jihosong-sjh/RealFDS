@@ -1,0 +1,191 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+env:
+  KUBECTL_VERSION: v1.28.0
+
+jobs:
+  deploy:
+    name: Deploy to K8s
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.ref_type }}" == "tag" ]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Update image tags
+        run: |
+          cd k8s/overlays/${{ steps.env.outputs.environment }}
+
+          # Determine image tag based on trigger
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            # Use semver tag (v1.2.3 → 1.2.3)
+            TAG=${GITHUB_REF#refs/tags/v}
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            TAG=latest
+          else
+            TAG=develop
+          fi
+
+          echo "Using image tag: $TAG"
+
+          # Update kustomization.yaml with new image tags
+          sed -i "s/newTag: .*/newTag: $TAG/" kustomization.yaml
+
+      - name: Deploy to Kubernetes
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+
+          echo "🚀 Deploying to $ENV environment..."
+
+          # Apply Kustomize configuration
+          kubectl apply -k k8s/overlays/$ENV/
+
+          echo "✅ Deployment initiated"
+
+      - name: Wait for deployments
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          NAMESPACE=realfds-$ENV
+
+          echo "⏳ Waiting for deployments to be ready..."
+
+          # Wait for each deployment to be ready (timeout: 5 minutes)
+          kubectl wait --for=condition=available --timeout=300s \
+            deployment/alert-service \
+            deployment/websocket-gateway \
+            deployment/alert-dashboard \
+            deployment/frontend-dashboard \
+            -n $NAMESPACE || EXIT_CODE=$?
+
+          if [ ! -z "$EXIT_CODE" ] && [ "$EXIT_CODE" != "0" ]; then
+            echo "❌ Deployment failed or timed out"
+            exit 1
+          fi
+
+          echo "✅ All deployments are ready"
+
+      - name: Verify deployment
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          NAMESPACE=realfds-$ENV
+
+          echo "🔍 Verifying deployment..."
+
+          # Check pod status
+          kubectl get pods -n $NAMESPACE
+
+          # Check services
+          kubectl get services -n $NAMESPACE
+
+          # Check if any pods are in error state
+          ERROR_PODS=$(kubectl get pods -n $NAMESPACE --field-selector=status.phase!=Running,status.phase!=Succeeded -o name | wc -l)
+
+          if [ "$ERROR_PODS" -gt "0" ]; then
+            echo "⚠️ Warning: $ERROR_PODS pod(s) not in Running state"
+            kubectl get pods -n $NAMESPACE --field-selector=status.phase!=Running,status.phase!=Succeeded
+          else
+            echo "✅ All pods are running successfully"
+          fi
+
+      - name: Health check
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          NAMESPACE=realfds-$ENV
+
+          echo "🏥 Running health checks..."
+
+          # Check alert-service health
+          kubectl run healthcheck --rm -i --restart=Never --image=curlimages/curl:latest -n $NAMESPACE -- \
+            curl -f http://alert-service:8081/actuator/health || echo "⚠️ alert-service health check failed"
+
+          # Check websocket-gateway health
+          kubectl run healthcheck --rm -i --restart=Never --image=curlimages/curl:latest -n $NAMESPACE -- \
+            curl -f http://websocket-gateway:8082/actuator/health || echo "⚠️ websocket-gateway health check failed"
+
+          # Check alert-dashboard health
+          kubectl run healthcheck --rm -i --restart=Never --image=curlimages/curl:latest -n $NAMESPACE -- \
+            curl -f http://alert-dashboard:8084/actuator/health || echo "⚠️ alert-dashboard health check failed"
+
+          echo "✅ Health checks completed"
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          NAMESPACE=realfds-$ENV
+
+          echo "📊 Deployment Summary"
+          echo "===================="
+          echo "Environment: $ENV"
+          echo "Namespace: $NAMESPACE"
+          echo "Git Ref: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+          echo ""
+          echo "Deployments:"
+          kubectl get deployments -n $NAMESPACE -o wide
+          echo ""
+          echo "Pods:"
+          kubectl get pods -n $NAMESPACE -o wide
+
+  # Slack notification (optional)
+  notify:
+    name: Notify deployment
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+
+    steps:
+      - name: Deployment result
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "✅ Deployment succeeded"
+          else
+            echo "❌ Deployment failed"
+          fi

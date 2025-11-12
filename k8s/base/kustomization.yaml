@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: realfds
+
+resources:
+  # Namespace
+  - namespace.yaml
+
+  # Configuration
+  - configmap.yaml
+
+  # Infrastructure
+  - kafka/zookeeper.yaml
+  - kafka/kafka.yaml
+  - postgresql/postgresql.yaml
+  - flink/flink-configuration-configmap.yaml
+  - flink/jobmanager.yaml
+  - flink/taskmanager.yaml
+
+  # Applications
+  - transaction-generator/deployment.yaml
+  - fraud-detector/job.yaml
+  - alert-service/deployment.yaml
+  - websocket-gateway/deployment.yaml
+  - alert-dashboard/deployment.yaml
+  - frontend-dashboard/deployment.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: realfds
+  app.kubernetes.io/managed-by: kustomize

@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: realfds-config
+  namespace: realfds
+data:
+  # Kafka Configuration
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  KAFKA_TRANSACTION_TOPIC: "virtual-transactions"
+  KAFKA_ALERT_TOPIC: "transaction-alerts"
+
+  # Zookeeper Configuration
+  ZOOKEEPER_CONNECT: "zookeeper:2181"
+
+  # PostgreSQL Configuration
+  POSTGRES_HOST: "postgresql"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "alertdb"
+
+  # Flink Configuration
+  FLINK_JOBMANAGER_HOST: "flink-jobmanager"
+  FLINK_JOBMANAGER_PORT: "8081"
+
+  # Service URLs
+  ALERT_SERVICE_URL: "http://alert-service:8081"
+  WEBSOCKET_GATEWAY_URL: "http://websocket-gateway:8082"
+  ALERT_DASHBOARD_URL: "http://alert-dashboard:8084"
+  FRONTEND_URL: "http://frontend-dashboard:8083"
+
+  # Application Configuration
+  TRANSACTION_RATE: "1"
+  LOG_LEVEL: "INFO"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: realfds-secrets
+  namespace: realfds
+type: Opaque
+stringData:
+  # PostgreSQL Credentials
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres123"
+
+  # R2DBC URL
+  R2DBC_URL: "r2dbc:postgresql://postgresql:5432/alertdb"
+  R2DBC_USERNAME: "postgres"
+  R2DBC_PASSWORD: "postgres123"

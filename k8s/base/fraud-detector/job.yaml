@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fraud-detector-job
+  namespace: realfds
+spec:
+  template:
+    metadata:
+      labels:
+        app: fraud-detector
+    spec:
+      containers:
+      - name: fraud-detector
+        image: ghcr.io/your-username/realfds-fraud-detector:latest
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: realfds-config
+              key: KAFKA_BOOTSTRAP_SERVERS
+        - name: FLINK_JOBMANAGER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: realfds-config
+              key: FLINK_JOBMANAGER_HOST
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      restartPolicy: OnFailure
+  backoffLimit: 3

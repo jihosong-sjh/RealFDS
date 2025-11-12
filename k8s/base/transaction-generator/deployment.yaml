@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-generator
+  namespace: realfds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-generator
+  template:
+    metadata:
+      labels:
+        app: transaction-generator
+    spec:
+      containers:
+      - name: transaction-generator
+        image: ghcr.io/jihosong-sjh/realfds-transaction-generator:latest
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: realfds-config
+              key: KAFKA_BOOTSTRAP_SERVERS
+        - name: KAFKA_TRANSACTION_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: realfds-config
+              key: KAFKA_TRANSACTION_TOPIC
+        - name: TRANSACTION_RATE
+          valueFrom:
+            configMapKeyRef:
+              name: realfds-config
+              key: TRANSACTION_RATE
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+      restartPolicy: Always

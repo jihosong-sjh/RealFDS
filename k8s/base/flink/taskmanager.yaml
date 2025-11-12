@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+  namespace: realfds
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flink
+      component: taskmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: taskmanager
+    spec:
+      containers:
+      - name: taskmanager
+        image: flink:1.18-scala_2.12-java11
+        args: ["taskmanager"]
+        ports:
+        - containerPort: 6122
+          name: rpc
+        env:
+        - name: FLINK_PROPERTIES
+          value: |
+            jobmanager.rpc.address: flink-jobmanager
+            taskmanager.numberOfTaskSlots: 4
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: flink-config-volume
+          mountPath: /opt/flink/conf
+        - name: checkpoints
+          mountPath: /flink-checkpoints
+        - name: savepoints
+          mountPath: /flink-savepoints
+      volumes:
+      - name: flink-config-volume
+        configMap:
+          name: flink-config
+      - name: checkpoints
+        persistentVolumeClaim:
+          claimName: flink-checkpoints-pvc
+      - name: savepoints
+        persistentVolumeClaim:
+          claimName: flink-savepoints-pvc

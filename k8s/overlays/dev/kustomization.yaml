@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: realfds-dev
+
+bases:
+  - ../../base
+
+namePrefix: dev-
+
+nameSuffix: ""
+
+commonLabels:
+  environment: dev
+
+patches:
+  # Reduce replicas for dev environment
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: alert-service
+
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: websocket-gateway
+
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: alert-dashboard
+
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: frontend-dashboard
+
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: flink-taskmanager
+
+images:
+  - name: ghcr.io/jihosong-sjh/realfds-transaction-generator
+    newTag: develop
+  - name: ghcr.io/jihosong-sjh/realfds-fraud-detector
+    newTag: develop
+  - name: ghcr.io/jihosong-sjh/realfds-alert-service
+    newTag: develop
+  - name: ghcr.io/jihosong-sjh/realfds-websocket-gateway
+    newTag: develop
+  - name: ghcr.io/jihosong-sjh/realfds-alert-dashboard-backend
+    newTag: develop
+  - name: ghcr.io/jihosong-sjh/realfds-frontend-dashboard
+    newTag: develop
+
+configMapGenerator:
+  - name: realfds-config
+    behavior: merge
+    literals:
+      - LOG_LEVEL=DEBUG
+      - TRANSACTION_RATE=2

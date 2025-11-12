@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: realfds
+  labels:
+    app.kubernetes.io/name: realfds
+    app.kubernetes.io/component: infrastructure
