@@ -23,6 +23,7 @@ tests/
 
 ## Recent Changes
 - 003-alert-history: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+- 003-alert-history: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 - 001-realtime-fds: Added
 

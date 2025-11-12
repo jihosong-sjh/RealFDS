@@ -1,0 +1,588 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WebSocket Messages for Dashboard Realtime",
+  "description": "실시간 시스템 대시보드 WebSocket 메시지 형식 정의 (JSON Schema)",
+  "version": "1.0.0",
+  "definitions": {
+    "ServiceHealth": {
+      "type": "object",
+      "title": "서비스 Health Check 상태",
+      "description": "마이크로서비스의 현재 상태 및 성능 지표",
+      "required": ["serviceName", "status", "lastChecked"],
+      "properties": {
+        "serviceName": {
+          "type": "string",
+          "enum": [
+            "transaction-generator",
+            "fraud-detector",
+            "alert-service",
+            "websocket-gateway",
+            "frontend-dashboard"
+          ],
+          "description": "서비스 식별자"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["UP", "DOWN"],
+          "description": "현재 서비스 상태"
+        },
+        "lastChecked": {
+          "type": "string",
+          "format": "date-time",
+          "description": "마지막 Health Check 수행 시각 (ISO-8601)"
+        },
+        "responseTime": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Health Check 응답 시간 (밀리초). DOWN 시 null"
+        },
+        "memoryUsage": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 8192,
+          "description": "JVM 메모리 사용량 (메가바이트). DOWN 시 null"
+        },
+        "errorType": {
+          "type": ["string", "null"],
+          "enum": ["TIMEOUT", "HTTP_ERROR", "NETWORK_ERROR", null],
+          "description": "DOWN 상태 시 오류 유형. UP 시 null"
+        },
+        "errorMessage": {
+          "type": ["string", "null"],
+          "maxLength": 256,
+          "description": "DOWN 상태 시 오류 상세 메시지. UP 시 null"
+        }
+      },
+      "examples": [
+        {
+          "serviceName": "transaction-generator",
+          "status": "UP",
+          "lastChecked": "2025-11-12T10:30:05Z",
+          "responseTime": 45,
+          "memoryUsage": 128,
+          "errorType": null,
+          "errorMessage": null
+        },
+        {
+          "serviceName": "fraud-detector",
+          "status": "DOWN",
+          "lastChecked": "2025-11-12T10:30:02Z",
+          "responseTime": null,
+          "memoryUsage": null,
+          "errorType": "TIMEOUT",
+          "errorMessage": "Health check 응답 시간 초과 (>3초)"
+        }
+      ]
+    },
+    "TransactionMetrics": {
+      "type": "object",
+      "title": "거래량 메트릭 데이터 포인트",
+      "description": "특정 시점의 TPS (초당 거래 수) 데이터",
+      "required": ["timestamp", "tps", "totalTransactions"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "메트릭 측정 시각 (ISO-8601, 5초 간격)"
+        },
+        "tps": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "초당 거래 수 (Transactions Per Second)"
+        },
+        "totalTransactions": {
+          "type": "number",
+          "minimum": 0,
+          "description": "시스템 시작 이후 누적 거래 수"
+        }
+      },
+      "examples": [
+        {
+          "timestamp": "2025-11-12T09:30:05Z",
+          "tps": 60,
+          "totalTransactions": 216000
+        }
+      ]
+    },
+    "AlertMetrics": {
+      "type": "object",
+      "title": "알림 발생률 메트릭 데이터 포인트",
+      "description": "특정 시점의 분당 알림 수 및 규칙별 분류",
+      "required": ["timestamp", "alertsPerMinute", "byRule"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "메트릭 측정 시각 (ISO-8601, 5초 간격)"
+        },
+        "alertsPerMinute": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "분당 총 알림 발생 수"
+        },
+        "byRule": {
+          "type": "object",
+          "description": "규칙별 알림 발생 수",
+          "required": ["HIGH_VALUE", "FOREIGN_COUNTRY", "HIGH_FREQUENCY"],
+          "properties": {
+            "HIGH_VALUE": {
+              "type": "number",
+              "minimum": 0,
+              "description": "고액 거래 규칙 알림 수"
+            },
+            "FOREIGN_COUNTRY": {
+              "type": "number",
+              "minimum": 0,
+              "description": "해외 국가 규칙 알림 수"
+            },
+            "HIGH_FREQUENCY": {
+              "type": "number",
+              "minimum": 0,
+              "description": "고빈도 거래 규칙 알림 수"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "examples": [
+        {
+          "timestamp": "2025-11-12T09:30:05Z",
+          "alertsPerMinute": 8,
+          "byRule": {
+            "HIGH_VALUE": 3,
+            "FOREIGN_COUNTRY": 3,
+            "HIGH_FREQUENCY": 2
+          }
+        }
+      ]
+    },
+    "TpsAggregated": {
+      "type": "object",
+      "title": "거래량 메트릭 집계",
+      "description": "현재, 평균, 최대 TPS 및 1시간 히스토리",
+      "required": ["current", "average", "max", "history"],
+      "properties": {
+        "current": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "현재 TPS"
+        },
+        "average": {
+          "type": "number",
+          "minimum": 0,
+          "description": "1시간 평균 TPS"
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "1시간 최대 TPS"
+        },
+        "history": {
+          "type": "array",
+          "maxItems": 720,
+          "items": {
+            "$ref": "#/definitions/TransactionMetrics"
+          },
+          "description": "최근 1시간 TPS 시계열 데이터 (최대 720개)"
+        }
+      }
+    },
+    "AlertsAggregated": {
+      "type": "object",
+      "title": "알림 발생률 메트릭 집계",
+      "description": "현재, 평균, 최대 알림 발생률 및 1시간 히스토리",
+      "required": ["current", "average", "max", "byRule", "history"],
+      "properties": {
+        "current": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "현재 분당 알림 수"
+        },
+        "average": {
+          "type": "number",
+          "minimum": 0,
+          "description": "1시간 평균 알림 발생률"
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0,
+          "description": "1시간 최대 알림 발생률"
+        },
+        "byRule": {
+          "type": "object",
+          "description": "현재 규칙별 알림 수",
+          "required": ["HIGH_VALUE", "FOREIGN_COUNTRY", "HIGH_FREQUENCY"],
+          "properties": {
+            "HIGH_VALUE": {
+              "type": "number",
+              "minimum": 0
+            },
+            "FOREIGN_COUNTRY": {
+              "type": "number",
+              "minimum": 0
+            },
+            "HIGH_FREQUENCY": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "history": {
+          "type": "array",
+          "maxItems": 720,
+          "items": {
+            "$ref": "#/definitions/AlertMetrics"
+          },
+          "description": "최근 1시간 알림 발생률 시계열 데이터 (최대 720개)"
+        }
+      }
+    },
+    "ErrorDetails": {
+      "type": "object",
+      "title": "에러 상세 정보",
+      "description": "서버 측 오류 발생 시 전달되는 정보",
+      "required": ["code", "message"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_MESSAGE_FORMAT",
+            "BACKFILL_TOO_OLD",
+            "INTERNAL_SERVER_ERROR",
+            "SERVICE_UNAVAILABLE"
+          ],
+          "description": "에러 코드"
+        },
+        "message": {
+          "type": "string",
+          "description": "에러 메시지 (한글)"
+        },
+        "details": {
+          "type": "string",
+          "description": "에러 상세 정보 (선택적)"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/MetricsUpdateMessage"
+    },
+    {
+      "$ref": "#/definitions/BackfillRequestMessage"
+    },
+    {
+      "$ref": "#/definitions/BackfillResponseMessage"
+    },
+    {
+      "$ref": "#/definitions/ErrorMessage"
+    }
+  ],
+  "$defs": {
+    "MetricsUpdateMessage": {
+      "type": "object",
+      "title": "METRICS_UPDATE 메시지",
+      "description": "서버 → 클라이언트: 5초마다 최신 메트릭 데이터 브로드캐스트",
+      "required": ["type", "timestamp", "data"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "METRICS_UPDATE",
+          "description": "메시지 타입"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "메시지 생성 시각 (ISO-8601)"
+        },
+        "data": {
+          "type": "object",
+          "required": ["services", "tps", "alerts"],
+          "properties": {
+            "services": {
+              "type": "array",
+              "minItems": 5,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/definitions/ServiceHealth"
+              },
+              "description": "5개 서비스의 현재 상태"
+            },
+            "tps": {
+              "$ref": "#/definitions/TpsAggregated",
+              "description": "거래량 메트릭"
+            },
+            "alerts": {
+              "$ref": "#/definitions/AlertsAggregated",
+              "description": "알림 발생률 메트릭"
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "type": "METRICS_UPDATE",
+          "timestamp": "2025-11-12T10:30:05Z",
+          "data": {
+            "services": [
+              {
+                "serviceName": "transaction-generator",
+                "status": "UP",
+                "lastChecked": "2025-11-12T10:30:05Z",
+                "responseTime": 45,
+                "memoryUsage": 128,
+                "errorType": null,
+                "errorMessage": null
+              },
+              {
+                "serviceName": "fraud-detector",
+                "status": "UP",
+                "lastChecked": "2025-11-12T10:30:05Z",
+                "responseTime": 92,
+                "memoryUsage": 1024,
+                "errorType": null,
+                "errorMessage": null
+              },
+              {
+                "serviceName": "alert-service",
+                "status": "DOWN",
+                "lastChecked": "2025-11-12T10:30:02Z",
+                "responseTime": null,
+                "memoryUsage": null,
+                "errorType": "TIMEOUT",
+                "errorMessage": "Health check 응답 시간 초과 (>3초)"
+              },
+              {
+                "serviceName": "websocket-gateway",
+                "status": "UP",
+                "lastChecked": "2025-11-12T10:30:05Z",
+                "responseTime": 38,
+                "memoryUsage": 256,
+                "errorType": null,
+                "errorMessage": null
+              },
+              {
+                "serviceName": "frontend-dashboard",
+                "status": "UP",
+                "lastChecked": "2025-11-12T10:30:05Z",
+                "responseTime": 15,
+                "memoryUsage": 512,
+                "errorType": null,
+                "errorMessage": null
+              }
+            ],
+            "tps": {
+              "current": 87,
+              "average": 65,
+              "max": 150,
+              "history": [
+                {
+                  "timestamp": "2025-11-12T09:30:05Z",
+                  "tps": 60,
+                  "totalTransactions": 216000
+                },
+                {
+                  "timestamp": "2025-11-12T09:30:10Z",
+                  "tps": 65,
+                  "totalTransactions": 216325
+                }
+              ]
+            },
+            "alerts": {
+              "current": 12,
+              "average": 8,
+              "max": 25,
+              "byRule": {
+                "HIGH_VALUE": 5,
+                "FOREIGN_COUNTRY": 4,
+                "HIGH_FREQUENCY": 3
+              },
+              "history": [
+                {
+                  "timestamp": "2025-11-12T09:30:05Z",
+                  "alertsPerMinute": 8,
+                  "byRule": {
+                    "HIGH_VALUE": 3,
+                    "FOREIGN_COUNTRY": 3,
+                    "HIGH_FREQUENCY": 2
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "BackfillRequestMessage": {
+      "type": "object",
+      "title": "BACKFILL_REQUEST 메시지",
+      "description": "클라이언트 → 서버: 재연결 시 누락된 메트릭 데이터 요청",
+      "required": ["type", "lastReceivedTimestamp"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "BACKFILL_REQUEST",
+          "description": "메시지 타입"
+        },
+        "lastReceivedTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "클라이언트가 마지막으로 수신한 METRICS_UPDATE의 timestamp"
+        }
+      },
+      "examples": [
+        {
+          "type": "BACKFILL_REQUEST",
+          "lastReceivedTimestamp": "2025-11-12T10:25:00Z"
+        }
+      ]
+    },
+    "BackfillResponseMessage": {
+      "type": "object",
+      "title": "BACKFILL_RESPONSE 메시지",
+      "description": "서버 → 클라이언트: 누락된 메트릭 데이터 전송",
+      "required": ["type", "data"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "BACKFILL_RESPONSE",
+          "description": "메시지 타입"
+        },
+        "data": {
+          "type": "array",
+          "maxItems": 720,
+          "items": {
+            "type": "object",
+            "required": [
+              "timestamp",
+              "tps",
+              "totalTransactions",
+              "alertsPerMinute",
+              "byRule"
+            ],
+            "properties": {
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "측정 시각"
+              },
+              "tps": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000,
+                "description": "초당 거래 수"
+              },
+              "totalTransactions": {
+                "type": "number",
+                "minimum": 0,
+                "description": "누적 거래 수"
+              },
+              "alertsPerMinute": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000,
+                "description": "분당 알림 수"
+              },
+              "byRule": {
+                "type": "object",
+                "required": ["HIGH_VALUE", "FOREIGN_COUNTRY", "HIGH_FREQUENCY"],
+                "properties": {
+                  "HIGH_VALUE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "FOREIGN_COUNTRY": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "HIGH_FREQUENCY": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "lastReceivedTimestamp 이후의 모든 메트릭 데이터 포인트 (시간 순서)"
+        }
+      },
+      "examples": [
+        {
+          "type": "BACKFILL_RESPONSE",
+          "data": [
+            {
+              "timestamp": "2025-11-12T10:25:05Z",
+              "tps": 65,
+              "totalTransactions": 234000,
+              "alertsPerMinute": 8,
+              "byRule": {
+                "HIGH_VALUE": 3,
+                "FOREIGN_COUNTRY": 3,
+                "HIGH_FREQUENCY": 2
+              }
+            },
+            {
+              "timestamp": "2025-11-12T10:25:10Z",
+              "tps": 70,
+              "totalTransactions": 234350,
+              "alertsPerMinute": 9,
+              "byRule": {
+                "HIGH_VALUE": 4,
+                "FOREIGN_COUNTRY": 3,
+                "HIGH_FREQUENCY": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "ErrorMessage": {
+      "type": "object",
+      "title": "ERROR 메시지",
+      "description": "서버 → 클라이언트: 서버 측 오류 발생 시 전송",
+      "required": ["type", "timestamp", "error"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "ERROR",
+          "description": "메시지 타입"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "메시지 생성 시각"
+        },
+        "error": {
+          "$ref": "#/definitions/ErrorDetails",
+          "description": "에러 상세 정보"
+        }
+      },
+      "examples": [
+        {
+          "type": "ERROR",
+          "timestamp": "2025-11-12T10:30:05Z",
+          "error": {
+            "code": "INVALID_MESSAGE_FORMAT",
+            "message": "메시지 형식이 유효하지 않습니다",
+            "details": "JSON 파싱 실패: Unexpected token at position 10"
+          }
+        },
+        {
+          "type": "ERROR",
+          "timestamp": "2025-11-12T10:30:05Z",
+          "error": {
+            "code": "BACKFILL_TOO_OLD",
+            "message": "백필 요청 시각이 1시간 이상 이전입니다. 페이지를 새로고침하세요."
+          }
+        }
+      ]
+    }
+  }
+}
